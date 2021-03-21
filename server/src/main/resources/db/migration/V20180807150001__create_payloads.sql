@@ -1,0 +1,8 @@
+CREATE TABLE payloads (
+  id SERIAL PRIMARY KEY,
+  payload JSONB NOT NULL DEFAULT '{}'::JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TRIGGER payloads_update_updated_at BEFORE UPDATE ON payloads FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();

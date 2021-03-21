@@ -1,0 +1,380 @@
+swagger: '2.0'
+info:
+  version: 0.7.3
+  title: 'Job Scheduling Service'
+host: 0.0.0.0:8080
+schemes:
+  - http
+tags:
+  - name: Job Scheduling
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    in: header
+    name: Authorization
+paths:
+  /health:
+    get:
+      security: []
+      summary: healthcheck
+      operationId: healthcheck
+      x-scala-package: healthcheck
+      description: Ensure the service is responding to requests.
+      responses:
+        200:
+          description: Success
+        503:
+          description: Service not healthy
+          schema:
+            type: string
+  /organizations/{organizationId}/jobs:
+    get:
+      summary: get all an organizations jobs
+      description: ''
+      operationId: getAllJobs
+      x-scala-package: jobs
+      produces:
+        - application/json
+      parameters:
+        - name: organizationId
+          in: path
+          description: organization id
+          required: true
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: got jobs for that organization
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Job'
+        404:
+          description: no quota exists for organization
+        400:
+          description: request was malformed
+          schema:
+            type: string
+        403:
+          description: forbidden operation
+        500:
+          description: failed to process request
+          schema:
+            type: string
+      security:
+        - Bearer: []
+  /organizations/{organizationId}/jobs/{jobId}:
+    post:
+      summary: create a job for the given payload
+      description: ''
+      operationId: create
+      x-scala-package: jobs
+      produces:
+        - application/json
+      parameters:
+        - name: payload
+          in: body
+          description: payload to create the job with
+          required: true
+          schema:
+            type: object
+            x-scala-type: com.blackfynn.models.Payload
+        - name: organizationId
+          in: path
+          description: organization id
+          required: true
+          type: integer
+          format: int32
+        - name: jobId
+          in: path
+          description: unique id of job
+          required: true
+          type: string
+      responses:
+        201:
+          description: successfully created the job and payload
+          schema:
+            $ref: '#/definitions/Job'
+        202:
+          description: The job with the given id already exists. Does nothing with the request and returns the existing job
+          schema:
+            $ref: '#/definitions/Job'
+        400:
+          description: request was malformed
+          schema:
+            type: string
+        403:
+          description: forbidden operation
+        500:
+          description: failed to process request
+          schema:
+            type: string
+      security:
+        - Bearer: []
+    get:
+      summary: get a job by it's id
+      description: ''
+      operationId: getJob
+      x-scala-package: jobs
+      produces:
+        - application/json
+      parameters:
+        - name: organizationId
+          in: path
+          description: organization id
+          required: true
+          type: integer
+          format: int32
+        - name: jobId
+          in: path
+          description: job id aka importId
+          required: true
+          type: string
+      responses:
+        200:
+          description: got jobs for that organization
+          schema:
+            $ref: '#/definitions/Job'
+        404:
+          description: no quota exists for organization or jobId is not present in database
+          schema:
+            type: string
+        400:
+          description: request was malformed
+          schema:
+            type: string
+        403:
+          description: forbidden operation
+        500:
+          description: failed to process request
+          schema:
+            type: string
+      security:
+        - Bearer: []
+  /organizations/{organizationId}/jobs/{jobId}/upload-complete:
+    put:
+      summary: notify the Job Scheduling Service that an upload is complete
+      description:
+        'This endpoint indicates that an upload is complete. Can fail if job does not reference an Upload Payload'
+      operationId: completeUpload
+      x-scala-package: jobs
+      produces:
+        - application/json
+      parameters:
+        - name: organizationId
+          in: path
+          description: organization id
+          required: true
+          type: integer
+          format: int32
+        - name: jobId
+          in: path
+          description: job id aka importId
+          required: true
+          type: string
+        - name: uploadResult
+          in: body
+          description: details about the state of an upload job
+          required: true
+          schema:
+            $ref: '#/definitions/UploadResult'
+      responses:
+        200:
+          description: successful operation
+        202:
+          description: job already completed. Ignoring request.
+        400:
+          description: request was malformed
+          schema:
+            type: string
+        403:
+          description: forbidden operation
+        404:
+          description: no job was found matching that id
+        500:
+          description: failed to process request
+          schema:
+            type: string
+      security:
+        - Bearer: []
+  /organizations/{organizationId}/set/quota:
+    post:
+      summary: create an organization with a quota of jobs
+      description: ''
+      operationId: setQuota
+      x-scala-package: organizations
+      parameters:
+        - name: quota
+          in: body
+          description: quota to be added for the organization
+          required: true
+          schema:
+            $ref: '#/definitions/Quota'
+        - name: organizationId
+          in: path
+          description: organization id
+          required: true
+          type: integer
+          format: int32
+      responses:
+        201:
+          description: successfully added organization quota
+        403:
+          description: user does not have permission to create or update quota
+      security:
+        - Bearer: []
+  /organization/{organizationId}/datasets/{datasetId}/packages/{packageId}/state:
+    get:
+      summary: infer the state of a package from its jobs
+      description: ''
+      operationId: getPackageState
+      x-scala-package: jobs
+      parameters:
+        - name: organizationId
+          in: path
+          description: organization id
+          required: true
+          type: integer
+          format: int32
+        - name: datasetId
+          in: path
+          description: dataset id
+          required: true
+          type: integer
+          format: int32
+        - name: packageId
+          in: path
+          description: package id
+          required: true
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: succesfully retrieve package state
+          schema:
+            $ref: '#/definitions/PackageState'
+        400:
+          description: invalid request structure
+          schema:
+            type: string
+        403:
+          description: user does not have permission to access jobs
+        404:
+          description: Not found
+        500:
+          description: failed to process request
+          schema:
+            type: string
+      security:
+        - Bearer: []
+  /datasets/{datasetId}/packages/{packageId}/jobs:
+    get:
+      summary: get all the jobs for a package
+      description: ''
+      operationId: getPackageJobs
+      x-scala-package: jobs
+      parameters:
+        - name: datasetId
+          in: path
+          description: dataset id
+          required: true
+          type: integer
+          format: int32
+        - name: packageId
+          in: path
+          description: package id
+          required: true
+          type: integer
+          format: int32
+        - name: pageSize
+          in: query
+          description: the size of page max value is 1000
+          required: true
+          type: integer
+          format: int32
+          default: 100
+        - name: cursor
+          in: query
+          description: the cursor to get the next page if a page was truncated in the previous response
+          required: false
+          type: string
+      responses:
+        200:
+          description: successfully return jobs for a packageId
+          schema:
+            $ref: '#/definitions/JobPage'
+        400:
+          description: invalid request structure
+          schema:
+            type: string
+        404:
+          description: no jobs for specified package id
+        403:
+          description: user does not have permission to access jobs
+        500:
+          description: failed to process request
+          schema:
+            type: string
+      security:
+        - Bearer: []
+definitions:
+  Job:
+    type: object
+    required:
+      - id
+      - organizationId
+      - payloadId
+      - state
+      - createdAt
+      - updatedAt
+    properties:
+      id:
+        type: string
+        x-scala-type: java.util.UUID
+      organizationId:
+        type: integer
+        format: int32
+      userId:
+        type: integer
+        format: int32
+      payloadId:
+        type: integer
+        format: int32
+      state:
+        type: string
+        x-scala-type: com.blackfynn.jobscheduling.commons.JobState
+      createdAt:
+        type: string
+        format: date-time
+      updatedAt:
+        type: string
+        format: date-time
+  JobPage:
+    type: object
+    required:
+      - jobs
+    properties:
+      jobs:
+        type: array
+        items:
+          $ref: '#/definitions/Job'
+      cursor:
+        type: string
+  Quota:
+    type: object
+    required:
+      - slotsAllowed
+    properties:
+      slotsAllowed:
+        type: integer
+        format: int32
+  UploadResult:
+    type: object
+    required:
+      - isSuccess
+    properties:
+      isSuccess:
+        type: boolean
+  PackageState:
+    type: string
+    x-scala-type: com.blackfynn.models.PackageState

@@ -1,0 +1,11 @@
+CREATE TABLE jobs (
+  id UUID PRIMARY KEY,
+  organization_id INTEGER NOT NULL,
+  user_id INTEGER NOT NULL,
+  payload_id INTEGER NOT NULL REFERENCES payloads(id) ON DELETE CASCADE,
+  state VARCHAR(40) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TRIGGER jobs_update_updated_at BEFORE UPDATE ON jobs FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();

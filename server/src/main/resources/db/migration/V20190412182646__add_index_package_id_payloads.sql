@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY ON payloads (package_id);

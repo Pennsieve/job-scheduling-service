@@ -1,0 +1,31 @@
+.DS_Store
+
+.idea/
+*.class
+*.log
+
+# sbt specific
+.cache/
+.history/
+.lib/
+.bsp/
+dist/
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+project/metals.sbt
+
+# Other Scala build tools
+.bloop
+.ensime
+.ensime_cache
+.metals
+
+
+TAGS
+
+## Vim ##
+*.swp
+*.swo
