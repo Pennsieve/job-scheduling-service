@@ -1,6 +1,6 @@
-// Copyright (c) [2018] - [2020] Blackfynn, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.scheduler
+package com.pennsieve.jobscheduling.scheduler
 import akka.actor.Scheduler
 import akka.stream.scaladsl.{ Keep, Sink }
 import akka.stream.ActorMaterializer
@@ -10,25 +10,25 @@ import com.amazonaws.services.ecs.model.{
   StopTaskRequest,
   StopTaskResult
 }
-import com.blackfynn.jobscheduling.JobSchedulingPorts
-import com.blackfynn.jobscheduling.JobSchedulingPorts.{ createUpdateJob, UpdateJob }
-import com.blackfynn.jobscheduling.TestConfig.{
+import com.pennsieve.jobscheduling.JobSchedulingPorts
+import com.pennsieve.jobscheduling.JobSchedulingPorts.{ createUpdateJob, UpdateJob }
+import com.pennsieve.jobscheduling.TestConfig.{
   staticEcsConfig,
   staticJobSchedulerConfig,
   staticS3Config
 }
-import com.blackfynn.jobscheduling.db.JobsMapper
-import com.blackfynn.jobscheduling.model.ETLEvent
-import com.blackfynn.jobscheduling.pusher.JobPusherFakes.{
+import com.pennsieve.jobscheduling.db.JobsMapper
+import com.pennsieve.jobscheduling.model.ETLEvent
+import com.pennsieve.jobscheduling.pusher.JobPusherFakes.{
   defaultEcsConfig,
   defaultPusherConfig,
   successfulRunTask
 }
-import com.blackfynn.jobscheduling.pusher.JobPusherPorts.{ ListTasks, RunTask }
-import com.blackfynn.jobscheduling.pusher.{ JobPusher, JobPusherFakes, JobPusherPorts }
-import com.blackfynn.jobscheduling.watchdog.WatchDogPorts.{ DescribeTasks, StopTask }
-import com.blackfynn.service.utilities.ContextLogger
-import com.blackfynn.test.AwaitableImplicits
+import com.pennsieve.jobscheduling.pusher.JobPusherPorts.{ ListTasks, RunTask }
+import com.pennsieve.jobscheduling.pusher.{ JobPusher, JobPusherFakes, JobPusherPorts }
+import com.pennsieve.jobscheduling.watchdog.WatchDogPorts.{ DescribeTasks, StopTask }
+import com.pennsieve.service.utilities.ContextLogger
+import com.pennsieve.test.AwaitableImplicits
 
 import scala.concurrent.{ ExecutionContext, Future }
 

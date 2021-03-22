@@ -1,6 +1,6 @@
-// Copyright (c) [2018] - [2020] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.watchdog
+package com.pennsieve.jobscheduling.watchdog
 
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
@@ -13,37 +13,37 @@ import akka.stream.scaladsl.{ Keep, Sink, Source }
 import akka.testkit.TestKit
 import com.amazonaws.services.ecs.model.{ ContainerOverride, KeyValuePair, TaskOverride }
 import com.amazonaws.services.sqs.model.GetQueueAttributesResult
-import com.blackfynn.jobscheduling.Fakes.getManifest
-import com.blackfynn.jobscheduling.JobSchedulingPorts.{
+import com.pennsieve.jobscheduling.Fakes.getManifest
+import com.pennsieve.jobscheduling.JobSchedulingPorts.{
   createGetJob,
   createGetPayload,
   createUpdateJob,
   GetJob
 }
-import com.blackfynn.jobscheduling.TestConfig.{ staticS3Config, staticWatchDogConfig }
-import com.blackfynn.jobscheduling.TestPayload._
-import com.blackfynn.jobscheduling.TestTask._
-import com.blackfynn.jobscheduling._
-import com.blackfynn.jobscheduling.clients.SQSClient.{ GetNumberOfMessages, QueueName }
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.commons.JobState.{ Sent, Uploading }
-import com.blackfynn.jobscheduling.db.JobsMapper.update
-import com.blackfynn.jobscheduling.db._
-import com.blackfynn.jobscheduling.db.profile.api._
-import com.blackfynn.jobscheduling.handlers.JobsHandlerPorts.NotifyUpload
-import com.blackfynn.jobscheduling.model.EventualResult.EitherContext
-import com.blackfynn.jobscheduling.model.JobConverters.{
+import com.pennsieve.jobscheduling.TestConfig.{ staticS3Config, staticWatchDogConfig }
+import com.pennsieve.jobscheduling.TestPayload._
+import com.pennsieve.jobscheduling.TestTask._
+import com.pennsieve.jobscheduling._
+import com.pennsieve.jobscheduling.clients.SQSClient.{ GetNumberOfMessages, QueueName }
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.commons.JobState.{ Sent, Uploading }
+import com.pennsieve.jobscheduling.db.JobsMapper.update
+import com.pennsieve.jobscheduling.db._
+import com.pennsieve.jobscheduling.db.profile.api._
+import com.pennsieve.jobscheduling.handlers.JobsHandlerPorts.NotifyUpload
+import com.pennsieve.jobscheduling.model.EventualResult.EitherContext
+import com.pennsieve.jobscheduling.model.JobConverters.{
   payloadToManifest,
   ImportId,
   JobSchedulingService,
   PayloadId,
   RichJob
 }
-import com.blackfynn.jobscheduling.model._
-import com.blackfynn.jobscheduling.scheduler.JobQueued
-import com.blackfynn.jobscheduling.scheduler.JobSchedulerFakes.emptyDescribeTasks
-import com.blackfynn.jobscheduling.watchdog.JobStateWatchDogPorts.createGetJobsStuckInState
-import com.blackfynn.jobscheduling.watchdog.WatchDogPorts._
+import com.pennsieve.jobscheduling.model._
+import com.pennsieve.jobscheduling.scheduler.JobQueued
+import com.pennsieve.jobscheduling.scheduler.JobSchedulerFakes.emptyDescribeTasks
+import com.pennsieve.jobscheduling.watchdog.JobStateWatchDogPorts.createGetJobsStuckInState
+import com.pennsieve.jobscheduling.watchdog.WatchDogPorts._
 import org.scalatest.{ BeforeAndAfterEach, Matchers, WordSpecLike }
 
 import scala.concurrent.Future

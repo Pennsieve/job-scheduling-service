@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.watchdog
+package com.pennsieve.jobscheduling.watchdog
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
 import java.util.Date
@@ -11,17 +11,17 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{ Keep, Sink, Source }
 import cats.implicits._
 import com.amazonaws.services.ecs.model._
-import com.blackfynn.jobscheduling.JobSchedulingPorts.FinalSink
-import com.blackfynn.jobscheduling.{ JobSchedulingPorts, WatchDogConfig }
-import com.blackfynn.jobscheduling.clients.SQSClient.QueueName
-import com.blackfynn.jobscheduling.db.{ Job, TaskId }
-import com.blackfynn.jobscheduling.model.EventualResult.EventualResult
-import com.blackfynn.jobscheduling.model.JobConverters.JobSchedulingService
-import com.blackfynn.jobscheduling.model.Tick.Tick
-import com.blackfynn.jobscheduling.model._
-import com.blackfynn.jobscheduling.shapes.StreamRetry
-import com.blackfynn.models.JobId
-import com.blackfynn.service.utilities.{ ContextLogger, Tier }
+import com.pennsieve.jobscheduling.JobSchedulingPorts.FinalSink
+import com.pennsieve.jobscheduling.{ JobSchedulingPorts, WatchDogConfig }
+import com.pennsieve.jobscheduling.clients.SQSClient.QueueName
+import com.pennsieve.jobscheduling.db.{ Job, TaskId }
+import com.pennsieve.jobscheduling.model.EventualResult.EventualResult
+import com.pennsieve.jobscheduling.model.JobConverters.JobSchedulingService
+import com.pennsieve.jobscheduling.model.Tick.Tick
+import com.pennsieve.jobscheduling.model._
+import com.pennsieve.jobscheduling.shapes.StreamRetry
+import com.pennsieve.models.JobId
+import com.pennsieve.service.utilities.{ ContextLogger, Tier }
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }

@@ -1,10 +1,10 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling
+package com.pennsieve.jobscheduling
 
-import com.blackfynn.jobscheduling.model.ETLEvent
-import com.blackfynn.models.JobId
-import com.blackfynn.service.utilities.LogContext
+import com.pennsieve.jobscheduling.model.ETLEvent
+import com.pennsieve.models.JobId
+import com.pennsieve.service.utilities.LogContext
 
 final case class ETLLogContext(
   importId: Option[JobId] = None,

@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.shapes
+package com.pennsieve.jobscheduling.shapes
 
 import akka.NotUsed
 import akka.stream.scaladsl.{ Flow, GraphDSL, Keep, Sink, Source }

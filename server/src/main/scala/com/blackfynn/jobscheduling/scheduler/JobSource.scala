@@ -1,14 +1,14 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.scheduler
+package com.pennsieve.jobscheduling.scheduler
 
 import akka.actor.Scheduler
 import akka.pattern.after
 import akka.stream._
 import akka.stream.stage.{ GraphStage, GraphStageLogic, OutHandler }
-import com.blackfynn.jobscheduling.db.Job
-import com.blackfynn.jobscheduling.scheduler.JobSchedulerPorts.GetNextJob
-import com.blackfynn.service.utilities.ContextLogger
+import com.pennsieve.jobscheduling.db.Job
+import com.pennsieve.jobscheduling.scheduler.JobSchedulerPorts.GetNextJob
+import com.pennsieve.service.utilities.ContextLogger
 import io.circe.syntax.EncoderOps
 
 import scala.concurrent.duration.DurationInt

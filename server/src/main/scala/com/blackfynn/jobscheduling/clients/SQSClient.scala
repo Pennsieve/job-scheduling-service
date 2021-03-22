@@ -1,11 +1,11 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.clients
+package com.pennsieve.jobscheduling.clients
 
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model._
-import com.blackfynn.jobscheduling.clients.AwsAsyncCallback.async
-import com.blackfynn.jobscheduling.model.EventualResult.EventualResult
+import com.pennsieve.jobscheduling.clients.AwsAsyncCallback.async
+import com.pennsieve.jobscheduling.model.EventualResult.EventualResult
 import io.circe.Encoder
 import io.circe.generic.extras.semiauto.deriveUnwrappedEncoder
 

@@ -1,6 +1,6 @@
-// Copyright (c) [2018] - [2020] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.monitor
+package com.pennsieve.jobscheduling.monitor
 
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
@@ -14,7 +14,7 @@ import akka.stream.scaladsl.{ Sink, Source }
 import akka.testkit.TestKit
 import cats.data.EitherT
 import com.amazonaws.services.sqs.model.{ DeleteMessageResult, Message, SendMessageResult }
-import com.blackfynn.jobscheduling.JobSchedulingPorts.{
+import com.pennsieve.jobscheduling.JobSchedulingPorts.{
   createGetJob,
   createUpdateJob,
   GetJob,
@@ -25,34 +25,34 @@ import com.blackfynn.jobscheduling.JobSchedulingPorts.{
 }
 
 import scala.concurrent.duration.FiniteDuration
-import com.blackfynn.jobscheduling.{
+import com.pennsieve.jobscheduling.{
   JobMonitorConfig,
   JobSchedulingServiceSpecHarness,
   RetryConfig
 }
-import com.blackfynn.jobscheduling.Fakes._
-import com.blackfynn.jobscheduling.TestPayload._
-import com.blackfynn.jobscheduling.TestTask.taskId
-import com.blackfynn.jobscheduling.clients.SQSClient.{
+import com.pennsieve.jobscheduling.Fakes._
+import com.pennsieve.jobscheduling.TestPayload._
+import com.pennsieve.jobscheduling.TestTask.taskId
+import com.pennsieve.jobscheduling.clients.SQSClient.{
   MessageBody,
   ReceiptHandle,
   SendAck,
   SendMessage
 }
-import com.blackfynn.jobscheduling.db.JobsMapper.createWithPayload
-import com.blackfynn.jobscheduling.db.profile.api._
-import com.blackfynn.jobscheduling.db.{
+import com.pennsieve.jobscheduling.db.JobsMapper.createWithPayload
+import com.pennsieve.jobscheduling.db.profile.api._
+import com.pennsieve.jobscheduling.db.{
   Job,
   JobsMapper,
   OrganizationQuotaMapper,
   PayloadEntry,
   TaskId
 }
-import com.blackfynn.jobscheduling.model.EventualResult.EitherContext
-import com.blackfynn.jobscheduling.model.{ ETLEvent, ManifestUri }
-import com.blackfynn.jobscheduling.clients.Notifications._
-import com.blackfynn.models.{ PayloadType, _ }
-import com.blackfynn.notifications.{
+import com.pennsieve.jobscheduling.model.EventualResult.EitherContext
+import com.pennsieve.jobscheduling.model.{ ETLEvent, ManifestUri }
+import com.pennsieve.jobscheduling.clients.Notifications._
+import com.pennsieve.models.{ PayloadType, _ }
+import com.pennsieve.notifications.{
   ETLExportNotification,
   ETLNotification,
   MessageType,
@@ -64,11 +64,11 @@ import io.circe.generic.semiauto._
 import io.circe.syntax.EncoderOps
 import org.scalatest._
 import cats.implicits._
-import com.blackfynn.auth.middleware.{ OrganizationId, UserId }
-import com.blackfynn.jobscheduling.clients.PennsieveApiClient
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.commons.JobState._
-import com.blackfynn.jobscheduling.db.JobStateHelpers._
+import com.pennsieve.auth.middleware.{ OrganizationId, UserId }
+import com.pennsieve.jobscheduling.clients.PennsieveApiClient
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.commons.JobState._
+import com.pennsieve.jobscheduling.db.JobStateHelpers._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future, Promise }

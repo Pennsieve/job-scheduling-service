@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling
+package com.pennsieve.jobscheduling
 import java.time.OffsetDateTime
 
 import akka.Done
@@ -10,29 +10,29 @@ import cats.implicits._
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.services.sqs.model.SendMessageResult
 import com.amazonaws.services.sqs.{ AmazonSQSAsync, AmazonSQSAsyncClientBuilder }
-import com.blackfynn.auth.middleware.Jwt
-import com.blackfynn.jobscheduling.clients.SQSClient.MessageBody
-import com.blackfynn.jobscheduling.clients.{ ECSClient, ManifestS3Client }
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.db.JobsMapper.get
-import com.blackfynn.jobscheduling.db.profile.api._
-import com.blackfynn.jobscheduling.db._
-import com.blackfynn.jobscheduling.errors.{
+import com.pennsieve.auth.middleware.Jwt
+import com.pennsieve.jobscheduling.clients.SQSClient.MessageBody
+import com.pennsieve.jobscheduling.clients.{ ECSClient, ManifestS3Client }
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.db.JobsMapper.get
+import com.pennsieve.jobscheduling.db.profile.api._
+import com.pennsieve.jobscheduling.db._
+import com.pennsieve.jobscheduling.errors.{
   NoPayloadException,
   NoTaskException,
   UnsupportedPayload
 }
-import com.blackfynn.jobscheduling.handlers.JobsHandlerPorts.NotifyUpload
-import com.blackfynn.jobscheduling.model.EventualResult.{
+import com.pennsieve.jobscheduling.handlers.JobsHandlerPorts.NotifyUpload
+import com.pennsieve.jobscheduling.model.EventualResult.{
   EitherContext,
   EventualResult,
   EventualResultContext
 }
-import com.blackfynn.jobscheduling.model.JobConverters.payloadToManifest
-import com.blackfynn.jobscheduling.model.{ ETLEvent, ManifestUri }
-import com.blackfynn.jobscheduling.scheduler.{ JobNotQueued, JobQueued, JobScheduler }
-import com.blackfynn.models.{ JobId, Manifest, Payload, Upload }
-import com.blackfynn.service.utilities.{ ContextLogger, Tier }
+import com.pennsieve.jobscheduling.model.JobConverters.payloadToManifest
+import com.pennsieve.jobscheduling.model.{ ETLEvent, ManifestUri }
+import com.pennsieve.jobscheduling.scheduler.{ JobNotQueued, JobQueued, JobScheduler }
+import com.pennsieve.models.{ JobId, Manifest, Payload, Upload }
+import com.pennsieve.service.utilities.{ ContextLogger, Tier }
 import com.zaxxer.hikari.HikariDataSource
 import io.circe.syntax.EncoderOps
 import slick.util.AsyncExecutor

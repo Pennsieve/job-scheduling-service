@@ -1,16 +1,16 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.db
+package com.pennsieve.jobscheduling.db
 
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
 import java.util.UUID
 
-import com.blackfynn.jobscheduling.db.profile.api._
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.commons.JobState._
-import com.blackfynn.models.PackageState._
-import com.blackfynn.models.{ JobId, PackageState }
+import com.pennsieve.jobscheduling.db.profile.api._
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.commons.JobState._
+import com.pennsieve.models.PackageState._
+import com.pennsieve.models.{ JobId, PackageState }
 import com.github.tminglei.slickpg.window.PgWindowFuncSupport.WindowFunctions
 
 object JobStateHelpers {

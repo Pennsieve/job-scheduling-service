@@ -1,15 +1,15 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.clients
+package com.pennsieve.jobscheduling.clients
 import cats.data.EitherT
 import cats.implicits._
-import com.blackfynn.jobscheduling.ETLLogContext
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.commons.JobState.{ NotProcessing, Succeeded }
-import com.blackfynn.jobscheduling.clients.SQSClient.{ MessageBody, SendMessage }
-import com.blackfynn.jobscheduling.db.JobStateHelpers.{ isSuccess, shouldSendNotification }
-import com.blackfynn.jobscheduling.model.EventualResult.EventualResultT
-import com.blackfynn.models.{
+import com.pennsieve.jobscheduling.ETLLogContext
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.commons.JobState.{ NotProcessing, Succeeded }
+import com.pennsieve.jobscheduling.clients.SQSClient.{ MessageBody, SendMessage }
+import com.pennsieve.jobscheduling.db.JobStateHelpers.{ isSuccess, shouldSendNotification }
+import com.pennsieve.jobscheduling.model.EventualResult.EventualResultT
+import com.pennsieve.models.{
   ETLAppendWorkflow,
   ETLExportWorkflow,
   ETLWorkflow,
@@ -21,14 +21,14 @@ import com.blackfynn.models.{
   PayloadType,
   Upload
 }
-import com.blackfynn.notifications.{
+import com.pennsieve.notifications.{
   ETLExportNotification,
   ETLNotification,
   MessageType,
   NotificationMessage,
   UploadNotification
 }
-import com.blackfynn.service.utilities.ContextLogger
+import com.pennsieve.service.utilities.ContextLogger
 import io.circe.Encoder
 import io.circe.generic.semiauto.deriveEncoder
 import io.circe.syntax._

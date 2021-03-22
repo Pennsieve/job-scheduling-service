@@ -1,10 +1,10 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.handlers
+package com.pennsieve.jobscheduling.handlers
 
-import com.blackfynn.auth.middleware.Validator.{ hasDatasetAccess, hasOrganizationAccess }
-import com.blackfynn.auth.middleware.{ DatasetId, DatasetPermission, Jwt, OrganizationId }
-import com.blackfynn.jobscheduling.errors.ForbiddenException
+import com.pennsieve.auth.middleware.Validator.{ hasDatasetAccess, hasOrganizationAccess }
+import com.pennsieve.auth.middleware.{ DatasetId, DatasetPermission, Jwt, OrganizationId }
+import com.pennsieve.jobscheduling.errors.ForbiddenException
 
 import scala.concurrent.Future
 

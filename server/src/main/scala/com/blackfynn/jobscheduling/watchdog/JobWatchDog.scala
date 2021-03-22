@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.watchdog
+package com.pennsieve.jobscheduling.watchdog
 
 import java.util.UUID
 
@@ -8,18 +8,18 @@ import akka.NotUsed
 import akka.stream.{ ActorMaterializer, FlowShape }
 import akka.stream.scaladsl.{ Flow, GraphDSL, Merge }
 import com.amazonaws.services.ecs.model.{ DescribeTasksResult, StopTaskRequest }
-import com.blackfynn.jobscheduling.WatchDogConfig
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.db.{ DatabaseClientFlows, Job, TaskId }
-import com.blackfynn.jobscheduling.errors.{ NoTaskException, TaskMissingArnException }
-import com.blackfynn.jobscheduling.model.EventualResult.EitherContext
-import com.blackfynn.jobscheduling.model.JobConverters.ImportId
-import com.blackfynn.jobscheduling.model.Tick.Tick
-import com.blackfynn.jobscheduling.model._
-import com.blackfynn.jobscheduling.shapes.EitherPartition
-import com.blackfynn.jobscheduling.watchdog.WatchDog._
-import com.blackfynn.models.{ JobId, PackageState }
-import com.blackfynn.service.utilities.ContextLogger
+import com.pennsieve.jobscheduling.WatchDogConfig
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.db.{ DatabaseClientFlows, Job, TaskId }
+import com.pennsieve.jobscheduling.errors.{ NoTaskException, TaskMissingArnException }
+import com.pennsieve.jobscheduling.model.EventualResult.EitherContext
+import com.pennsieve.jobscheduling.model.JobConverters.ImportId
+import com.pennsieve.jobscheduling.model.Tick.Tick
+import com.pennsieve.jobscheduling.model._
+import com.pennsieve.jobscheduling.shapes.EitherPartition
+import com.pennsieve.jobscheduling.watchdog.WatchDog._
+import com.pennsieve.models.{ JobId, PackageState }
+import com.pennsieve.service.utilities.ContextLogger
 import io.circe.syntax.EncoderOps
 
 import scala.concurrent.ExecutionContext

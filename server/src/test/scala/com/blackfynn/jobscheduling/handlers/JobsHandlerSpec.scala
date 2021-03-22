@@ -1,6 +1,6 @@
-// Copyright (c) [2018] - [2020] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.handlers
+package com.pennsieve.jobscheduling.handlers
 
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
@@ -16,39 +16,39 @@ import cats.data.EitherT
 import cats.implicits._
 import com.amazonaws.AmazonServiceException
 import com.amazonaws.services.sqs.model.SendMessageResult
-import com.blackfynn.auth.middleware.Jwt.Role.RoleIdentifier
-import com.blackfynn.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserClaim, UserId }
-import com.blackfynn.core.clients.packages.UploadCompleteResponse
-import com.blackfynn.jobscheduling.Fakes.{
+import com.pennsieve.auth.middleware.Jwt.Role.RoleIdentifier
+import com.pennsieve.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserClaim, UserId }
+import com.pennsieve.core.clients.packages.UploadCompleteResponse
+import com.pennsieve.jobscheduling.Fakes.{
   fakePennsieveApiClient,
   SetPackageState,
   SetUploadComplete
 }
-import com.blackfynn.jobscheduling.TestTask.taskId
-import com.blackfynn.jobscheduling._
-import com.blackfynn.jobscheduling.clients.PennsieveApiClient
-import com.blackfynn.jobscheduling.clients.SQSClient.{ MessageBody, SendMessage }
-import com.blackfynn.jobscheduling.clients.generated.definitions.{
+import com.pennsieve.jobscheduling.TestTask.taskId
+import com.pennsieve.jobscheduling._
+import com.pennsieve.jobscheduling.clients.PennsieveApiClient
+import com.pennsieve.jobscheduling.clients.SQSClient.{ MessageBody, SendMessage }
+import com.pennsieve.jobscheduling.clients.generated.definitions.{
   JobPage,
   UploadResult,
   Job => SwaggerJob
 }
-import com.blackfynn.jobscheduling.clients.generated.jobs._
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.commons.JobState._
-import com.blackfynn.jobscheduling.db.JobsMapper.get
-import com.blackfynn.jobscheduling.db._
-import com.blackfynn.jobscheduling.db.profile.api._
-import com.blackfynn.jobscheduling.handlers.JobsHandlerPorts.{ apply => _, _ }
-import com.blackfynn.jobscheduling.model.Cursor
-import com.blackfynn.jobscheduling.model.JobConverters._
-import com.blackfynn.jobscheduling.scheduler.JobScheduler
-import com.blackfynn.jobscheduling.scheduler.JobSchedulerFakes.{
+import com.pennsieve.jobscheduling.clients.generated.jobs._
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.commons.JobState._
+import com.pennsieve.jobscheduling.db.JobsMapper.get
+import com.pennsieve.jobscheduling.db._
+import com.pennsieve.jobscheduling.db.profile.api._
+import com.pennsieve.jobscheduling.handlers.JobsHandlerPorts.{ apply => _, _ }
+import com.pennsieve.jobscheduling.model.Cursor
+import com.pennsieve.jobscheduling.model.JobConverters._
+import com.pennsieve.jobscheduling.scheduler.JobScheduler
+import com.pennsieve.jobscheduling.scheduler.JobSchedulerFakes.{
   runScheduler,
   schedulerAndRunnableEvent
 }
-import com.blackfynn.models.Manifest._
-import com.blackfynn.models.{
+import com.pennsieve.models.Manifest._
+import com.pennsieve.models.{
   Channel,
   ETLAppendWorkflow,
   FileType,
@@ -60,8 +60,8 @@ import com.blackfynn.models.{
   Upload,
   Workflow
 }
-import com.blackfynn.notifications.{ NotificationMessage, UploadNotification }
-import com.blackfynn.test.EitherValue._
+import com.pennsieve.notifications.{ NotificationMessage, UploadNotification }
+import com.pennsieve.test.EitherValue._
 import io.circe.Error
 import io.circe.parser.decode
 import org.scalatest.EitherValues._
@@ -82,7 +82,7 @@ class JobsHandlerSpec
 
   implicit val scheduler: Scheduler = system.scheduler
 
-  import com.blackfynn.jobscheduling.TestPayload._
+  import com.pennsieve.jobscheduling.TestPayload._
 
   override def beforeEach(): Unit = {
     ports.db.run(JobsMapper.delete).awaitFinite()
@@ -422,7 +422,7 @@ class JobsHandlerSpec
         .value
 
       response shouldBe CompleteUploadResponse.BadRequest(
-        s"Job: ${jobId.value} not associated with an Upload payload. Actually: com.blackfynn.models.ETLWorkflow"
+        s"Job: ${jobId.value} not associated with an Upload payload. Actually: com.pennsieve.models.ETLWorkflow"
       )
     }
 

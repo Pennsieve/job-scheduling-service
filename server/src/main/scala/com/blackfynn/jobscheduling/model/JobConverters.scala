@@ -1,18 +1,18 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.model
+package com.pennsieve.jobscheduling.model
 
 import cats.implicits._
 
 import com.amazonaws.services.ecs.model._
-import com.blackfynn.jobscheduling.clients.ManifestS3
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.db.{ Job, PayloadEntry, TaskId }
-import com.blackfynn.jobscheduling.pusher.JobPusher.ErrorWithJob
-import com.blackfynn.jobscheduling.clients.SQSClient.ReceiptHandle
-import com.blackfynn.jobscheduling.{ ECSConfig, PusherConfig }
-import com.blackfynn.models.PayloadType
-import com.blackfynn.models.{
+import com.pennsieve.jobscheduling.clients.ManifestS3
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.db.{ Job, PayloadEntry, TaskId }
+import com.pennsieve.jobscheduling.pusher.JobPusher.ErrorWithJob
+import com.pennsieve.jobscheduling.clients.SQSClient.ReceiptHandle
+import com.pennsieve.jobscheduling.{ ECSConfig, PusherConfig }
+import com.pennsieve.models.PayloadType
+import com.pennsieve.models.{
   ETLAppendWorkflow,
   ETLExportWorkflow,
   ETLWorkflow,
@@ -27,8 +27,8 @@ import com.blackfynn.models.{
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
 
-import com.blackfynn.jobscheduling.errors.{ NoPayloadForJob, UnsupportedPayload }
-import com.blackfynn.jobscheduling.server.generated.definitions
+import com.pennsieve.jobscheduling.errors.{ NoPayloadForJob, UnsupportedPayload }
+import com.pennsieve.jobscheduling.server.generated.definitions
 import io.circe.syntax.EncoderOps
 
 import scala.collection.JavaConverters.asJavaCollectionConverter

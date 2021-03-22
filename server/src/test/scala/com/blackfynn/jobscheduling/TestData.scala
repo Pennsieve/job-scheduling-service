@@ -1,6 +1,6 @@
-// Copyright (c) [2018] - [2020] Blackfynn, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling
+package com.pennsieve.jobscheduling
 
 import java.net.ServerSocket
 import java.nio.file.Paths
@@ -10,13 +10,13 @@ import java.util.UUID
 
 import cats.syntax.option.catsSyntaxOptionId
 import com.amazonaws.services.ecs.model.{ RunTaskResult, Task }
-import com.blackfynn.auth.middleware.{ OrganizationId, UserId }
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.commons.JobState.Running
-import com.blackfynn.jobscheduling.db.PayloadsMapper.create
-import com.blackfynn.jobscheduling.db._
-import com.blackfynn.models._
-import com.blackfynn.test.AwaitableImplicits
+import com.pennsieve.auth.middleware.{ OrganizationId, UserId }
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.commons.JobState.Running
+import com.pennsieve.jobscheduling.db.PayloadsMapper.create
+import com.pennsieve.jobscheduling.db._
+import com.pennsieve.models._
+import com.pennsieve.test.AwaitableImplicits
 import pureconfig.loadConfigOrThrow
 
 import scala.concurrent.ExecutionContext

@@ -15,8 +15,8 @@
       </encoder>
     </appender>
 
-    <logger name="com.blackfynn" level="INFO" />
-    <logger name="com.blackfynn.jobscheduling" level="OFF" />
+    <logger name="com.pennsieve" level="INFO" />
+    <logger name="com.pennsieve.jobscheduling" level="OFF" />
 
     <root level="WARN">
         <appender-ref ref="Console" />

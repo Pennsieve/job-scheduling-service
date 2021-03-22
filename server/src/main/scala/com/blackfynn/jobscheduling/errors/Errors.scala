@@ -1,12 +1,12 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.errors
+package com.pennsieve.jobscheduling.errors
 
 import akka.http.scaladsl.model.HttpResponse
-import com.blackfynn.core.clients.packages.UploadCompleteResponse
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.db.Job
-import com.blackfynn.models.{ JobId, Payload }
+import com.pennsieve.core.clients.packages.UploadCompleteResponse
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.db.Job
+import com.pennsieve.models.{ JobId, Payload }
 
 import scala.reflect.ClassTag
 

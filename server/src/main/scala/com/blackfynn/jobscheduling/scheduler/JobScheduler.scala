@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.scheduler
+package com.pennsieve.jobscheduling.scheduler
 
 import akka.NotUsed
 import akka.actor.Scheduler
@@ -8,15 +8,15 @@ import akka.stream.QueueOfferResult.{ Dropped, Enqueued, QueueClosed, Failure =>
 import akka.stream._
 import akka.stream.scaladsl.GraphDSL.Builder
 import akka.stream.scaladsl.{ GraphDSL, Keep, Source, SourceQueueWithComplete }
-import com.blackfynn.jobscheduling.JobSchedulingPorts.GenericFinalSink
-import com.blackfynn.jobscheduling.db.DatabaseClientFlows
-import com.blackfynn.jobscheduling.model.ETLEvent
-import com.blackfynn.jobscheduling.scheduler.JobArrived.JobArrived
-import com.blackfynn.jobscheduling.scheduler.JobNotQueued.JobNotQueued
-import com.blackfynn.jobscheduling.scheduler.JobQueued.JobQueued
-import com.blackfynn.jobscheduling.shapes.StreamRetry
-import com.blackfynn.jobscheduling.{ ECSConfig, JobSchedulerConfig }
-import com.blackfynn.service.utilities.ContextLogger
+import com.pennsieve.jobscheduling.JobSchedulingPorts.GenericFinalSink
+import com.pennsieve.jobscheduling.db.DatabaseClientFlows
+import com.pennsieve.jobscheduling.model.ETLEvent
+import com.pennsieve.jobscheduling.scheduler.JobArrived.JobArrived
+import com.pennsieve.jobscheduling.scheduler.JobNotQueued.JobNotQueued
+import com.pennsieve.jobscheduling.scheduler.JobQueued.JobQueued
+import com.pennsieve.jobscheduling.shapes.StreamRetry
+import com.pennsieve.jobscheduling.{ ECSConfig, JobSchedulerConfig }
+import com.pennsieve.service.utilities.ContextLogger
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.control.NonFatal

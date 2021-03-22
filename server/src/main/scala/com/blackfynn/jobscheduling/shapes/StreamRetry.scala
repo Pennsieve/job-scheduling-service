@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.shapes
+package com.pennsieve.jobscheduling.shapes
 
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
@@ -8,8 +8,8 @@ import java.time.temporal.ChronoUnit.MILLIS
 
 import akka.actor.Scheduler
 import akka.pattern.after
-import com.blackfynn.jobscheduling.RetryConfig
-import com.blackfynn.service.utilities.ContextLogger
+import com.pennsieve.jobscheduling.RetryConfig
+import com.pennsieve.service.utilities.ContextLogger
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.control.NonFatal

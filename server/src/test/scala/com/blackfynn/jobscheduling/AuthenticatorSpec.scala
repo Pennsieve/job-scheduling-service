@@ -1,13 +1,13 @@
-// Copyright (c) [2018] - [2020] Blackfynn, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling
-import com.blackfynn.auth.middleware.Jwt
-import com.blackfynn.auth.middleware.Jwt.Config
-import com.blackfynn.jobscheduling.handlers.AuthorizationChecks.{
+package com.pennsieve.jobscheduling
+import com.pennsieve.auth.middleware.Jwt
+import com.pennsieve.auth.middleware.Jwt.Config
+import com.pennsieve.jobscheduling.handlers.AuthorizationChecks.{
   withAuthorization,
   withDatasetAccess
 }
-import com.blackfynn.test.AwaitableImplicits
+import com.pennsieve.test.AwaitableImplicits
 import org.scalatest.{ Matchers, WordSpecLike }
 
 import scala.concurrent.duration.DurationInt

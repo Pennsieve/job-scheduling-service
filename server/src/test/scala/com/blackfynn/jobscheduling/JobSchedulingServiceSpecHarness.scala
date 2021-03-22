@@ -1,10 +1,10 @@
-// Copyright (c) [2018] - [2020] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling
+package com.pennsieve.jobscheduling
 
-import com.blackfynn.jobscheduling.TestConfig._
-import com.blackfynn.service.utilities.ContextLogger
-import com.blackfynn.test.AwaitableImplicits
+import com.pennsieve.jobscheduling.TestConfig._
+import com.pennsieve.service.utilities.ContextLogger
+import com.pennsieve.test.AwaitableImplicits
 import com.spotify.docker.client.DefaultDockerClient
 import com.spotify.docker.client.exceptions.DockerException
 import com.whisk.docker.DockerFactory
@@ -12,7 +12,7 @@ import com.whisk.docker.impl.spotify.SpotifyDockerFactory
 import com.whisk.docker.scalatest.DockerTestKit
 import org.scalatest.time.{ Second, Seconds, Span }
 import org.scalatest.{ BeforeAndAfterAll, OptionValues, Suite }
-import com.blackfynn.jobscheduling.db.profile.api._
+import com.pennsieve.jobscheduling.db.profile.api._
 
 import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.concurrent.duration.DurationInt

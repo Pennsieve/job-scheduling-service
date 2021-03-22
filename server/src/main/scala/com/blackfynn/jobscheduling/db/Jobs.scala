@@ -1,19 +1,19 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.db
+package com.pennsieve.jobscheduling.db
 
 import java.sql.Timestamp
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
 import java.util.UUID
 
-import com.blackfynn.auth.middleware.{ OrganizationId, UserId }
-import com.blackfynn.jobscheduling.ETLLogContext
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.db.profile.api._
-import com.blackfynn.jobscheduling.errors.NoJobException
-import com.blackfynn.jobscheduling.model.Cursor
-import com.blackfynn.models.{ JobId, Payload }
+import com.pennsieve.auth.middleware.{ OrganizationId, UserId }
+import com.pennsieve.jobscheduling.ETLLogContext
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.db.profile.api._
+import com.pennsieve.jobscheduling.errors.NoJobException
+import com.pennsieve.jobscheduling.model.Cursor
+import com.pennsieve.models.{ JobId, Payload }
 import io.circe.generic.semiauto.{ deriveDecoder, deriveEncoder }
 import io.circe.{ Decoder, Encoder, Json }
 import slick.dbio.{ DBIOAction, Effect, NoStream }

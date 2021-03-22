@@ -1,10 +1,10 @@
-// Copyright (c) [2018] - [2020] Blackfynn, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling
+package com.pennsieve.jobscheduling
 
 import java.sql.DriverManager
 
-import com.blackfynn.jobscheduling.TestPostgresConfiguration.advertisedPort
+import com.pennsieve.jobscheduling.TestPostgresConfiguration.advertisedPort
 import com.whisk.docker._
 
 import scala.concurrent.{ ExecutionContext, Future }

@@ -1,9 +1,9 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling
+package com.pennsieve.jobscheduling
 
 import com.amazonaws.regions.Regions
-import com.blackfynn.jobscheduling.clients.SQSClient.QueueName
+import com.pennsieve.jobscheduling.clients.SQSClient.QueueName
 
 import scala.concurrent.duration._
 import scala.concurrent.duration.FiniteDuration

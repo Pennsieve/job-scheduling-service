@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.monitor
+package com.pennsieve.jobscheduling.monitor
 
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets.UTF_8
@@ -8,18 +8,18 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 import cats.implicits._
-import com.blackfynn.jobscheduling.ETLLogContext
-import com.blackfynn.jobscheduling.clients.SQSClient.ReceiptHandle
-import com.blackfynn.jobscheduling.monitor.CloudwatchMessageDecoders.{
+import com.pennsieve.jobscheduling.ETLLogContext
+import com.pennsieve.jobscheduling.clients.SQSClient.ReceiptHandle
+import com.pennsieve.jobscheduling.monitor.CloudwatchMessageDecoders.{
   runningTaskEventDecoder,
   stoppedTaskEventDecoder
 }
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.db.{ Job, TaskId }
-import com.blackfynn.jobscheduling.errors.NoJobException
-import com.blackfynn.jobscheduling.model.JobConverters.{ ImportId, RichJob }
-import com.blackfynn.jobscheduling.model.{ ETLEvent, ManifestUri }
-import com.blackfynn.models.JobId
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.db.{ Job, TaskId }
+import com.pennsieve.jobscheduling.errors.NoJobException
+import com.pennsieve.jobscheduling.model.JobConverters.{ ImportId, RichJob }
+import com.pennsieve.jobscheduling.model.{ ETLEvent, ManifestUri }
+import com.pennsieve.models.JobId
 import io.circe.generic.semiauto._
 import io.circe.{ Decoder, DecodingFailure, Encoder, HCursor }
 
@@ -74,7 +74,7 @@ case class CloudwatchMessage(
 
 object CloudwatchMessage {
   import JobId._
-  import com.blackfynn.jobscheduling.model.OffsetDateTimeEncoder._
+  import com.pennsieve.jobscheduling.model.OffsetDateTimeEncoder._
   implicit val encoder: Encoder[CloudwatchMessage] = deriveEncoder[CloudwatchMessage]
   implicit val decoder: Decoder[CloudwatchMessage] =
     runningTaskEventDecoder.or(stoppedTaskEventDecoder)

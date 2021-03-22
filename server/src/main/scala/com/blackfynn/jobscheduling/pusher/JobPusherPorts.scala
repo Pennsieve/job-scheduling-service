@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.pusher
+package com.pennsieve.jobscheduling.pusher
 
 import com.amazonaws.services.ecs.model.{
   ListTasksRequest,
@@ -8,11 +8,11 @@ import com.amazonaws.services.ecs.model.{
   RunTaskRequest,
   RunTaskResult
 }
-import com.blackfynn.jobscheduling.JobSchedulingPorts.{ createGetPayload, GetPayload }
-import com.blackfynn.jobscheduling.clients.{ ECSClient, ManifestS3, ManifestS3Client }
-import com.blackfynn.jobscheduling.db.profile.api._
-import com.blackfynn.jobscheduling.model.EventualResult.EventualResult
-import com.blackfynn.jobscheduling.pusher.JobPusherPorts.{ ListTasks, PutManifest, RunTask }
+import com.pennsieve.jobscheduling.JobSchedulingPorts.{ createGetPayload, GetPayload }
+import com.pennsieve.jobscheduling.clients.{ ECSClient, ManifestS3, ManifestS3Client }
+import com.pennsieve.jobscheduling.db.profile.api._
+import com.pennsieve.jobscheduling.model.EventualResult.EventualResult
+import com.pennsieve.jobscheduling.pusher.JobPusherPorts.{ ListTasks, PutManifest, RunTask }
 
 import scala.concurrent.{ ExecutionContext => EC }
 

@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.commons
+package com.pennsieve.jobscheduling.commons
 
 import enumeratum.{CirceEnum, Enum, EnumEntry}
 import enumeratum.EnumEntry.UpperSnakecase

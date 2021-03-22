@@ -1,12 +1,12 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.model
+package com.pennsieve.jobscheduling.model
 import java.nio.charset.StandardCharsets
 import java.time.{ Instant, OffsetDateTime, ZoneOffset }
 import java.util.{ Base64, UUID }
 
 import cats.implicits._
-import com.blackfynn.models.JobId
+import com.pennsieve.models.JobId
 
 import scala.util.Try
 

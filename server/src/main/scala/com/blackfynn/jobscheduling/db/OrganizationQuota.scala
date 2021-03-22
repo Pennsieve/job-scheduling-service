@@ -1,10 +1,10 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.db
+package com.pennsieve.jobscheduling.db
 
 import java.time.OffsetDateTime
 
-import com.blackfynn.jobscheduling.db.profile.api._
+import com.pennsieve.jobscheduling.db.profile.api._
 import slick.dbio.{ Effect, NoStream }
 import slick.sql.SqlAction
 

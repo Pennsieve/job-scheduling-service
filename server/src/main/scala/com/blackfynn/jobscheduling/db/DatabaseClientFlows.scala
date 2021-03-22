@@ -1,16 +1,16 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.db
+package com.pennsieve.jobscheduling.db
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import cats.implicits._
-import com.blackfynn.jobscheduling.JobSchedulingPorts._
-import com.blackfynn.jobscheduling.commons.JobState.{ Failed, Lost }
-import com.blackfynn.jobscheduling.model.EventualResult.{ EitherContext, EventualResultContext }
-import com.blackfynn.jobscheduling.model._
-import com.blackfynn.jobscheduling.{ ETLLogContext, JobSchedulingPorts, ThrottleConfig }
-import com.blackfynn.models._
-import com.blackfynn.service.utilities.{ ContextLogger, Tier }
+import com.pennsieve.jobscheduling.JobSchedulingPorts._
+import com.pennsieve.jobscheduling.commons.JobState.{ Failed, Lost }
+import com.pennsieve.jobscheduling.model.EventualResult.{ EitherContext, EventualResultContext }
+import com.pennsieve.jobscheduling.model._
+import com.pennsieve.jobscheduling.{ ETLLogContext, JobSchedulingPorts, ThrottleConfig }
+import com.pennsieve.models._
+import com.pennsieve.service.utilities.{ ContextLogger, Tier }
 import io.circe.syntax.EncoderOps
 
 import scala.concurrent.{ ExecutionContext, Future }

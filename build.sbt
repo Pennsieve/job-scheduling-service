@@ -1,7 +1,7 @@
 cancelable in Global := true
 
 // Shared settings
-ThisBuild / organization := "com.blackfynn"
+ThisBuild / organization := "com.pennsieve"
 ThisBuild / scalaVersion := "2.12.11"
 ThisBuild / scalacOptions ++= Seq(
   "-language:implicitConversions",
@@ -22,8 +22,8 @@ ThisBuild / resolvers ++= Seq(
 
 ThisBuild / credentials += Credentials("Sonatype Nexus Repository Manager",
   "nexus.pennsieve.cc",
-  sys.env.getOrElse("PENNSIEVE_NEXUS_USER", "pennsieveci"),
-  sys.env.getOrElse("PENNSIEVE_NEXUS_PW", "")
+  sys.env("PENNSIEVE_NEXUS_USER"),
+  sys.env("PENNSIEVE_NEXUS_PW")
 )
 
 // Temporarily disable Coursier because parallel builds fail on Jenkins.
@@ -50,11 +50,11 @@ lazy val headerMappingsValue = HeaderFileType.scala -> HeaderCommentStyle.cppSty
 // Dependency versions
 lazy val AkkaHttpVersion = "10.1.11"
 lazy val AkkaVersion = "2.6.5"
-lazy val AuthMiddlewareVersion = "4.2.2"
+lazy val AuthMiddlewareVersion = "4.2.3"
 lazy val AwsVersion = "1.11.414"
 lazy val CatsVersion = "1.2.0"
 lazy val CirceVersion = "0.11.1"
-lazy val CoreVersion = "bootstrap-SNAPSHOT"
+lazy val CoreVersion = "com.pennsieve-SNAPSHOT"
 lazy val DockerItVersion = "0.9.7"
 lazy val EnumeratumVersion = "1.5.14"
 lazy val LogbackVersion = "1.2.3"
@@ -62,14 +62,14 @@ lazy val PureConfigVersion = "0.9.1"
 lazy val ScalaLoggingVersion = "3.9.2"
 lazy val SlickVersion = "3.3.2"
 lazy val SlickPgVersion = "0.17.3"
-lazy val ServiceUtilitiesVersion = "1.3.4-SNAPSHOT"
-lazy val UtilitiesVersion = "0.1.10-SNAPSHOT"
+lazy val ServiceUtilitiesVersion = "6-2a4488a"
+lazy val UtilitiesVersion = "3-cd7539b"
 
 // Shared dependencies
 ThisBuild / libraryDependencies ++= Seq(
   "com.typesafe.scala-logging" %% "scala-logging"     % ScalaLoggingVersion,
 
-  "com.blackfynn"              %% "core-models"       % CoreVersion,
+  "com.pennsieve"              %% "core-models"       % CoreVersion,
 
   "com.typesafe.akka"          %% "akka-http"         % AkkaHttpVersion,
   "com.typesafe.akka"          %% "akka-stream-typed" % AkkaVersion,
@@ -103,7 +103,7 @@ lazy val client = project
     },
     publishMavenStyle := true,
     guardrailTasks in Compile := List(
-      Client(file("./swagger/job-scheduling-service.yml"), pkg="com.blackfynn.jobscheduling.clients.generated")
+      Client(file("./swagger/job-scheduling-service.yml"), pkg="com.pennsieve.jobscheduling.clients.generated")
     )
   )
 
@@ -134,7 +134,7 @@ lazy val server = project
     headerLicense := headerLicenseValue,
     headerMappings := headerMappings.value + headerMappingsValue,
     guardrailTasks in Compile := List(
-      Server(file("./swagger/job-scheduling-service.yml"), pkg="com.blackfynn.jobscheduling.server.generated")
+      Server(file("./swagger/job-scheduling-service.yml"), pkg="com.pennsieve.jobscheduling.server.generated")
     ),
     test in assembly := {},
     libraryDependencies ++= Seq(
@@ -146,11 +146,11 @@ lazy val server = project
       "com.amazonaws" % "aws-java-sdk-s3" % AwsVersion,
       "com.amazonaws" % "aws-java-sdk-sqs" % AwsVersion,
 
-      "com.blackfynn" %% "service-utilities" % ServiceUtilitiesVersion,
-      "com.blackfynn" %% "utilities" % UtilitiesVersion,
+      "com.pennsieve" %% "service-utilities" % ServiceUtilitiesVersion,
+      "com.pennsieve" %% "utilities" % UtilitiesVersion,
 
-      "com.blackfynn" %% "auth-middleware" % AuthMiddlewareVersion,
-      "com.blackfynn" %% "core-clients" % CoreVersion,
+      "com.pennsieve" %% "auth-middleware" % AuthMiddlewareVersion,
+      "com.pennsieve" %% "core-clients" % CoreVersion,
 
       "org.apache.commons" % "commons-io" % "1.3.2",
 
@@ -177,7 +177,7 @@ lazy val server = project
 
       "io.scalaland" %% "chimney" % "0.2.1",
 
-      "com.blackfynn" %% "utilities" % UtilitiesVersion % "test" classifier "tests",
+      "com.pennsieve" %% "utilities" % UtilitiesVersion % "test" classifier "tests",
       "com.whisk" %% "docker-testkit-scalatest" % DockerItVersion % Test,
       "com.whisk" %% "docker-testkit-impl-spotify" % DockerItVersion % Test,
       "org.scalatest" %% "scalatest"% "3.0.5" % Test,
@@ -193,28 +193,28 @@ lazy val server = project
       "io.circe" %% "circe-jawn" % CirceVersion,
     ),
 
-    coverageExcludedPackages := "com.blackfynn.jobscheduling.server\\..*;"
-      + "com.blackfynn.jobscheduling.Server;"
-      + "com.blackfynn.jobscheduling.ServiceConfig;"
-      + "com.blackfynn.jobscheduling.DatabaseMigrator;"
-      + "com.blackfynn.jobscheduling.ETLLogger.*;"
-      + "com.blackfynn.jobscheduling.model.EventualResult.*;"
-      + "com.blackfynn.jobscheduling.model.OffsetDateTimeEncoder;"
-      + "com.blackfynn.jobscheduling.handlers.HealthcheckHandler;"
-      + "com.blackfynn.jobscheduling.monitor.JobMonitorPorts;"
-      + "com.blackfynn.jobscheduling.monitor.CloudwatchMessage;"
-      + "com.blackfynn.jobscheduling.pusher.JobPusherPorts;"
-      + "com.blackfynn.jobscheduling.scheduler.JobSchedulerPorts;"
-      + "com.blackfynn.jobscheduling.watchdog.WatchDogPorts;"
-      + "com.blackfynn.jobscheduling.model.InvalidCursorException;"
-      + "com.blackfynn.jobscheduling.watchdog.FailedToStopTaskException;"
-      + "com.blackfynn.jobscheduling.watchdog.StoppedTaskWithoutJobException;"
-      + "com.blackfynn.jobscheduling.watchdog.NoJobIdException;"
-      + "com.blackfynn.jobscheduling.watchdog.WatchDogException;"
-      + "com.blackfynn.jobscheduling.db.DatabaseClientFlows;"
-      + "com.blackfynn.jobscheduling.clients\\..*;"
-      + "com.blackfynn.jobscheduling.errors\\..*;"
-      + "com.blackfynn.jobscheduling.db.PostgresProfile",
+    coverageExcludedPackages := "com.pennsieve.jobscheduling.server\\..*;"
+      + "com.pennsieve.jobscheduling.Server;"
+      + "com.pennsieve.jobscheduling.ServiceConfig;"
+      + "com.pennsieve.jobscheduling.DatabaseMigrator;"
+      + "com.pennsieve.jobscheduling.ETLLogger.*;"
+      + "com.pennsieve.jobscheduling.model.EventualResult.*;"
+      + "com.pennsieve.jobscheduling.model.OffsetDateTimeEncoder;"
+      + "com.pennsieve.jobscheduling.handlers.HealthcheckHandler;"
+      + "com.pennsieve.jobscheduling.monitor.JobMonitorPorts;"
+      + "com.pennsieve.jobscheduling.monitor.CloudwatchMessage;"
+      + "com.pennsieve.jobscheduling.pusher.JobPusherPorts;"
+      + "com.pennsieve.jobscheduling.scheduler.JobSchedulerPorts;"
+      + "com.pennsieve.jobscheduling.watchdog.WatchDogPorts;"
+      + "com.pennsieve.jobscheduling.model.InvalidCursorException;"
+      + "com.pennsieve.jobscheduling.watchdog.FailedToStopTaskException;"
+      + "com.pennsieve.jobscheduling.watchdog.StoppedTaskWithoutJobException;"
+      + "com.pennsieve.jobscheduling.watchdog.NoJobIdException;"
+      + "com.pennsieve.jobscheduling.watchdog.WatchDogException;"
+      + "com.pennsieve.jobscheduling.db.DatabaseClientFlows;"
+      + "com.pennsieve.jobscheduling.clients\\..*;"
+      + "com.pennsieve.jobscheduling.errors\\..*;"
+      + "com.pennsieve.jobscheduling.db.PostgresProfile",
     coverageMinimum := 85,
     coverageFailOnMinimum := true,
 

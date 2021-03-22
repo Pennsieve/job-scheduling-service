@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling
+package com.pennsieve.jobscheduling
 package monitor
 
 import akka.actor.Scheduler
@@ -12,18 +12,18 @@ import akka.{ Done, NotUsed }
 import cats.data.EitherT
 import cats.implicits._
 import com.amazonaws.services.sqs.model.Message
-import com.blackfynn.jobscheduling.JobSchedulingPorts.FinalSink
-import com.blackfynn.jobscheduling.clients.SQSClient.{ ReceiptHandle, SendAck }
-import com.blackfynn.jobscheduling.clients.{ Notifications, SQSClient }
-import com.blackfynn.jobscheduling.commons.JobState.Cancelled
-import com.blackfynn.jobscheduling.db.DatabaseClientFlows
-import com.blackfynn.jobscheduling.model.EventualResult.{ EitherContext, EventualResultContextT }
-import com.blackfynn.jobscheduling.model.{ ETLEvent, PackageLostEvent }
-import com.blackfynn.jobscheduling.monitor.CloudwatchMessage._
-import com.blackfynn.jobscheduling.shapes.EitherPartition._
-import com.blackfynn.jobscheduling.shapes.StreamRetry
-import com.blackfynn.models.Payload
-import com.blackfynn.service.utilities.{ ContextLogger, Tier }
+import com.pennsieve.jobscheduling.JobSchedulingPorts.FinalSink
+import com.pennsieve.jobscheduling.clients.SQSClient.{ ReceiptHandle, SendAck }
+import com.pennsieve.jobscheduling.clients.{ Notifications, SQSClient }
+import com.pennsieve.jobscheduling.commons.JobState.Cancelled
+import com.pennsieve.jobscheduling.db.DatabaseClientFlows
+import com.pennsieve.jobscheduling.model.EventualResult.{ EitherContext, EventualResultContextT }
+import com.pennsieve.jobscheduling.model.{ ETLEvent, PackageLostEvent }
+import com.pennsieve.jobscheduling.monitor.CloudwatchMessage._
+import com.pennsieve.jobscheduling.shapes.EitherPartition._
+import com.pennsieve.jobscheduling.shapes.StreamRetry
+import com.pennsieve.models.Payload
+import com.pennsieve.service.utilities.{ ContextLogger, Tier }
 import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
 

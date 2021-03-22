@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.clients
+package com.pennsieve.jobscheduling.clients
 
 import akka.NotUsed
 import akka.http.scaladsl.model.StatusCodes.NotFound
@@ -8,22 +8,22 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{ Authorization, OAuth2BearerToken, RawHeader }
 import akka.stream.scaladsl.Flow
 import cats.implicits._
-import com.blackfynn.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserId }
-import com.blackfynn.core.clients.packages.{ PackagesClient, UploadCompleteResponse }
-import com.blackfynn.jobscheduling.Authenticator.generateServiceToken
-import com.blackfynn.jobscheduling.clients.PennsieveApiClient.CreateAuthToken
-import com.blackfynn.jobscheduling.clients.HttpClient.HttpClient
-import com.blackfynn.jobscheduling.db.JobStateHelpers.toPackageState
-import com.blackfynn.jobscheduling.errors.HttpClientUnsupportedResponse
-import com.blackfynn.jobscheduling.model.EventualResult.{
+import com.pennsieve.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserId }
+import com.pennsieve.core.clients.packages.{ PackagesClient, UploadCompleteResponse }
+import com.pennsieve.jobscheduling.Authenticator.generateServiceToken
+import com.pennsieve.jobscheduling.clients.PennsieveApiClient.CreateAuthToken
+import com.pennsieve.jobscheduling.clients.HttpClient.HttpClient
+import com.pennsieve.jobscheduling.db.JobStateHelpers.toPackageState
+import com.pennsieve.jobscheduling.errors.HttpClientUnsupportedResponse
+import com.pennsieve.jobscheduling.model.EventualResult.{
   EitherContext,
   EventualResponseT,
   EventualResultT
 }
-import com.blackfynn.jobscheduling.model.{ ETLEvent, PackageId, PackageLostEvent }
-import com.blackfynn.jobscheduling.{ PennsieveApiConfig, ThrottleConfig }
-import com.blackfynn.models._
-import com.blackfynn.service.utilities.{ ContextLogger, Tier }
+import com.pennsieve.jobscheduling.model.{ ETLEvent, PackageId, PackageLostEvent }
+import com.pennsieve.jobscheduling.{ PennsieveApiConfig, ThrottleConfig }
+import com.pennsieve.models._
+import com.pennsieve.service.utilities.{ ContextLogger, Tier }
 import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
 import io.circe.parser.decode

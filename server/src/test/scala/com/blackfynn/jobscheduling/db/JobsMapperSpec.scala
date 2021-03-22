@@ -1,17 +1,17 @@
-// Copyright (c) [2018] - [2020] Blackfynn, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.db
+package com.pennsieve.jobscheduling.db
 
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
 import java.util.UUID
 
-import com.blackfynn.jobscheduling.TestPayload._
-import com.blackfynn.jobscheduling.commons.JobState._
-import com.blackfynn.jobscheduling.JobSchedulingServiceSpecHarness
-import com.blackfynn.jobscheduling.db.profile.api._
-import com.blackfynn.models.JobId
-import com.blackfynn.test.AwaitableImplicits
+import com.pennsieve.jobscheduling.TestPayload._
+import com.pennsieve.jobscheduling.commons.JobState._
+import com.pennsieve.jobscheduling.JobSchedulingServiceSpecHarness
+import com.pennsieve.jobscheduling.db.profile.api._
+import com.pennsieve.models.JobId
+import com.pennsieve.test.AwaitableImplicits
 import org.scalatest.{ BeforeAndAfterEach, Matchers, WordSpec }
 
 class JobsMapperSpec

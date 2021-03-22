@@ -1,9 +1,9 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.monitor
+package com.pennsieve.jobscheduling.monitor
 
 import com.amazonaws.services.sqs.AmazonSQSAsync
-import com.blackfynn.jobscheduling.JobSchedulingPorts.{
+import com.pennsieve.jobscheduling.JobSchedulingPorts.{
   createGetJob,
   createGetPayload,
   createNotifyJobSource,
@@ -14,10 +14,10 @@ import com.blackfynn.jobscheduling.JobSchedulingPorts.{
   NotifyJobSource,
   UpdateJob
 }
-import com.blackfynn.jobscheduling.scheduler.JobScheduler
-import com.blackfynn.jobscheduling.clients.{ ManifestS3Client, PennsieveApiClient, SQSClient }
-import com.blackfynn.jobscheduling.clients.SQSClient.{ QueueName, SendAck }
-import com.blackfynn.jobscheduling.db.profile.api._
+import com.pennsieve.jobscheduling.scheduler.JobScheduler
+import com.pennsieve.jobscheduling.clients.{ ManifestS3Client, PennsieveApiClient, SQSClient }
+import com.pennsieve.jobscheduling.clients.SQSClient.{ QueueName, SendAck }
+import com.pennsieve.jobscheduling.db.profile.api._
 import scala.concurrent.ExecutionContext
 
 case class JobMonitorPorts(

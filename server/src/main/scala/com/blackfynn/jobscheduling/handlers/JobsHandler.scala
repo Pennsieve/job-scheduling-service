@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.handlers
+package com.pennsieve.jobscheduling.handlers
 
 import java.io.{ PrintWriter, StringWriter }
 import java.util.UUID
@@ -10,38 +10,38 @@ import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import cats.data.EitherT
 import com.amazonaws.services.sqs.model.SendMessageResult
-import com.blackfynn.auth.middleware.AkkaDirective._
-import com.blackfynn.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserId }
-import com.blackfynn.jobscheduling._
-import com.blackfynn.jobscheduling.clients.Notifications
-import com.blackfynn.jobscheduling.db._
-import com.blackfynn.jobscheduling.errors._
-import com.blackfynn.jobscheduling.handlers.AuthorizationChecks._
-import com.blackfynn.service.utilities.ResponseLogger._
-import com.blackfynn.service.utilities.{ ContextLogger, ResponseTier }
+import com.pennsieve.auth.middleware.AkkaDirective._
+import com.pennsieve.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserId }
+import com.pennsieve.jobscheduling._
+import com.pennsieve.jobscheduling.clients.Notifications
+import com.pennsieve.jobscheduling.db._
+import com.pennsieve.jobscheduling.errors._
+import com.pennsieve.jobscheduling.handlers.AuthorizationChecks._
+import com.pennsieve.service.utilities.ResponseLogger._
+import com.pennsieve.service.utilities.{ ContextLogger, ResponseTier }
 import cats.implicits._
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.commons.JobState._
-import com.blackfynn.jobscheduling.model.EventualResult.EventualResultT
-import com.blackfynn.jobscheduling.model.JobConverters.RichJob
-import com.blackfynn.jobscheduling.model.{ Cursor, InvalidCursorException, PackageId }
-import com.blackfynn.jobscheduling.scheduler.JobScheduler
-import com.blackfynn.jobscheduling.server.generated.definitions
-import com.blackfynn.jobscheduling.server.generated.definitions.{ JobPage, UploadResult }
-import com.blackfynn.jobscheduling.server.generated.jobs.JobsResource._
-import com.blackfynn.jobscheduling.server.generated.jobs.JobsResource.createResponse._
-import com.blackfynn.jobscheduling.server.generated.jobs.{
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.commons.JobState._
+import com.pennsieve.jobscheduling.model.EventualResult.EventualResultT
+import com.pennsieve.jobscheduling.model.JobConverters.RichJob
+import com.pennsieve.jobscheduling.model.{ Cursor, InvalidCursorException, PackageId }
+import com.pennsieve.jobscheduling.scheduler.JobScheduler
+import com.pennsieve.jobscheduling.server.generated.definitions
+import com.pennsieve.jobscheduling.server.generated.definitions.{ JobPage, UploadResult }
+import com.pennsieve.jobscheduling.server.generated.jobs.JobsResource._
+import com.pennsieve.jobscheduling.server.generated.jobs.JobsResource.createResponse._
+import com.pennsieve.jobscheduling.server.generated.jobs.{
   JobsResource,
   JobsHandler => GuardrailHandler
 }
-import com.blackfynn.models.PackageState._
-import com.blackfynn.models.{ JobId, Payload, _ }
+import com.pennsieve.models.PackageState._
+import com.pennsieve.models.{ JobId, Payload, _ }
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.reflectiveCalls
 import scala.util.control.NonFatal
 import scala.util.{ Failure, Success, Try }
-import com.blackfynn.jobscheduling.errors.ForbiddenException
+import com.pennsieve.jobscheduling.errors.ForbiddenException
 
 /**
   * The JobsHandler contains all HTTP endpoints that other services use to

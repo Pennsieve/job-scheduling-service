@@ -1,15 +1,15 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.scheduler
+package com.pennsieve.jobscheduling.scheduler
 
 import akka.actor.Scheduler
-import com.blackfynn.jobscheduling.JobSchedulingPorts.{ createUpdateJob, UpdateJob }
-import com.blackfynn.jobscheduling.db.{ Job, JobsMapper }
-import com.blackfynn.jobscheduling.pusher.JobPusherPorts.ListTasks
-import com.blackfynn.jobscheduling.pusher.{ JobPusher, JobPusherPorts }
-import com.blackfynn.jobscheduling.scheduler.JobSchedulerPorts.GetNextJob
-import com.blackfynn.jobscheduling.{ JobSchedulingPorts, ServiceConfig }
-import com.blackfynn.service.utilities.{ ContextLogger, Tier }
+import com.pennsieve.jobscheduling.JobSchedulingPorts.{ createUpdateJob, UpdateJob }
+import com.pennsieve.jobscheduling.db.{ Job, JobsMapper }
+import com.pennsieve.jobscheduling.pusher.JobPusherPorts.ListTasks
+import com.pennsieve.jobscheduling.pusher.{ JobPusher, JobPusherPorts }
+import com.pennsieve.jobscheduling.scheduler.JobSchedulerPorts.GetNextJob
+import com.pennsieve.jobscheduling.{ JobSchedulingPorts, ServiceConfig }
+import com.pennsieve.service.utilities.{ ContextLogger, Tier }
 
 import scala.concurrent.{ ExecutionContext, Future }
 

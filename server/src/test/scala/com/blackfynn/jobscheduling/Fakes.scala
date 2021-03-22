@@ -1,6 +1,6 @@
-// Copyright (c) [2018] - [2020] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling
+package com.pennsieve.jobscheduling
 
 import java.time.OffsetDateTime
 
@@ -10,26 +10,26 @@ import cats.data.EitherT
 import com.amazonaws.AmazonServiceException
 import com.amazonaws.services.ecs.model._
 import com.amazonaws.services.sqs.model.{ DeleteMessageResult, SendMessageResult }
-import com.blackfynn.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserId }
-import com.blackfynn.core.clients.packages.UploadCompleteResponse
-import com.blackfynn.core.clients.packages.UploadCompleteResponse.OK
-import com.blackfynn.jobscheduling.JobSchedulingPorts._
-import com.blackfynn.jobscheduling.TestTask.{ createTask, runTaskResult }
-import com.blackfynn.jobscheduling.clients.PennsieveApiClient
-import com.blackfynn.jobscheduling.clients.SQSClient.{ ReceiptHandle, SendAck, SendMessage }
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.db.TaskId
-import com.blackfynn.jobscheduling.db.profile.api.Database
-import com.blackfynn.jobscheduling.handlers.JobsHandlerPorts.NotifyUpload
-import com.blackfynn.jobscheduling.model.EventualResult.{
+import com.pennsieve.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserId }
+import com.pennsieve.core.clients.packages.UploadCompleteResponse
+import com.pennsieve.core.clients.packages.UploadCompleteResponse.OK
+import com.pennsieve.jobscheduling.JobSchedulingPorts._
+import com.pennsieve.jobscheduling.TestTask.{ createTask, runTaskResult }
+import com.pennsieve.jobscheduling.clients.PennsieveApiClient
+import com.pennsieve.jobscheduling.clients.SQSClient.{ ReceiptHandle, SendAck, SendMessage }
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.db.TaskId
+import com.pennsieve.jobscheduling.db.profile.api.Database
+import com.pennsieve.jobscheduling.handlers.JobsHandlerPorts.NotifyUpload
+import com.pennsieve.jobscheduling.model.EventualResult.{
   EventualResponseT,
   EventualResult,
   EventualResultT
 }
-import com.blackfynn.jobscheduling.model.PackageId
-import com.blackfynn.jobscheduling.scheduler.JobQueued
-import com.blackfynn.models.{ JobId, Manifest, PackageState, Payload }
-import com.blackfynn.test.AwaitableImplicits
+import com.pennsieve.jobscheduling.model.PackageId
+import com.pennsieve.jobscheduling.scheduler.JobQueued
+import com.pennsieve.models.{ JobId, Manifest, PackageState, Payload }
+import com.pennsieve.test.AwaitableImplicits
 
 import scala.collection.JavaConverters.asJavaCollectionConverter
 import scala.concurrent.{ ExecutionContext, Future }

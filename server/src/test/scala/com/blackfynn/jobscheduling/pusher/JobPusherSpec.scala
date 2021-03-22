@@ -1,6 +1,6 @@
-// Copyright (c) [2018] - [2020] Blackfynn, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.pusher
+package com.pennsieve.jobscheduling.pusher
 
 import java.util.UUID
 
@@ -11,19 +11,19 @@ import akka.testkit.TestKitBase
 import cats.implicits._
 import com.amazonaws.AmazonServiceException
 import com.amazonaws.services.ecs.model._
-import com.blackfynn.jobscheduling.JobSchedulingPorts.GetPayload
-import com.blackfynn.jobscheduling.TestConfig.{ staticEcsConfig, staticS3Config }
-import com.blackfynn.jobscheduling.TestTask._
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.db.{ Job, PayloadEntry }
-import com.blackfynn.jobscheduling.errors.NoPayloadForJob
-import com.blackfynn.jobscheduling.model.ETLEvent
-import com.blackfynn.jobscheduling.model.JobConverters.{ ErrorWithJobConverter, RichJob }
-import com.blackfynn.jobscheduling.pusher.JobPusherFakes._
-import com.blackfynn.jobscheduling.pusher.JobPusherPorts._
-import com.blackfynn.jobscheduling.{ ECSConfig, FakeFargate }
-import com.blackfynn.models.PayloadType._
-import com.blackfynn.models.{
+import com.pennsieve.jobscheduling.JobSchedulingPorts.GetPayload
+import com.pennsieve.jobscheduling.TestConfig.{ staticEcsConfig, staticS3Config }
+import com.pennsieve.jobscheduling.TestTask._
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.db.{ Job, PayloadEntry }
+import com.pennsieve.jobscheduling.errors.NoPayloadForJob
+import com.pennsieve.jobscheduling.model.ETLEvent
+import com.pennsieve.jobscheduling.model.JobConverters.{ ErrorWithJobConverter, RichJob }
+import com.pennsieve.jobscheduling.pusher.JobPusherFakes._
+import com.pennsieve.jobscheduling.pusher.JobPusherPorts._
+import com.pennsieve.jobscheduling.{ ECSConfig, FakeFargate }
+import com.pennsieve.models.PayloadType._
+import com.pennsieve.models.{
   Channel,
   ETLAppendWorkflow,
   ETLExportWorkflow,
@@ -32,8 +32,8 @@ import com.blackfynn.models.{
   Manifest,
   PackageType
 }
-import com.blackfynn.service.utilities.ContextLogger
-import com.blackfynn.test.AwaitableImplicits
+import com.pennsieve.service.utilities.ContextLogger
+import com.pennsieve.test.AwaitableImplicits
 import io.circe.parser.decode
 import org.scalatest._
 

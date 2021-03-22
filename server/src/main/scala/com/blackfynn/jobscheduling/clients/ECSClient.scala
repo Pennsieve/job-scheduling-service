@@ -1,13 +1,13 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.clients
+package com.pennsieve.jobscheduling.clients
 
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.ecs.AmazonECSAsyncClientBuilder
 import com.amazonaws.services.ecs.model._
-import com.blackfynn.jobscheduling.clients.AwsAsyncCallback.async
-import com.blackfynn.jobscheduling.model.EventualResult.EventualResult
+import com.pennsieve.jobscheduling.clients.AwsAsyncCallback.async
+import com.pennsieve.jobscheduling.model.EventualResult.EventualResult
 
 class ECSClient(region: Regions) {
 

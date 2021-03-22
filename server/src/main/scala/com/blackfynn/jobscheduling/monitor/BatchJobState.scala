@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.monitor
+package com.pennsieve.jobscheduling.monitor
 
 import enumeratum.EnumEntry.Uppercase
 import enumeratum.{ CirceEnum, Enum, EnumEntry }

@@ -1,9 +1,9 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.clients
+package com.pennsieve.jobscheduling.clients
 import com.amazonaws.AmazonWebServiceRequest
 import com.amazonaws.handlers.{ AsyncHandler => AWSAsyncHandler }
-import com.blackfynn.jobscheduling.model.EventualResult.EventualResult
+import com.pennsieve.jobscheduling.model.EventualResult.EventualResult
 
 import scala.concurrent.Promise
 import java.util.concurrent.{ Future => JavaFuture }

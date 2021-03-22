@@ -1,37 +1,37 @@
-// Copyright (c) [2018] - [2020] Blackfynn, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.scheduler
+package com.pennsieve.jobscheduling.scheduler
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
 import akka.testkit.TestKit
-import com.blackfynn.jobscheduling.Fakes.failingUpdateJob
-import com.blackfynn.jobscheduling.TestConfig.{
+import com.pennsieve.jobscheduling.Fakes.failingUpdateJob
+import com.pennsieve.jobscheduling.TestConfig.{
   staticEcsConfig,
   staticJobSchedulerConfig,
   staticS3Config
 }
-import com.blackfynn.jobscheduling.TestPayload.{
+import com.pennsieve.jobscheduling.TestPayload.{
   importPayload,
   insertAvailableJobInDB,
   organizationId
 }
-import com.blackfynn.jobscheduling.TestTask.taskId
-import com.blackfynn.jobscheduling._
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.db.profile.api._
-import com.blackfynn.jobscheduling.db.{ Job, JobsMapper, OrganizationQuotaMapper }
-import com.blackfynn.jobscheduling.model.ETLEvent
-import com.blackfynn.jobscheduling.model.JobConverters.RichJob
-import com.blackfynn.jobscheduling.pusher.JobPusherFakes.{ defaultEcsConfig, defaultPusherConfig }
-import com.blackfynn.jobscheduling.pusher.{ JobPusher, JobPusherFakes, JobPusherPorts }
-import com.blackfynn.jobscheduling.scheduler.JobSchedulerFakes.{
+import com.pennsieve.jobscheduling.TestTask.taskId
+import com.pennsieve.jobscheduling._
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.db.profile.api._
+import com.pennsieve.jobscheduling.db.{ Job, JobsMapper, OrganizationQuotaMapper }
+import com.pennsieve.jobscheduling.model.ETLEvent
+import com.pennsieve.jobscheduling.model.JobConverters.RichJob
+import com.pennsieve.jobscheduling.pusher.JobPusherFakes.{ defaultEcsConfig, defaultPusherConfig }
+import com.pennsieve.jobscheduling.pusher.{ JobPusher, JobPusherFakes, JobPusherPorts }
+import com.pennsieve.jobscheduling.scheduler.JobSchedulerFakes.{
   runFullSchedulerStream,
   runScheduler,
   schedulerAndRunnableEvent
 }
-import com.blackfynn.test.AwaitableImplicits
+import com.pennsieve.test.AwaitableImplicits
 import org.scalatest._
 
 import scala.collection.immutable

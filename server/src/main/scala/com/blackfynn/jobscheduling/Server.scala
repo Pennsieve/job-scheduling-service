@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling
+package com.pennsieve.jobscheduling
 
 import java.net.URI
 
@@ -10,18 +10,18 @@ import akka.http.scaladsl.model.{ HttpRequest, HttpResponse }
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import com.blackfynn.core.clients.packages.PackagesClient
-import com.blackfynn.jobscheduling.clients.{ HttpClient, PennsieveApiClientImpl }
-import com.blackfynn.jobscheduling.handlers.{
+import com.pennsieve.core.clients.packages.PackagesClient
+import com.pennsieve.jobscheduling.clients.{ HttpClient, PennsieveApiClientImpl }
+import com.pennsieve.jobscheduling.handlers.{
   HealthcheckHandler,
   JobsHandler,
   JobsHandlerPorts,
   OrganizationsHandler
 }
-import com.blackfynn.jobscheduling.monitor.{ JobMonitor, JobMonitorPorts }
-import com.blackfynn.jobscheduling.scheduler.{ JobScheduler, JobSchedulerPorts }
-import com.blackfynn.jobscheduling.watchdog.{ WatchDog, WatchDogPorts }
-import com.blackfynn.service.utilities.{ ContextLogger, MigrationRunner, QueueHttpResponder }
+import com.pennsieve.jobscheduling.monitor.{ JobMonitor, JobMonitorPorts }
+import com.pennsieve.jobscheduling.scheduler.{ JobScheduler, JobSchedulerPorts }
+import com.pennsieve.jobscheduling.watchdog.{ WatchDog, WatchDogPorts }
+import com.pennsieve.service.utilities.{ ContextLogger, MigrationRunner, QueueHttpResponder }
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }

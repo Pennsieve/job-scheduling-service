@@ -78,7 +78,7 @@ paths:
           required: true
           schema:
             type: object
-            x-scala-type: com.blackfynn.models.Payload
+            x-scala-type: com.pennsieve.models.Payload
         - name: organizationId
           in: path
           description: organization id
@@ -342,7 +342,7 @@ definitions:
         format: int32
       state:
         type: string
-        x-scala-type: com.blackfynn.jobscheduling.commons.JobState
+        x-scala-type: com.pennsieve.jobscheduling.commons.JobState
       createdAt:
         type: string
         format: date-time
@@ -377,4 +377,4 @@ definitions:
         type: boolean
   PackageState:
     type: string
-    x-scala-type: com.blackfynn.models.PackageState
+    x-scala-type: com.pennsieve.models.PackageState

@@ -1,9 +1,9 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.watchdog
+package com.pennsieve.jobscheduling.watchdog
 import com.amazonaws.services.ecs.model.Task
-import com.blackfynn.jobscheduling.db.TaskId
-import com.blackfynn.models.JobId
+import com.pennsieve.jobscheduling.db.TaskId
+import com.pennsieve.models.JobId
 import io.circe.Encoder
 import io.circe.syntax.EncoderOps
 

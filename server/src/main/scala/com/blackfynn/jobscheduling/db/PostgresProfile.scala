@@ -1,11 +1,11 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.db
+package com.pennsieve.jobscheduling.db
 
 import java.util.UUID
 
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.models.{ JobId, Payload }
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.models.{ JobId, Payload }
 import com.github.tminglei.slickpg.{ ExPostgresProfile, PgCirceJsonSupport, PgDate2Support }
 import io.circe.Json
 import io.circe.syntax._

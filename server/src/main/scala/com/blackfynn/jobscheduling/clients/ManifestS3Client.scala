@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.clients
+package com.pennsieve.jobscheduling.clients
 
 import java.io.ByteArrayInputStream
 
@@ -8,11 +8,11 @@ import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.amazonaws.services.s3.{ AmazonS3, AmazonS3ClientBuilder, AmazonS3URI }
-import com.blackfynn.jobscheduling.S3Config
-import com.blackfynn.jobscheduling.model.ManifestUri
-import com.blackfynn.jobscheduling.model.EventualResult.EventualResult
-import com.blackfynn.jobscheduling.pusher.ManifestUploadFailure
-import com.blackfynn.models.Manifest
+import com.pennsieve.jobscheduling.S3Config
+import com.pennsieve.jobscheduling.model.ManifestUri
+import com.pennsieve.jobscheduling.model.EventualResult.EventualResult
+import com.pennsieve.jobscheduling.pusher.ManifestUploadFailure
+import com.pennsieve.models.Manifest
 import io.circe.parser.decode
 
 import scala.concurrent.{ blocking, ExecutionContext, Future }

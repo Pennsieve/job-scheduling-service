@@ -1,15 +1,15 @@
-// Copyright (c) [2018] - [2020] Blackfynn, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.pusher
+package com.pennsieve.jobscheduling.pusher
 
-import com.blackfynn.jobscheduling.JobSchedulingPorts.GetPayload
-import com.blackfynn.jobscheduling.TestConfig.staticEcsConfig
-import com.blackfynn.jobscheduling.TestPayload.uploadPayload
-import com.blackfynn.jobscheduling.TestTask.runTaskResult
-import com.blackfynn.jobscheduling.db.PayloadEntry
-import com.blackfynn.jobscheduling.pusher.JobPusherPorts.{ PutManifest, RunTask }
-import com.blackfynn.jobscheduling.{ ECSConfig, PusherConfig }
-import com.blackfynn.models.{ ETLWorkflow, FileType, PackageType }
+import com.pennsieve.jobscheduling.JobSchedulingPorts.GetPayload
+import com.pennsieve.jobscheduling.TestConfig.staticEcsConfig
+import com.pennsieve.jobscheduling.TestPayload.uploadPayload
+import com.pennsieve.jobscheduling.TestTask.runTaskResult
+import com.pennsieve.jobscheduling.db.PayloadEntry
+import com.pennsieve.jobscheduling.pusher.JobPusherPorts.{ PutManifest, RunTask }
+import com.pennsieve.jobscheduling.{ ECSConfig, PusherConfig }
+import com.pennsieve.models.{ ETLWorkflow, FileType, PackageType }
 
 import scala.concurrent.Future
 

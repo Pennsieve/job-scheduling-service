@@ -1,9 +1,9 @@
-// Copyright (c) [2018] - [2020] Blackfynn, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.db
-import com.blackfynn.jobscheduling.JobSchedulingServiceSpecHarness
-import com.blackfynn.jobscheduling.TestPayload.uploadPayload
-import com.blackfynn.test.AwaitableImplicits
+package com.pennsieve.jobscheduling.db
+import com.pennsieve.jobscheduling.JobSchedulingServiceSpecHarness
+import com.pennsieve.jobscheduling.TestPayload.uploadPayload
+import com.pennsieve.test.AwaitableImplicits
 import org.scalatest.{ Matchers, WordSpec }
 
 class PayloadsMapperSpec

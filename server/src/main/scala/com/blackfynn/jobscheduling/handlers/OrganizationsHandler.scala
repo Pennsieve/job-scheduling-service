@@ -1,23 +1,23 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.handlers
+package com.pennsieve.jobscheduling.handlers
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import com.blackfynn.auth.middleware.AkkaDirective.authenticateJwt
-import com.blackfynn.auth.middleware.Validator.{ hasOrganizationAccess, isServiceClaim }
-import com.blackfynn.auth.middleware.{ Jwt, OrganizationId }
-import com.blackfynn.jobscheduling.db.OrganizationQuotaMapper._
-import com.blackfynn.jobscheduling.server.generated.definitions.Quota
-import com.blackfynn.jobscheduling.server.generated.organizations.OrganizationsResource._
-import com.blackfynn.jobscheduling.server.generated.organizations.{
+import com.pennsieve.auth.middleware.AkkaDirective.authenticateJwt
+import com.pennsieve.auth.middleware.Validator.{ hasOrganizationAccess, isServiceClaim }
+import com.pennsieve.auth.middleware.{ Jwt, OrganizationId }
+import com.pennsieve.jobscheduling.db.OrganizationQuotaMapper._
+import com.pennsieve.jobscheduling.server.generated.definitions.Quota
+import com.pennsieve.jobscheduling.server.generated.organizations.OrganizationsResource._
+import com.pennsieve.jobscheduling.server.generated.organizations.{
   OrganizationsResource,
   OrganizationsHandler => GuardrailHandler
 }
-import com.blackfynn.jobscheduling.{ ETLLogContext, JobSchedulingPorts }
-import com.blackfynn.service.utilities.ResponseLogger.logResponse
-import com.blackfynn.service.utilities.{ ContextLogger, ResponseTier }
+import com.pennsieve.jobscheduling.{ ETLLogContext, JobSchedulingPorts }
+import com.pennsieve.service.utilities.ResponseLogger.logResponse
+import com.pennsieve.service.utilities.{ ContextLogger, ResponseTier }
 
 import scala.concurrent.{ ExecutionContext, Future }
 

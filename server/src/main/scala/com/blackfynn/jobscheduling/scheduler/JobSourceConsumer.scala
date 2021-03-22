@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.scheduler
+package com.pennsieve.jobscheduling.scheduler
 
 import akka.actor.Scheduler
 import akka.pattern.after
@@ -9,10 +9,10 @@ import akka.stream.stage.{ GraphStage, GraphStageLogic, InHandler, OutHandler }
 import cats.Monad
 import cats.implicits._
 import com.amazonaws.services.ecs.model.{ ListTasksRequest, ListTasksResult }
-import com.blackfynn.jobscheduling.ECSConfig
-import com.blackfynn.jobscheduling.db.Job
-import com.blackfynn.jobscheduling.scheduler.JobArrived.JobArrived
-import com.blackfynn.service.utilities.ContextLogger
+import com.pennsieve.jobscheduling.ECSConfig
+import com.pennsieve.jobscheduling.db.Job
+import com.pennsieve.jobscheduling.scheduler.JobArrived.JobArrived
+import com.pennsieve.service.utilities.ContextLogger
 import io.circe.syntax.EncoderOps
 
 import scala.concurrent.duration.DurationInt

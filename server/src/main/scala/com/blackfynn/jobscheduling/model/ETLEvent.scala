@@ -1,18 +1,18 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.model
-import com.blackfynn.jobscheduling.commons.JobState
-import com.blackfynn.jobscheduling.db.TaskId
-import com.blackfynn.jobscheduling.model.JobConverters.getManifestPath
-import com.blackfynn.jobscheduling.clients.SQSClient.ReceiptHandle
-import com.blackfynn.models.{ JobId, PackageState }
+package com.pennsieve.jobscheduling.model
+import com.pennsieve.jobscheduling.commons.JobState
+import com.pennsieve.jobscheduling.db.TaskId
+import com.pennsieve.jobscheduling.model.JobConverters.getManifestPath
+import com.pennsieve.jobscheduling.clients.SQSClient.ReceiptHandle
+import com.pennsieve.models.{ JobId, PackageState }
 import io.circe.{ Encoder, Json }
 import io.circe.syntax._
 import io.circe.generic.semiauto.deriveEncoder
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
 
-import com.blackfynn.jobscheduling.ETLLogContext
+import com.pennsieve.jobscheduling.ETLLogContext
 
 sealed trait ETLEvent {
   val importId: JobId

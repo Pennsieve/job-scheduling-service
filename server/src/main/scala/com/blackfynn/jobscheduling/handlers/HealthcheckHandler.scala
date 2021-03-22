@@ -1,14 +1,14 @@
 // Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.handlers
+package com.pennsieve.jobscheduling.handlers
 
 import akka.stream.ActorMaterializer
-import com.blackfynn.jobscheduling.JobSchedulingPorts
-import com.blackfynn.jobscheduling.server.generated.healthcheck.{
+import com.pennsieve.jobscheduling.JobSchedulingPorts
+import com.pennsieve.jobscheduling.server.generated.healthcheck.{
   HealthcheckResource,
   HealthcheckHandler => GuardrailHandler
 }
-import com.blackfynn.jobscheduling.db.profile.api._
+import com.pennsieve.jobscheduling.db.profile.api._
 import slick.dbio.{ DBIOAction, Effect, NoStream }
 
 import scala.concurrent.{ ExecutionContext, Future }

@@ -1,11 +1,11 @@
-// Copyright (c) [2018] - [2020] Blackfynn, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
 
-package com.blackfynn.jobscheduling.handlers
+package com.pennsieve.jobscheduling.handlers
 import akka.http.scaladsl.model.headers.{ Authorization, OAuth2BearerToken }
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.blackfynn.auth.middleware.Jwt.Role.RoleIdentifier
-import com.blackfynn.auth.middleware.{
+import com.pennsieve.auth.middleware.Jwt.Role.RoleIdentifier
+import com.pennsieve.auth.middleware.{
   ClaimType,
   DatasetPermission,
   Jwt,
@@ -15,15 +15,15 @@ import com.blackfynn.auth.middleware.{
   UserId,
   Wildcard
 }
-import com.blackfynn.jobscheduling.JobSchedulingServiceSpecHarness
-import com.blackfynn.jobscheduling.TestPayload.{ organizationId, userId }
-import com.blackfynn.jobscheduling.clients.generated.definitions.Quota
-import com.blackfynn.jobscheduling.clients.generated.organizations.OrganizationsClient
-import com.blackfynn.jobscheduling.db.OrganizationQuotaMapper
-import com.blackfynn.jobscheduling.db.OrganizationQuotaMapper.getOrganization
-import com.blackfynn.jobscheduling.db.profile.api._
-import com.blackfynn.models.Role
-import com.blackfynn.test.AwaitableImplicits
+import com.pennsieve.jobscheduling.JobSchedulingServiceSpecHarness
+import com.pennsieve.jobscheduling.TestPayload.{ organizationId, userId }
+import com.pennsieve.jobscheduling.clients.generated.definitions.Quota
+import com.pennsieve.jobscheduling.clients.generated.organizations.OrganizationsClient
+import com.pennsieve.jobscheduling.db.OrganizationQuotaMapper
+import com.pennsieve.jobscheduling.db.OrganizationQuotaMapper.getOrganization
+import com.pennsieve.jobscheduling.db.profile.api._
+import com.pennsieve.models.Role
+import com.pennsieve.test.AwaitableImplicits
 import org.scalatest.{ BeforeAndAfterEach, Matchers, WordSpec }
 import shapeless.Coproduct
 import shapeless.syntax.inject.InjectSyntax
