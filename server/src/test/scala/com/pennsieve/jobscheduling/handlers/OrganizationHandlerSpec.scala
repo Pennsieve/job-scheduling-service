@@ -2,13 +2,22 @@
 
 package com.pennsieve.jobscheduling.db.handlers
 
-import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
+import akka.http.scaladsl.model.headers.{ Authorization, OAuth2BearerToken }
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.pennsieve.auth.middleware.Jwt.Role.RoleIdentifier
-import com.pennsieve.auth.middleware.{ClaimType, DatasetPermission, Jwt, OrganizationId, ServiceClaim, UserClaim, UserId, Wildcard}
+import com.pennsieve.auth.middleware.{
+  ClaimType,
+  DatasetPermission,
+  Jwt,
+  OrganizationId,
+  ServiceClaim,
+  UserClaim,
+  UserId,
+  Wildcard
+}
 import com.pennsieve.jobscheduling.JobSchedulingServiceSpecHarness
-import com.pennsieve.jobscheduling.TestPayload.{organizationId, userId}
+import com.pennsieve.jobscheduling.TestPayload.{ organizationId, userId }
 import com.pennsieve.jobscheduling.clients.generated.definitions.Quota
 import com.pennsieve.jobscheduling.clients.generated.organizations.OrganizationsClient
 import com.pennsieve.jobscheduling.db.OrganizationQuotaMapper
@@ -17,11 +26,11 @@ import com.pennsieve.jobscheduling.db.profile.api._
 import com.pennsieve.jobscheduling.handlers.OrganizationsHandler
 import com.pennsieve.models.Role
 import com.pennsieve.test.AwaitableImplicits
-import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
+import org.scalatest.{ BeforeAndAfterEach, Matchers, WordSpec }
 import shapeless.Coproduct
 import shapeless.syntax.inject.InjectSyntax
 
-import scala.concurrent.duration.{FiniteDuration, MINUTES}
+import scala.concurrent.duration.{ FiniteDuration, MINUTES }
 
 class OrganizationHandlerSpec
     extends WordSpec

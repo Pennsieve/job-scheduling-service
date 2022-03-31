@@ -3,8 +3,8 @@
 package com.pennsieve.jobscheduling
 
 import cats.syntax.option.catsSyntaxOptionId
-import com.amazonaws.services.ecs.model.{RunTaskResult, Task}
-import com.pennsieve.auth.middleware.{OrganizationId, UserId}
+import com.amazonaws.services.ecs.model.{ RunTaskResult, Task }
+import com.pennsieve.auth.middleware.{ OrganizationId, UserId }
 import com.pennsieve.jobscheduling.commons.JobState
 import com.pennsieve.jobscheduling.commons.JobState.Running
 import com.pennsieve.jobscheduling.db.PayloadsMapper.create
@@ -58,7 +58,7 @@ object TestConfig {
   )
 
   private val testConfPath =
-    Paths.get(getClass.getResource("/application-test.conf").getPath)
+    Paths.get(getClass.getResource("/application-test.conf").toURI)
 
   private lazy val rootConfig: RootConfig = loadConfigOrThrow[RootConfig](testConfPath)
 

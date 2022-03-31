@@ -7,27 +7,31 @@ import akka.http.scaladsl.model.StatusCodes.NotFound
 import cats.data.EitherT
 import com.amazonaws.AmazonServiceException
 import com.amazonaws.services.ecs.model._
-import com.amazonaws.services.sqs.model.{DeleteMessageResult, SendMessageResult}
-import com.pennsieve.auth.middleware.{DatasetId, Jwt, OrganizationId, UserId}
+import com.amazonaws.services.sqs.model.{ DeleteMessageResult, SendMessageResult }
+import com.pennsieve.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserId }
 import com.pennsieve.core.clients.packages.UploadCompleteResponse
 import com.pennsieve.core.clients.packages.UploadCompleteResponse.OK
 import com.pennsieve.jobscheduling.JobSchedulingPorts._
-import com.pennsieve.jobscheduling.TestTask.{createTask, runTaskResult}
+import com.pennsieve.jobscheduling.TestTask.{ createTask, runTaskResult }
 import com.pennsieve.jobscheduling.clients.PennsieveApiClient
-import com.pennsieve.jobscheduling.clients.SQSClient.{ReceiptHandle, SendAck, SendMessage}
+import com.pennsieve.jobscheduling.clients.SQSClient.{ ReceiptHandle, SendAck, SendMessage }
 import com.pennsieve.jobscheduling.commons.JobState
 import com.pennsieve.jobscheduling.db.TaskId
 import com.pennsieve.jobscheduling.db.profile.api.Database
 import com.pennsieve.jobscheduling.handlers.JobsHandlerPorts.NotifyUpload
-import com.pennsieve.jobscheduling.model.EventualResult.{EventualResponseT, EventualResult, EventualResultT}
+import com.pennsieve.jobscheduling.model.EventualResult.{
+  EventualResponseT,
+  EventualResult,
+  EventualResultT
+}
 import com.pennsieve.jobscheduling.model.PackageId
 import com.pennsieve.jobscheduling.scheduler.JobQueued
-import com.pennsieve.models.{JobId, Manifest, PackageState}
+import com.pennsieve.models.{ JobId, Manifest, PackageState }
 import com.pennsieve.test.AwaitableImplicits
 
 import java.time.OffsetDateTime
 import scala.collection.JavaConverters.asJavaCollectionConverter
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 object Fakes extends AwaitableImplicits {
   import cats.implicits._

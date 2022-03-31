@@ -10,12 +10,12 @@ import com.spotify.docker.client.exceptions.DockerException
 import com.whisk.docker.DockerFactory
 import com.whisk.docker.impl.spotify.SpotifyDockerFactory
 import com.whisk.docker.scalatest.DockerTestKit
-import org.scalatest.time.{Second, Seconds, Span}
-import org.scalatest.{BeforeAndAfterAll, OptionValues, Suite}
+import org.scalatest.time.{ Second, Seconds, Span }
+import org.scalatest.{ BeforeAndAfterAll, OptionValues, Suite }
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 trait JobSchedulingServiceSpecHarness
     extends Suite

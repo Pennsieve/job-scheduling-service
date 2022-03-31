@@ -81,6 +81,8 @@ class JobMonitorSpec(system: ActorSystem)
     with Matchers
     with BeforeAndAfterEach {
 
+  override val StopContainersTimeout = 15.seconds
+
   def this() = this(ActorSystem("JobMonitorSpec"))
 
   implicit val actorSystem: ActorSystem = system

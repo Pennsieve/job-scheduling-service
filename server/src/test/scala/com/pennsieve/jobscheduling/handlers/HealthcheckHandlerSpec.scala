@@ -4,12 +4,15 @@ package com.pennsieve.jobscheduling.db.handlers
 
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.pennsieve.jobscheduling.{JobSchedulingServiceSpecHarness, UnhealthyDBJobSchedulingServiceSpecHarness}
+import com.pennsieve.jobscheduling.{
+  JobSchedulingServiceSpecHarness,
+  UnhealthyDBJobSchedulingServiceSpecHarness
+}
 import com.pennsieve.test.AwaitableImplicits
 import com.pennsieve.jobscheduling.clients.generated.healthcheck.HealthcheckClient
 import com.pennsieve.jobscheduling.clients.generated.healthcheck.HealthcheckResponse
 import com.pennsieve.jobscheduling.handlers.HealthcheckHandler
-import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
+import org.scalatest.{ BeforeAndAfterEach, Matchers, WordSpec }
 
 class HealthyHealthcheckHandlerSpec
     extends WordSpec

@@ -3,9 +3,12 @@
 package com.pennsieve.jobscheduling
 import com.pennsieve.auth.middleware.Jwt
 import com.pennsieve.auth.middleware.Jwt.Config
-import com.pennsieve.jobscheduling.handlers.AuthorizationChecks.{withAuthorization, withDatasetAccess}
+import com.pennsieve.jobscheduling.handlers.AuthorizationChecks.{
+  withAuthorization,
+  withDatasetAccess
+}
 import com.pennsieve.test.AwaitableImplicits
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.{ Matchers, WordSpecLike }
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt

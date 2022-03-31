@@ -7,7 +7,7 @@ import com.whisk.docker._
 
 import java.sql.DriverManager
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Try
 
 trait DockerPostgresService extends DockerKit {
