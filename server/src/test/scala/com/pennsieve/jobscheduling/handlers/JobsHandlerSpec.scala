@@ -1,15 +1,14 @@
-// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
 
-package com.pennsieve.jobscheduling.handlers
+package com.pennsieve.jobscheduling.db.handlers
 
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
 import java.util.UUID
-
 import akka.actor.Scheduler
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.StatusCode._
-import akka.http.scaladsl.model.headers.{ Authorization, OAuth2BearerToken }
+import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import cats.data.EitherT
@@ -17,61 +16,40 @@ import cats.implicits._
 import com.amazonaws.AmazonServiceException
 import com.amazonaws.services.sqs.model.SendMessageResult
 import com.pennsieve.auth.middleware.Jwt.Role.RoleIdentifier
-import com.pennsieve.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserClaim, UserId }
+import com.pennsieve.auth.middleware.{DatasetId, Jwt, OrganizationId, UserClaim, UserId}
 import com.pennsieve.core.clients.packages.UploadCompleteResponse
-import com.pennsieve.jobscheduling.Fakes.{
-  fakePennsieveApiClient,
-  SetPackageState,
-  SetUploadComplete
-}
+import com.pennsieve.jobscheduling.Fakes.{SetPackageState, SetUploadComplete, fakePennsieveApiClient}
 import com.pennsieve.jobscheduling.TestTask.taskId
 import com.pennsieve.jobscheduling._
 import com.pennsieve.jobscheduling.clients.PennsieveApiClient
-import com.pennsieve.jobscheduling.clients.SQSClient.{ MessageBody, SendMessage }
-import com.pennsieve.jobscheduling.clients.generated.definitions.{
-  JobPage,
-  UploadResult,
-  Job => SwaggerJob
-}
+import com.pennsieve.jobscheduling.clients.SQSClient.{MessageBody, SendMessage}
+import com.pennsieve.jobscheduling.clients.generated.definitions.{JobPage, UploadResult, Job => SwaggerJob}
 import com.pennsieve.jobscheduling.clients.generated.jobs._
 import com.pennsieve.jobscheduling.commons.JobState
 import com.pennsieve.jobscheduling.commons.JobState._
 import com.pennsieve.jobscheduling.db.JobsMapper.get
 import com.pennsieve.jobscheduling.db._
 import com.pennsieve.jobscheduling.db.profile.api._
-import com.pennsieve.jobscheduling.handlers.JobsHandlerPorts.{ apply => _, _ }
+import com.pennsieve.jobscheduling.handlers.{JobsHandler, JobsHandlerPorts}
+import com.pennsieve.jobscheduling.handlers.JobsHandlerPorts.{apply => _, _}
 import com.pennsieve.jobscheduling.model.Cursor
 import com.pennsieve.jobscheduling.model.JobConverters._
 import com.pennsieve.jobscheduling.scheduler.JobScheduler
-import com.pennsieve.jobscheduling.scheduler.JobSchedulerFakes.{
-  runScheduler,
-  schedulerAndRunnableEvent
-}
+import com.pennsieve.jobscheduling.scheduler.JobSchedulerFakes.{runScheduler, schedulerAndRunnableEvent}
 import com.pennsieve.models.Manifest._
-import com.pennsieve.models.{
-  Channel,
-  ETLAppendWorkflow,
-  FileType,
-  JobId,
-  Manifest,
-  PackageState,
-  PackageType,
-  Role,
-  Upload,
-  Workflow
-}
-import com.pennsieve.notifications.{ NotificationMessage, UploadNotification }
+import com.pennsieve.models.{Channel, ETLAppendWorkflow, FileType, JobId, Manifest, PackageState, PackageType, Role, Upload, Workflow}
+import com.pennsieve.notifications.{NotificationMessage, UploadNotification}
 import com.pennsieve.test.EitherValue._
 import io.circe.Error
 import io.circe.parser.decode
 import org.scalatest.EitherValues._
-import org.scalatest.{ BeforeAndAfterEach, Matchers, WordSpec }
+import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 import shapeless.syntax.inject.InjectSyntax
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration._
-import scala.concurrent.{ Future, TimeoutException }
-import scala.util.{ Success, Try }
+import scala.concurrent.{Future, TimeoutException}
+import scala.util.{Success, Try}
 
 class JobsHandlerSpec
     extends WordSpec

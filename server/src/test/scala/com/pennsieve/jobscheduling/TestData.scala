@@ -1,16 +1,10 @@
-// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
 
 package com.pennsieve.jobscheduling
 
-import java.net.ServerSocket
-import java.nio.file.Paths
-import java.time.OffsetDateTime
-import java.time.ZoneOffset.UTC
-import java.util.UUID
-
 import cats.syntax.option.catsSyntaxOptionId
-import com.amazonaws.services.ecs.model.{ RunTaskResult, Task }
-import com.pennsieve.auth.middleware.{ OrganizationId, UserId }
+import com.amazonaws.services.ecs.model.{RunTaskResult, Task}
+import com.pennsieve.auth.middleware.{OrganizationId, UserId}
 import com.pennsieve.jobscheduling.commons.JobState
 import com.pennsieve.jobscheduling.commons.JobState.Running
 import com.pennsieve.jobscheduling.db.PayloadsMapper.create
@@ -19,6 +13,11 @@ import com.pennsieve.models._
 import com.pennsieve.test.AwaitableImplicits
 import pureconfig.loadConfigOrThrow
 
+import java.net.ServerSocket
+import java.nio.file.Paths
+import java.time.OffsetDateTime
+import java.time.ZoneOffset.UTC
+import java.util.UUID
 import scala.concurrent.ExecutionContext
 
 object TestPostgresConfiguration {

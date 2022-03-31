@@ -1,4 +1,4 @@
-// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
 
 package com.pennsieve.jobscheduling
 
@@ -10,13 +10,12 @@ import com.spotify.docker.client.exceptions.DockerException
 import com.whisk.docker.DockerFactory
 import com.whisk.docker.impl.spotify.SpotifyDockerFactory
 import com.whisk.docker.scalatest.DockerTestKit
-import org.scalatest.time.{ Second, Seconds, Span }
-import org.scalatest.{ BeforeAndAfterAll, OptionValues, Suite }
-import com.pennsieve.jobscheduling.db.profile.api._
+import org.scalatest.time.{Second, Seconds, Span}
+import org.scalatest.{BeforeAndAfterAll, OptionValues, Suite}
 
-import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 
 trait JobSchedulingServiceSpecHarness
     extends Suite

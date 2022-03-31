@@ -1,17 +1,15 @@
-// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
 
-package com.pennsieve.jobscheduling.handlers
+package com.pennsieve.jobscheduling.db.handlers
 
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.pennsieve.jobscheduling.{
-  JobSchedulingServiceSpecHarness,
-  UnhealthyDBJobSchedulingServiceSpecHarness
-}
+import com.pennsieve.jobscheduling.{JobSchedulingServiceSpecHarness, UnhealthyDBJobSchedulingServiceSpecHarness}
 import com.pennsieve.test.AwaitableImplicits
 import com.pennsieve.jobscheduling.clients.generated.healthcheck.HealthcheckClient
 import com.pennsieve.jobscheduling.clients.generated.healthcheck.HealthcheckResponse
-import org.scalatest.{ BeforeAndAfterEach, Matchers, WordSpec }
+import com.pennsieve.jobscheduling.handlers.HealthcheckHandler
+import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 
 class HealthyHealthcheckHandlerSpec
     extends WordSpec

@@ -1,14 +1,13 @@
-// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
 
 package com.pennsieve.jobscheduling
-
-import java.sql.DriverManager
 
 import com.pennsieve.jobscheduling.TestPostgresConfiguration.advertisedPort
 import com.whisk.docker._
 
-import scala.concurrent.{ ExecutionContext, Future }
+import java.sql.DriverManager
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 trait DockerPostgresService extends DockerKit {

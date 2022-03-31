@@ -1,6 +1,6 @@
-// Copyright (c) [2018] - [2021] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
 
-package com.pennsieve.jobscheduling
+package com.pennsieve.jobscheduling.db
 
 import org.scalactic.source
 import org.scalatest.exceptions.TestFailedException
