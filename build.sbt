@@ -15,9 +15,6 @@ ThisBuild / scalacOptions ++= Seq(
 ThisBuild / resolvers ++= Seq(
   "Pennsieve Releases" at "https://nexus.pennsieve.cc/repository/maven-releases",
   "Pennsieve Snapshots" at "https://nexus.pennsieve.cc/repository/maven-snapshots",
-  Resolver.bintrayRepo("hseeberger", "maven"),
-  Resolver.jcenterRepo,
-  Resolver.bintrayRepo("commercetools", "maven")
 )
 
 ThisBuild / credentials += Credentials("Sonatype Nexus Repository Manager",
