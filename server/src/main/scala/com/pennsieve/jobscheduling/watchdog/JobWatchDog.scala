@@ -35,7 +35,6 @@ object JobWatchDog {
 
   private def updateFlow(
     implicit
-    mat: ActorMaterializer,
     ec: ExecutionContext,
     ports: WatchDogPorts,
     config: WatchDogConfig,
@@ -169,7 +168,6 @@ object JobWatchDog {
     etlBucket: String,
     clusterArn: String
   )(implicit
-    mat: ActorMaterializer,
     ec: ExecutionContext,
     ports: WatchDogPorts,
     config: WatchDogConfig,

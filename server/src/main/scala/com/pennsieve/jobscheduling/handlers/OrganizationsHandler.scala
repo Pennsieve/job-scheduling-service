@@ -4,7 +4,6 @@ package com.pennsieve.jobscheduling.handlers
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Route
-import akka.stream.ActorMaterializer
 import com.pennsieve.auth.middleware.AkkaDirective.authenticateJwt
 import com.pennsieve.auth.middleware.Validator.{ hasOrganizationAccess, isServiceClaim }
 import com.pennsieve.auth.middleware.{ Jwt, OrganizationId }
@@ -67,7 +66,6 @@ object OrganizationsHandler {
     ports: JobSchedulingPorts,
     log: ContextLogger,
     system: ActorSystem,
-    materializer: ActorMaterializer,
     executionContext: ExecutionContext
   ): Route =
     authenticateJwt(system.name)(ports.jwt) { claim =>

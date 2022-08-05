@@ -2,7 +2,7 @@
 
 package com.pennsieve.jobscheduling.handlers
 
-import akka.stream.ActorMaterializer
+import akka.actor.ActorSystem
 import com.pennsieve.jobscheduling.JobSchedulingPorts
 import com.pennsieve.jobscheduling.server.generated.healthcheck.{
   HealthcheckResource,
@@ -41,7 +41,7 @@ class HealthcheckHandler(
 object HealthcheckHandler {
   def routes(
   )(implicit
-    materializer: ActorMaterializer,
+    system: ActorSystem,
     executionContext: ExecutionContext,
     ports: JobSchedulingPorts
   ) = HealthcheckResource.routes(new HealthcheckHandler(ports))

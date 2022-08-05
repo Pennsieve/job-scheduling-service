@@ -4,10 +4,8 @@ package com.pennsieve.jobscheduling.watchdog
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
 import java.util.Date
-
 import akka.Done
-import akka.actor.Scheduler
-import akka.stream.ActorMaterializer
+import akka.actor.{ ActorSystem, Scheduler }
 import akka.stream.scaladsl.{ Keep, Sink, Source }
 import cats.implicits._
 import com.amazonaws.services.ecs.model._
@@ -50,7 +48,7 @@ class WatchDog(
     source: Source[Tick, A]
   )(implicit
     log: ContextLogger,
-    fm: ActorMaterializer
+    system: ActorSystem
   ): Future[Done] =
     for {
       _ <- source.runWith(JobWatchDog(etlBucket, clusterArn).toMat(finalSink)(Keep.right))
@@ -67,7 +65,7 @@ class WatchDog(
     source: Source[Tick, A] = repeatingTick
   )(implicit
     log: ContextLogger,
-    fm: ActorMaterializer
+    system: ActorSystem
   ): Future[Done] =
     StreamRetry(() => runTaskAndJobStreams(finalSink, source), config.retry, "WatchDog")
 }

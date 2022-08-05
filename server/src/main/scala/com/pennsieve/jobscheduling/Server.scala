@@ -61,6 +61,7 @@ object Server extends App {
     pureconfig.loadConfigOrThrow[ServiceConfig]
 
   implicit val system: ActorSystem = ActorSystem("job-scheduling-service")
+  // Need deprecated ActorMaterialize for service-utilities QueueHttpResponder
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = system.dispatcher
   implicit val scheduler: Scheduler = system.scheduler

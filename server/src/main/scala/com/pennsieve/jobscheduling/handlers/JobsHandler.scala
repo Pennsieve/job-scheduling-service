@@ -513,7 +513,6 @@ object JobsHandler {
     jobScheduler: JobScheduler
   )(implicit
     system: ActorSystem,
-    materializer: ActorMaterializer,
     executionContext: ExecutionContext,
     log: ContextLogger
   ): Route =

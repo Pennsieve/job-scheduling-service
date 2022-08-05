@@ -3,8 +3,7 @@
 package com.pennsieve.jobscheduling
 package monitor
 
-import akka.actor.Scheduler
-import akka.stream.ActorMaterializer
+import akka.actor.{ ActorSystem, Scheduler }
 import akka.stream.alpakka.sqs.SqsSourceSettings
 import akka.stream.alpakka.sqs.scaladsl.SqsSource
 import akka.stream.scaladsl.{ Flow, Keep, Source }
@@ -37,7 +36,7 @@ class JobMonitor(
   etlBucket: String
 )(implicit
   log: ContextLogger,
-  mat: ActorMaterializer,
+  system: ActorSystem,
   scheduler: Scheduler,
   ec: ExecutionContext,
   ports: JobMonitorPorts,
@@ -165,7 +164,7 @@ object JobMonitor {
     etlBucket: String
   )(implicit
     log: ContextLogger,
-    materializer: ActorMaterializer,
+    system: ActorSystem,
     scheduler: Scheduler,
     ec: ExecutionContext
   ): JobMonitor = {

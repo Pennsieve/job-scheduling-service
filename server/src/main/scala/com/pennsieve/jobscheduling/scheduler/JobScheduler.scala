@@ -3,7 +3,7 @@
 package com.pennsieve.jobscheduling.scheduler
 
 import akka.NotUsed
-import akka.actor.Scheduler
+import akka.actor.{ ActorSystem, Scheduler }
 import akka.stream.QueueOfferResult.{ Dropped, Enqueued, QueueClosed, Failure => QueueFailure }
 import akka.stream._
 import akka.stream.scaladsl.GraphDSL.Builder
@@ -28,7 +28,7 @@ class JobScheduler(
   ports: JobSchedulerPorts
 )(implicit
   executionContext: ExecutionContext,
-  matierializer: ActorMaterializer,
+  system: ActorSystem,
   scheduler: Scheduler,
   log: ContextLogger
 ) {
