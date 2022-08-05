@@ -1,9 +1,8 @@
 // Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
 
 package com.pennsieve.jobscheduling.scheduler
-import akka.actor.Scheduler
+import akka.actor.{ ActorSystem, Scheduler }
 import akka.stream.scaladsl.{ Keep, Sink }
-import akka.stream.ActorMaterializer
 import com.amazonaws.services.ecs.model.{
   DescribeTasksResult,
   ListTasksResult,
@@ -49,7 +48,7 @@ object JobSchedulerFakes extends AwaitableImplicits {
   )(implicit
     ports: JobSchedulingPorts,
     ec: ExecutionContext,
-    matierializer: ActorMaterializer,
+    system: ActorSystem,
     scheduler: Scheduler,
     log: ContextLogger
   ) =
@@ -80,7 +79,7 @@ object JobSchedulerFakes extends AwaitableImplicits {
   )(implicit
     ports: JobSchedulingPorts,
     ec: ExecutionContext,
-    matierializer: ActorMaterializer,
+    system: ActorSystem,
     scheduler: Scheduler,
     log: ContextLogger
   ) = {
@@ -97,7 +96,7 @@ object JobSchedulerFakes extends AwaitableImplicits {
   )(implicit
     ports: JobSchedulingPorts,
     ec: ExecutionContext,
-    matierializer: ActorMaterializer,
+    system: ActorSystem,
     scheduler: Scheduler,
     log: ContextLogger
   ): (JobScheduler, Future[Option[ETLEvent]]) = {
@@ -112,7 +111,7 @@ object JobSchedulerFakes extends AwaitableImplicits {
   )(implicit
     ports: JobSchedulingPorts,
     ec: ExecutionContext,
-    matierializer: ActorMaterializer,
+    system: ActorSystem,
     scheduler: Scheduler,
     log: ContextLogger
   ) =

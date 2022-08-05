@@ -9,7 +9,6 @@ import java.util.UUID
 import akka.actor.{ ActorSystem, Scheduler }
 import akka.http.scaladsl.model.StatusCodes.NotFound
 import akka.http.scaladsl.model.StatusCode
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{ Sink, Source }
 import akka.testkit.TestKit
 import cats.data.EitherT
@@ -86,7 +85,6 @@ class JobMonitorSpec(system: ActorSystem)
   def this() = this(ActorSystem("JobMonitorSpec"))
 
   implicit val actorSystem: ActorSystem = system
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = actorSystem.dispatcher
   implicit val scheduler: Scheduler = actorSystem.scheduler
   implicit val etlNotificationDecoder: Decoder[ETLNotification] =

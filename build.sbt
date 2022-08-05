@@ -47,7 +47,7 @@ lazy val headerMappingsValue = HeaderFileType.scala -> HeaderCommentStyle.cppSty
 // Dependency versions
 lazy val AkkaHttpVersion = "10.1.11"
 lazy val AkkaVersion = "2.6.5"
-lazy val AuthMiddlewareVersion = "4.2.3"
+lazy val AuthMiddlewareVersion = "5.1.3"
 lazy val AwsVersion = "1.11.414"
 lazy val CatsVersion = "1.2.0"
 lazy val CirceVersion = "0.11.1"
@@ -59,8 +59,8 @@ lazy val PureConfigVersion = "0.9.1"
 lazy val ScalaLoggingVersion = "3.9.2"
 lazy val SlickVersion = "3.3.2"
 lazy val SlickPgVersion = "0.17.3"
-lazy val ServiceUtilitiesVersion = "6-2a4488a"
-lazy val UtilitiesVersion = "3-cd7539b"
+lazy val ServiceUtilitiesVersion = "8-9751ee3"
+lazy val UtilitiesVersion = "4-55953e4"
 
 // Shared dependencies
 ThisBuild / libraryDependencies ++= Seq(
@@ -174,7 +174,7 @@ lazy val server = project
 
       "io.scalaland" %% "chimney" % "0.2.1",
 
-      "com.pennsieve" %% "utilities" % UtilitiesVersion % "test" classifier "tests",
+      "com.pennsieve" %% "utilities" % UtilitiesVersion % Test classifier "tests",
       "com.whisk" %% "docker-testkit-scalatest" % DockerItVersion % Test,
       "com.whisk" %% "docker-testkit-impl-spotify" % DockerItVersion % Test,
       "org.scalatest" %% "scalatest"% "3.0.5" % Test,

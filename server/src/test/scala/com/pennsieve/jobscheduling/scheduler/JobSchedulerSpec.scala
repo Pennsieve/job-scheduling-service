@@ -3,7 +3,6 @@
 package com.pennsieve.jobscheduling.scheduler
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
 import akka.testkit.TestKit
 import com.pennsieve.jobscheduling.Fakes.failingUpdateJob
@@ -49,7 +48,6 @@ class JobSchedulerSpec(system: ActorSystem)
   def this() = this(ActorSystem("JobSchedulerSpec"))
 
   implicit val actorSystem = system
-  implicit val materializer = ActorMaterializer()
   implicit val scheduler = system.scheduler
 
   override def beforeEach(): Unit = {

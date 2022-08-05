@@ -8,7 +8,6 @@ import java.util.Date
 
 import akka.Done
 import akka.actor.{ ActorSystem, Scheduler }
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{ Keep, Sink, Source }
 import akka.testkit.TestKit
 import com.amazonaws.services.ecs.model.{ ContainerOverride, KeyValuePair, TaskOverride }
@@ -58,7 +57,6 @@ class WatchDogSpec(system: ActorSystem)
   def this() = this(ActorSystem("WatchDogSpec"))
 
   implicit val actorSystem: ActorSystem = system
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val scheduler: Scheduler = system.scheduler
 
   override def beforeEach(): Unit = {

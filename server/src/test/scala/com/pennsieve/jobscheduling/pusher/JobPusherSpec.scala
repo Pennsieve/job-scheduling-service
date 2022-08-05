@@ -5,7 +5,6 @@ package com.pennsieve.jobscheduling.pusher
 import java.util.UUID
 
 import akka.actor.{ ActorSystem, Scheduler }
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{ Sink, Source }
 import akka.testkit.TestKitBase
 import cats.implicits._
@@ -53,7 +52,6 @@ class JobPusherSpec
   implicit lazy val system = ActorSystem("JobPusherSpec")
 
   implicit val log: ContextLogger = new ContextLogger
-  implicit val actorMaterializer: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = system.dispatcher
   implicit val scheduler: Scheduler = system.scheduler
   val etlBucket: String = staticS3Config.etlBucket
