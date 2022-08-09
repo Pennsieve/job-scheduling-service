@@ -9,7 +9,6 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ HttpRequest, HttpResponse }
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.stream.ActorMaterializer
 import com.pennsieve.core.clients.packages.PackagesClient
 import com.pennsieve.jobscheduling.clients.{ HttpClient, PennsieveApiClientImpl }
 import com.pennsieve.jobscheduling.handlers.{
@@ -61,8 +60,6 @@ object Server extends App {
     pureconfig.loadConfigOrThrow[ServiceConfig]
 
   implicit val system: ActorSystem = ActorSystem("job-scheduling-service")
-  // Need deprecated ActorMaterialize for service-utilities QueueHttpResponder
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = system.dispatcher
   implicit val scheduler: Scheduler = system.scheduler
   implicit val ports: JobSchedulingPorts = new JobSchedulingPorts(config)
