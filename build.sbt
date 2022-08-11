@@ -1,8 +1,18 @@
-cancelable in Global := true
+import CrossCompilationUtil.{
+  getVersion,
+  handle212OnlyDependency,
+  scalaVersionMatch
+}
+Global / cancelable := true
+
+
+lazy val scala212 = "2.12.11"
+lazy val scala213 = "2.13.8"
+lazy val supportedScalaVersions = List(scala212)//, scala213)
 
 // Shared settings
 ThisBuild / organization := "com.pennsieve"
-ThisBuild / scalaVersion := "2.12.11"
+ThisBuild / scalaVersion := scala212
 ThisBuild / scalacOptions ++= Seq(
   "-language:implicitConversions",
   "-language:postfixOps",
@@ -88,6 +98,7 @@ lazy val client = project
   .dependsOn(commons)
   .settings(
     name := "job-scheduling-service-client",
+    crossScalaVersions := supportedScalaVersions,
     headerLicense := headerLicenseValue,
     headerMappings := headerMappings.value + headerMappingsValue,
     publishTo := {
@@ -108,6 +119,7 @@ lazy val commons = project
   .enablePlugins(AutomateHeaderPlugin)
   .settings(
     name := "job-scheduling-service-commons",
+    crossScalaVersions := supportedScalaVersions,
     headerLicense := headerLicenseValue,
     headerMappings := headerMappings.value + headerMappingsValue,
     publishTo := {
@@ -166,9 +178,6 @@ lazy val server = project
 
       "com.github.tminglei" %% "slick-pg" % SlickPgVersion,
       "com.github.tminglei" %% "slick-pg_circe-json" % SlickPgVersion,
-
-      "com.beachape" %% "enumeratum" % EnumeratumVersion,
-      "com.beachape" %% "enumeratum-circe" % EnumeratumVersion,
 
       "org.postgresql" % "postgresql" % "42.2.4",
 
@@ -238,3 +247,8 @@ lazy val server = project
 
 lazy val root = (project in file("."))
   .aggregate(server, client)
+  .settings(
+    // crossScalaVersions must be set to Nil on the aggregating project
+    crossScalaVersions := Nil,
+    publish / skip := true
+  )
