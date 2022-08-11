@@ -49,7 +49,7 @@ lazy val AkkaHttpVersion = "10.1.11"
 lazy val AkkaVersion = "2.6.5"
 lazy val AuthMiddlewareVersion = "5.1.3"
 lazy val AwsVersion = "1.11.414"
-lazy val CatsVersion = "1.2.0"
+lazy val CatsVersion = "1.5.0"
 lazy val CirceVersion = "0.11.1"
 lazy val CoreVersion = "190-9da55c4"
 lazy val DockerItVersion = "0.9.7"
@@ -99,7 +99,7 @@ lazy val client = project
       }
     },
     publishMavenStyle := true,
-    guardrailTasks in Compile := List(
+    Compile / guardrailTasks := List(
       Client(file("./swagger/job-scheduling-service.yml"), pkg="com.pennsieve.jobscheduling.clients.generated")
     )
   )
@@ -130,10 +130,10 @@ lazy val server = project
     name := "job-scheduling-service",
     headerLicense := headerLicenseValue,
     headerMappings := headerMappings.value + headerMappingsValue,
-    guardrailTasks in Compile := List(
+    Compile / guardrailTasks := List(
       Server(file("./swagger/job-scheduling-service.yml"), pkg="com.pennsieve.jobscheduling.server.generated")
     ),
-    test in assembly := {},
+    assembly / test := {},
     libraryDependencies ++= Seq(
       "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % "1.0-M1",
 
@@ -217,7 +217,7 @@ lazy val server = project
 
     scalafmtOnCompile := true,
 
-    dockerfile in docker := {
+    docker / dockerfile := {
       val artifact: File = assembly.value
       val artifactTargetPath = s"/app/${artifact.name}"
       new Dockerfile {
@@ -231,7 +231,7 @@ lazy val server = project
         cmd("--service", "job-scheduling-service", "exec", "app/run.sh", artifactTargetPath)
       }
     },
-    imageNames in docker := Seq(
+    docker / imageNames := Seq(
       ImageName("pennsieve/job-scheduling-service:latest")
     )
   )
