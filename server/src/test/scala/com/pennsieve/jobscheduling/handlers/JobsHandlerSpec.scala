@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
 
-package com.pennsieve.jobscheduling.db.handlers
+package com.pennsieve.jobscheduling.handlers
 
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
@@ -38,7 +38,6 @@ import com.pennsieve.jobscheduling.commons.JobState._
 import com.pennsieve.jobscheduling.db.JobsMapper.get
 import com.pennsieve.jobscheduling.db._
 import com.pennsieve.jobscheduling.db.profile.api._
-import com.pennsieve.jobscheduling.handlers.{ JobsHandler, JobsHandlerPorts }
 import com.pennsieve.jobscheduling.handlers.JobsHandlerPorts.{ apply => _, _ }
 import com.pennsieve.jobscheduling.model.Cursor
 import com.pennsieve.jobscheduling.model.JobConverters._
@@ -64,6 +63,7 @@ import com.pennsieve.notifications.{ NotificationMessage, UploadNotification }
 import com.pennsieve.test.EitherValue._
 import io.circe.Error
 import io.circe.parser.decode
+import io.circe.syntax._
 import org.scalatest.EitherValues._
 import org.scalatest.{ BeforeAndAfterEach, Matchers, WordSpec }
 import shapeless.syntax.inject.InjectSyntax
@@ -789,7 +789,9 @@ class JobsHandlerSpec
       resp.value
         .awaitFinite()
         .value
-        .getOrFail[GetPackageStateResponse.OK, PackageState]
+        .getOrFail[GetPackageStateResponse.OK, io.circe.Json]
+        .as[PackageState]
+        .value
     }
 
     "get the state of a package based on its jobs simple" in {
@@ -1093,7 +1095,7 @@ class JobsHandlerSpec
           .value
           .getOrFail[GetPackageJobsResponse.OK, JobPage]
 
-      jobPage shouldBe JobPage(IndexedSeq(insertedJob.toClientJob))
+      jobPage shouldBe JobPage(Vector(insertedJob.toClientJob))
     }
 
     "return a page of jobs with a cursor if more than the expected page size are present" in {
@@ -1105,7 +1107,7 @@ class JobsHandlerSpec
       val nextJob = insertJobInDB(organizationId, state = Uploading)
 
       val someCursor = Some(Cursor(nextJob.id, nextJob.createdAt).toString)
-      val expectedPage = JobPage(IndexedSeq(oldJob.toClientJob), someCursor)
+      val expectedPage = JobPage(Vector(oldJob.toClientJob), someCursor)
 
       val jobPage =
         createClient(createRoutes(jobScheduler))
@@ -1132,7 +1134,7 @@ class JobsHandlerSpec
       val nextJob = insertJobInDB(organizationId, state = Uploading)
 
       val expectedPage =
-        JobPage(IndexedSeq(nextJob.toClientJob), None)
+        JobPage(Vector(nextJob.toClientJob), None)
 
       val client = createClient(createRoutes(jobScheduler))
 

@@ -1,6 +1,6 @@
 // Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
 
-package com.pennsieve.jobscheduling.db.handlers
+package com.pennsieve.jobscheduling.handlers
 
 import akka.http.scaladsl.model.headers.{ Authorization, OAuth2BearerToken }
 import akka.http.scaladsl.server.Route
@@ -23,7 +23,6 @@ import com.pennsieve.jobscheduling.clients.generated.organizations.Organizations
 import com.pennsieve.jobscheduling.db.OrganizationQuotaMapper
 import com.pennsieve.jobscheduling.db.OrganizationQuotaMapper.getOrganization
 import com.pennsieve.jobscheduling.db.profile.api._
-import com.pennsieve.jobscheduling.handlers.OrganizationsHandler
 import com.pennsieve.models.Role
 import com.pennsieve.test.AwaitableImplicits
 import org.scalatest.{ BeforeAndAfterEach, Matchers, WordSpec }

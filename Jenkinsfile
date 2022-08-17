@@ -15,14 +15,14 @@ node("executor") {
 
     stage("Build") {
         withCredentials([pennsieveNexusCreds]) {
-            sh "$sbt clean compile"
+            sh "$sbt clean +compile"
         }
     }
 
     stage("Test") {
         withCredentials([pennsieveNexusCreds]) {
             try {
-                sh "$sbt coverageOn test"
+                sh "$sbt coverageOn +test"
             } finally {
                 junit '**/target/test-reports/*.xml'
             }
@@ -38,8 +38,8 @@ node("executor") {
     if (["main"].contains(env.BRANCH_NAME)) {
         stage("Publish Jars") {
             withCredentials([pennsieveNexusCreds]) {
-                sh "$sbt commons/publish"
-                sh "$sbt client/publish"
+                sh "$sbt +commons/publish"
+                sh "$sbt +client/publish"
             }
         }
 

@@ -7,7 +7,7 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Route
-import akka.stream.ActorMaterializer
+import io.circe.syntax._
 import cats.data.EitherT
 import com.amazonaws.services.sqs.model.SendMessageResult
 import com.pennsieve.auth.middleware.AkkaDirective._
@@ -348,7 +348,7 @@ class JobsHandler(
               .getLastJobNotAppend(datasetId, packageId, organizationId)
               .map {
                 case Some(job) =>
-                  logResponse(respond.OK(inferPackageStateFromJobState(job.state)))
+                  logResponse(respond.OK(inferPackageStateFromJobState(job.state).asJson))
 
                 case None =>
                   val msg = s"No job found for given package id $packageId"
