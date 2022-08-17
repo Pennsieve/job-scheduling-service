@@ -28,8 +28,15 @@ import com.pennsieve.jobscheduling.model.{ Cursor, InvalidCursorException, Packa
 import com.pennsieve.jobscheduling.scheduler.JobScheduler
 import com.pennsieve.jobscheduling.server.generated.definitions
 import com.pennsieve.jobscheduling.server.generated.definitions.{ JobPage, UploadResult }
-import com.pennsieve.jobscheduling.server.generated.jobs.JobsResource._
-import com.pennsieve.jobscheduling.server.generated.jobs.JobsResource.createResponse._
+import com.pennsieve.jobscheduling.server.generated.jobs.JobsResource.{
+  CompleteUploadResponse,
+  CreateResponse,
+  GetAllJobsResponse,
+  GetAllJobsResponseOK,
+  GetJobResponse,
+  GetPackageJobsResponse,
+  GetPackageStateResponse
+}
 import com.pennsieve.jobscheduling.server.generated.jobs.{
   JobsResource,
   JobsHandler => GuardrailHandler
@@ -66,10 +73,10 @@ class JobsHandler(
 
   def parseJobId(jobId: String): Future[JobId] = toUUID(jobId).map(JobId.apply)
 
-  type GetAllJobs = getAllJobsResponse
-  type GetAllOK = getAllJobsResponseOK
+  type GetAllJobs = GetAllJobsResponse
+  type GetAllOK = GetAllJobsResponseOK
 
-  type GetAllRespond = JobsResource.getAllJobsResponse.type
+  type GetAllRespond = GetAllJobsResponse.type
 
   implicit val getAllJobsMarker: ResponseTier[GetAllJobs] =
     ResponseTier("GetAllJobs", "failed to get all jobs with", "got all jobs")
@@ -81,10 +88,10 @@ class JobsHandler(
       ports
         .getJobs(OrganizationId(organizationId))
         .map { jobs =>
-          logResponse(respond.OK(jobs.toIndexedSeq.map(_.toSwaggerJob)))
+          logResponse(respond.OK(jobs.toVector.map(_.toSwaggerJob)))
         }
 
-    withAuthorization[getAllJobsResponse](claim, organizationId) { _ =>
+    withAuthorization[GetAllJobsResponse](claim, organizationId) { _ =>
       ports
         .getOrganization(OrganizationId(organizationId))
         .flatMap {
@@ -97,12 +104,12 @@ class JobsHandler(
     }
   }
 
-  type GetJob = getJobResponse
+  type GetJob = GetJobResponse
   implicit val getJobMarker: ResponseTier[GetJob] =
     ResponseTier("GetJob", "failed to get job with", "got job")
 
   override def getJob(
-    respond: JobsResource.getJobResponse.type
+    respond: JobsResource.GetJobResponse.type
   )(
     organizationId: Int,
     jobId: String
@@ -133,13 +140,13 @@ class JobsHandler(
     }
   }
 
-  type InternalServerError = JobsResource.createResponseInternalServerError
-  type CreateResponse = JobsResource.createResponse
+  type InternalServerError = JobsResource.CreateResponseInternalServerError
+  type CreateResponse = JobsResource.CreateResponse
   implicit val createMarker: ResponseTier[CreateResponse] =
     ResponseTier("CreateJob", "failed to create job", "created job")
 
   override def create(
-    respond: JobsResource.createResponse.type
+    respond: JobsResource.CreateResponse.type
   )(
     organizationId: Int,
     jobId: String,
@@ -151,7 +158,7 @@ class JobsHandler(
       payload: Payload,
       organizationId: Int,
       userId: Option[Int],
-      respond: JobsResource.createResponse.type
+      respond: CreateResponse.type
     )(implicit
       log: ContextLogger,
       logContext: ETLLogContext
@@ -171,7 +178,7 @@ class JobsHandler(
     def notifyConsumer(
       createdJob: Job,
       payload: Payload,
-      respond: JobsResource.createResponse.type
+      respond: CreateResponse.type
     )(implicit
       log: ContextLogger,
       logContext: ETLLogContext
@@ -205,7 +212,7 @@ class JobsHandler(
       organizationId: Int,
       payload: Payload,
       userId: => Option[UserId],
-      respond: JobsResource.createResponse.type
+      respond: CreateResponse.type
     )(implicit
       log: ContextLogger,
       logContext: ETLLogContext
@@ -215,7 +222,7 @@ class JobsHandler(
           payload match {
             case _: Workflow =>
               EitherT(jobScheduler.addJob())
-                .leftMap(_ => InternalServerError("Job not queued"))
+                .leftMap(_ => CreateResponse.InternalServerError("Job not queued"))
                 .map(_ => createdJob)
             case uploadPayload =>
               notifyConsumer(createdJob, uploadPayload, respond)
@@ -250,11 +257,11 @@ class JobsHandler(
         } yield response
       }
     }.recover {
-      case ForbiddenException => logResponse(Forbidden)
+      case ForbiddenException => logResponse(CreateResponse.Forbidden)
     }
   }
 
-  type GetPackageJobs = JobsResource.getPackageJobsResponse
+  type GetPackageJobs = GetPackageJobsResponse
   implicit val getPackageJobs: ResponseTier[GetPackageJobs] =
     ResponseTier[GetPackageJobs](
       "GetPackageJob",
@@ -263,7 +270,7 @@ class JobsHandler(
     )
 
   override def getPackageJobs(
-    respond: JobsResource.getPackageJobsResponse.type
+    respond: GetPackageJobsResponse.type
   )(
     datasetId: Int,
     packageId: Int,
@@ -292,11 +299,9 @@ class JobsHandler(
                   val nextPageFirstJob = jobs.last
                   val cursor = Cursor(nextPageFirstJob.id, nextPageFirstJob.createdAt).toString
 
-                  respond.OK(
-                    JobPage(jobs.dropRight(1).map(_.toSwaggerJob).toIndexedSeq, Some(cursor))
-                  )
+                  respond.OK(JobPage(jobs.dropRight(1).map(_.toSwaggerJob).toVector, Some(cursor)))
                 } else {
-                  respond.OK(JobPage(jobs.map(_.toSwaggerJob).toIndexedSeq))
+                  respond.OK(JobPage(jobs.map(_.toSwaggerJob).toVector))
                 }
               }
           }
@@ -309,7 +314,7 @@ class JobsHandler(
       case ForbiddenException => respond.Forbidden
     }
 
-  type GetPackageState = JobsResource.getPackageStateResponse
+  type GetPackageState = GetPackageStateResponse
   implicit val getPackageState: ResponseTier[GetPackageState] =
     ResponseTier[GetPackageState](
       "GetPackageState",
@@ -327,7 +332,7 @@ class JobsHandler(
     }
   }
   override def getPackageState(
-    respond: JobsResource.getPackageStateResponse.type
+    respond: GetPackageStateResponse.type
   )(
     organizationId: Int,
     datasetId: Int,
@@ -359,7 +364,7 @@ class JobsHandler(
     case ForbiddenException => respond.Forbidden
   }
 
-  type CompleteUpload = JobsResource.completeUploadResponse
+  type CompleteUpload = CompleteUploadResponse
   implicit val completeUploadMarker: ResponseTier[CompleteUpload] =
     ResponseTier[CompleteUpload](
       "CompleteUpload",
@@ -368,7 +373,7 @@ class JobsHandler(
     )
 
   override def completeUpload(
-    respond: JobsResource.completeUploadResponse.type
+    respond: CompleteUploadResponse.type
   )(
     organizationId: Int,
     jobId: String,

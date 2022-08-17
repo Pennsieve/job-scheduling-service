@@ -28,8 +28,8 @@ class OrganizationsHandler(
   log: ContextLogger
 ) extends GuardrailHandler {
 
-  type SetQuota = setQuotaResponse
-  type SetQuotaBuilder = OrganizationsResource.setQuotaResponse.type
+  type SetQuota = SetQuotaResponse
+  type SetQuotaBuilder = OrganizationsResource.SetQuotaResponse.type
   implicit val setQuotaMarker: ResponseTier[SetQuota] =
     ResponseTier("SetQuota", "failed to set quota", "set quota")
 

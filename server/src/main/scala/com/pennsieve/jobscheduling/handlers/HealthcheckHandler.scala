@@ -24,13 +24,13 @@ class HealthcheckHandler(
   }
 
   override def healthcheck(
-    respond: HealthcheckResource.healthcheckResponse.type
+    respond: HealthcheckResource.HealthcheckResponse.type
   )(
-  ): Future[HealthcheckResource.healthcheckResponse] = {
+  ): Future[HealthcheckResource.HealthcheckResponse] = {
     ports.db
       .run(checkDatabaseHealth)
       .map { _ =>
-        HealthcheckResource.healthcheckResponseOK
+        HealthcheckResource.HealthcheckResponseOK
       }
       .recoverWith {
         case e => Future.successful(respond.ServiceUnavailable(e.toString))

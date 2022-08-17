@@ -20,7 +20,7 @@ addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.7")
 
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
 
-addSbtPlugin("com.twilio" % "sbt-guardrail" % "0.43.0")
+addSbtPlugin("dev.guardrail" % "sbt-guardrail" % "0.70.0.2")
 
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
 

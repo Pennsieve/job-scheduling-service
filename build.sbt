@@ -1,27 +1,14 @@
-import CrossCompilationUtil.{
-  getVersion,
-  handle212OnlyDependency,
-  scalaVersionMatch
-}
+import CrossCompilationUtil.{getScalacOptions, getVersion, handle212OnlyDependency, scalaVersionMatch}
 Global / cancelable := true
 
 
 lazy val scala212 = "2.12.11"
 lazy val scala213 = "2.13.8"
-lazy val supportedScalaVersions = List(scala212)//, scala213)
+lazy val supportedScalaVersions = List(scala212, scala213)
 
 // Shared settings
 ThisBuild / organization := "com.pennsieve"
 ThisBuild / scalaVersion := scala212
-ThisBuild / scalacOptions ++= Seq(
-  "-language:implicitConversions",
-  "-language:postfixOps",
-  "-language:reflectiveCalls",
-  "-Ypartial-unification",
-  "-Xmax-classfile-name", "100",
-  "-feature",
-  "-deprecation",
-)
 ThisBuild / resolvers ++= Seq(
   "Pennsieve Releases" at "https://nexus.pennsieve.cc/repository/maven-releases",
   "Pennsieve Snapshots" at "https://nexus.pennsieve.cc/repository/maven-snapshots",
@@ -59,11 +46,14 @@ lazy val AkkaHttpVersion = "10.1.11"
 lazy val AkkaVersion = "2.6.5"
 lazy val AuthMiddlewareVersion = "5.1.3"
 lazy val AwsVersion = "1.11.414"
-lazy val CatsVersion = "1.5.0"
-lazy val CirceVersion = "0.11.1"
-lazy val CoreVersion = "190-9da55c4"
+lazy val cats212Version = "1.5.0"
+lazy val cats213Version = "2.6.1"
+lazy val circe212Version = "0.11.1"
+lazy val circe213Version = "0.14.1"
+lazy val CoreVersion = "191-fe6a5c7"
 lazy val DockerItVersion = "0.9.7"
-lazy val EnumeratumVersion = "1.5.14"
+lazy val enumeratum212Version = "1.5.14"
+lazy val enumeratum213Version = "1.7.0"
 lazy val LogbackVersion = "1.2.3"
 lazy val PureConfigVersion = "0.9.1"
 lazy val ScalaLoggingVersion = "3.9.2"
@@ -71,6 +61,26 @@ lazy val SlickVersion = "3.3.2"
 lazy val SlickPgVersion = "0.17.3"
 lazy val ServiceUtilitiesVersion = "8-9751ee3"
 lazy val UtilitiesVersion = "4-55953e4"
+
+lazy val circeVersion = SettingKey[String]("circeVersion")
+lazy val enumeratumVersion = SettingKey[String]("enumeratumVersion")
+lazy val catsVersion = SettingKey[String]("catsVersion")
+
+lazy val sharedEnumeratumDependencies = Seq(
+  "com.beachape"               %% "enumeratum",
+  "com.beachape"               %% "enumeratum-circe"
+)
+
+lazy val sharedCirceDependencies = Seq(
+  "io.circe"                   %% "circe-core",
+  "io.circe"                   %% "circe-generic",
+  //"io.circe"                   %% "circe-java8",
+  "io.circe"                   %% "circe-jawn",
+)
+
+lazy val sharedCatsDependencies = Seq(
+  "org.typelevel"              %% "cats-core",
+)
 
 // Shared dependencies
 ThisBuild / libraryDependencies ++= Seq(
@@ -80,16 +90,6 @@ ThisBuild / libraryDependencies ++= Seq(
 
   "com.typesafe.akka"          %% "akka-http"         % AkkaHttpVersion,
   "com.typesafe.akka"          %% "akka-stream-typed" % AkkaVersion,
-
-  "com.beachape"               %% "enumeratum"        % EnumeratumVersion,
-  "com.beachape"               %% "enumeratum-circe"  % EnumeratumVersion,
-
-  "io.circe"                   %% "circe-core"        % CirceVersion,
-  "io.circe"                   %% "circe-generic"     % CirceVersion,
-  "io.circe"                   %% "circe-java8"       % CirceVersion,
-  "io.circe"                   %% "circe-jawn"        % CirceVersion,
-
-  "org.typelevel"              %% "cats-core"         % CatsVersion,
 )
 
 // project definitions
@@ -98,7 +98,30 @@ lazy val client = project
   .dependsOn(commons)
   .settings(
     name := "job-scheduling-service-client",
+    scalacOptions ++= getScalacOptions(scalaVersion.value),
     crossScalaVersions := supportedScalaVersions,
+    circeVersion := getVersion(
+      scalaVersion.value,
+      circe212Version,
+      circe213Version
+    ),
+    enumeratumVersion := getVersion(
+      scalaVersion.value,
+      enumeratum212Version,
+      enumeratum213Version
+    ),
+    catsVersion := getVersion(
+      scalaVersion.value,
+      cats212Version,
+      cats213Version
+    ),
+    libraryDependencies ++= sharedEnumeratumDependencies.map(_ % enumeratumVersion.value),
+    libraryDependencies ++= sharedCirceDependencies.map(_ % circeVersion.value),
+    libraryDependencies ++= handle212OnlyDependency(
+      scalaVersion.value,
+      "io.circe" %% "circe-java8" % circeVersion.value
+    ),
+    libraryDependencies ++= sharedCatsDependencies.map(_ % catsVersion.value),
     headerLicense := headerLicenseValue,
     headerMappings := headerMappings.value + headerMappingsValue,
     publishTo := {
@@ -110,8 +133,21 @@ lazy val client = project
       }
     },
     publishMavenStyle := true,
-    Compile / guardrailTasks := List(
-      Client(file("./swagger/job-scheduling-service.yml"), pkg="com.pennsieve.jobscheduling.clients.generated")
+    Compile / guardrailTasks := scalaVersionMatch(
+      scalaVersion.value,
+      List(
+        ScalaClient(
+          file("./swagger/job-scheduling-service.yml"),
+          pkg = "com.pennsieve.jobscheduling.clients.generated",
+          modules = List("akka-http", "circe-0.11")
+        )
+      ),
+      List(
+        ScalaClient(
+          file("./swagger/job-scheduling-service.yml"),
+          pkg = "com.pennsieve.jobscheduling.clients.generated"
+        )
+      )
     )
   )
 
@@ -119,7 +155,30 @@ lazy val commons = project
   .enablePlugins(AutomateHeaderPlugin)
   .settings(
     name := "job-scheduling-service-commons",
+    scalacOptions ++= getScalacOptions(scalaVersion.value),
     crossScalaVersions := supportedScalaVersions,
+    circeVersion := getVersion(
+      scalaVersion.value,
+      circe212Version,
+      circe213Version
+    ),
+    enumeratumVersion := getVersion(
+      scalaVersion.value,
+      enumeratum212Version,
+      enumeratum213Version
+    ),
+    catsVersion := getVersion(
+      scalaVersion.value,
+      cats212Version,
+      cats213Version
+    ),
+    libraryDependencies ++= sharedEnumeratumDependencies.map(_ % enumeratumVersion.value),
+    libraryDependencies ++= sharedCirceDependencies.map(_ % circeVersion.value),
+    libraryDependencies ++= handle212OnlyDependency(
+      scalaVersion.value,
+      "io.circe" %% "circe-java8" % circeVersion.value
+    ),
+    libraryDependencies ++= sharedCatsDependencies.map(_ % catsVersion.value),
     headerLicense := headerLicenseValue,
     headerMappings := headerMappings.value + headerMappingsValue,
     publishTo := {
@@ -140,12 +199,38 @@ lazy val server = project
   .dependsOn(client % "test->compile", commons)
   .settings(
     name := "job-scheduling-service",
+    scalacOptions ++= getScalacOptions(scalaVersion.value),
     headerLicense := headerLicenseValue,
     headerMappings := headerMappings.value + headerMappingsValue,
     Compile / guardrailTasks := List(
-      Server(file("./swagger/job-scheduling-service.yml"), pkg="com.pennsieve.jobscheduling.server.generated")
+      ScalaServer(
+        file("./swagger/job-scheduling-service.yml"),
+        pkg="com.pennsieve.jobscheduling.server.generated",
+        modules = List("akka-http", "circe-0.11"))
     ),
     assembly / test := {},
+    circeVersion := getVersion(
+      scalaVersion.value,
+      circe212Version,
+      circe213Version
+    ),
+    enumeratumVersion := getVersion(
+      scalaVersion.value,
+      enumeratum212Version,
+      enumeratum213Version
+    ),
+    catsVersion := getVersion(
+      scalaVersion.value,
+      cats212Version,
+      cats213Version
+    ),
+    libraryDependencies ++= sharedEnumeratumDependencies.map(_ % enumeratumVersion.value),
+    libraryDependencies ++= sharedCirceDependencies.map(_ % circeVersion.value),
+    libraryDependencies ++= handle212OnlyDependency(
+      scalaVersion.value,
+      "io.circe" %% "circe-java8" % circeVersion.value
+    ),
+    libraryDependencies ++= sharedCatsDependencies.map(_ % catsVersion.value),
     libraryDependencies ++= Seq(
       "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % "1.0-M1",
 
@@ -193,10 +278,10 @@ lazy val server = project
     ),
 
     dependencyOverrides ++= Seq(
-      "io.circe" %% "circe-core" % CirceVersion,
-      "io.circe" %% "circe-generic" % CirceVersion,
-      "io.circe" %% "circe-java8" % CirceVersion,
-      "io.circe" %% "circe-jawn" % CirceVersion,
+      "io.circe" %% "circe-core" % circeVersion.value,
+      "io.circe" %% "circe-generic" % circeVersion.value,
+      "io.circe" %% "circe-java8" % circeVersion.value,
+      "io.circe" %% "circe-jawn" % circeVersion.value,
     ),
 
     coverageExcludedPackages := "com.pennsieve.jobscheduling.server\\..*;"
