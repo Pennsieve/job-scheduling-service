@@ -22,6 +22,6 @@ addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
 
 addSbtPlugin("dev.guardrail" % "sbt-guardrail" % "0.70.0.2")
 
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.9.3")
 
 addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.1.0")

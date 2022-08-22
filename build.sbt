@@ -325,7 +325,7 @@ lazy val server = project
       + "com.pennsieve.jobscheduling.clients\\..*;"
       + "com.pennsieve.jobscheduling.errors\\..*;"
       + "com.pennsieve.jobscheduling.db.PostgresProfile",
-    coverageMinimum := 85,
+    coverageMinimumStmtTotal := 85,
     coverageFailOnMinimum := true,
     scalafmtOnCompile := true,
     docker / dockerfile := {
