@@ -2,7 +2,6 @@
 
 package com.pennsieve.jobscheduling
 import java.time.OffsetDateTime
-
 import akka.Done
 import akka.stream.scaladsl.Sink
 import cats.data.EitherT
@@ -36,6 +35,7 @@ import com.pennsieve.service.utilities.{ ContextLogger, Tier }
 import com.zaxxer.hikari.HikariDataSource
 import io.circe.syntax.EncoderOps
 import slick.util.AsyncExecutor
+import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.control.NonFatal
@@ -71,6 +71,7 @@ class JobSchedulingPorts(config: ServiceConfig) {
   val sqsClient: SqsAsyncClient =
     SqsAsyncClient
       .builder()
+      .httpClientBuilder(NettyNioAsyncHttpClient.builder())
       .credentialsProvider(DefaultCredentialsProvider.create())
       .region(config.jobMonitor.awsRegion)
       .build()
