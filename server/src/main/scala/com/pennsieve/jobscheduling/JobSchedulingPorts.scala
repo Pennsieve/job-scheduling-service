@@ -7,9 +7,9 @@ import akka.Done
 import akka.stream.scaladsl.Sink
 import cats.data.EitherT
 import cats.implicits._
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
-import com.amazonaws.services.sqs.model.SendMessageResult
-import com.amazonaws.services.sqs.{ AmazonSQSAsync, AmazonSQSAsyncClientBuilder }
+import software.amazon.awssdk.services.sqs.model.SendMessageResponse
+import software.amazon.awssdk.services.sqs.SqsAsyncClient
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import com.pennsieve.auth.middleware.Jwt
 import com.pennsieve.jobscheduling.clients.SQSClient.MessageBody
 import com.pennsieve.jobscheduling.clients.{ ECSClient, ManifestS3Client }
@@ -68,11 +68,11 @@ class JobSchedulingPorts(config: ServiceConfig) {
 
   val manifestClient: ManifestS3Client = ManifestS3Client(config.s3)
 
-  val sqsClient: AmazonSQSAsync =
-    AmazonSQSAsyncClientBuilder
-      .standard()
-      .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
-      .withRegion(config.jobMonitor.awsRegion)
+  val sqsClient: SqsAsyncClient =
+    SqsAsyncClient
+      .builder()
+      .credentialsProvider(DefaultCredentialsProvider.create())
+      .region(config.jobMonitor.awsRegion)
       .build()
 
   val jwt: Jwt.Config = new Jwt.Config {
@@ -111,7 +111,7 @@ object JobSchedulingPorts {
     }
 
   type NotifyJobSource = () => Future[Either[JobNotQueued.JobNotQueued, JobQueued.JobQueued]]
-  def createNotifyJobSource(scheduler: JobScheduler): NotifyJobSource = () => scheduler.addJob
+  def createNotifyJobSource(scheduler: JobScheduler): NotifyJobSource = scheduler.addJob
 
   type GetManifest = ManifestUri => EventualResult[Manifest]
 
@@ -163,7 +163,7 @@ object JobSchedulingPorts {
   )(implicit
     notifyUploadConsumer: NotifyUpload,
     executionContext: ExecutionContext
-  ): EitherT[Future, Throwable, SendMessageResult] = {
+  ): EitherT[Future, Throwable, SendMessageResponse] = {
     val isValidPayload: Either[Throwable, Unit] = payload match {
       case _: Upload => Right(())
       case unsupportedPayload => Left(UnsupportedPayload(unsupportedPayload))

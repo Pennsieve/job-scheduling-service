@@ -5,13 +5,13 @@ package com.pennsieve.jobscheduling.watchdog
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
 import java.util.Date
-
 import akka.Done
 import akka.actor.{ ActorSystem, Scheduler }
 import akka.stream.scaladsl.{ Keep, Sink, Source }
 import akka.testkit.TestKit
 import com.amazonaws.services.ecs.model.{ ContainerOverride, KeyValuePair, TaskOverride }
-import com.amazonaws.services.sqs.model.GetQueueAttributesResult
+import software.amazon.awssdk.services.sqs.model.GetQueueAttributesResponse
+import software.amazon.awssdk.services.sqs.model.QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES
 import com.pennsieve.jobscheduling.Fakes.getManifest
 import com.pennsieve.jobscheduling.JobSchedulingPorts.{
   createGetJob,
@@ -43,13 +43,17 @@ import com.pennsieve.jobscheduling.scheduler.JobQueued
 import com.pennsieve.jobscheduling.scheduler.JobSchedulerFakes.emptyDescribeTasks
 import com.pennsieve.jobscheduling.watchdog.JobStateWatchDogPorts.createGetJobsStuckInState
 import com.pennsieve.jobscheduling.watchdog.WatchDogPorts._
-import org.scalatest.{ BeforeAndAfterEach, Matchers, WordSpecLike }
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.EitherValues._
 
 import scala.concurrent.Future
+import scala.jdk.CollectionConverters._
 
 class WatchDogSpec(system: ActorSystem)
     extends TestKit(system)
-    with WordSpecLike
+    with AnyWordSpecLike
     with JobSchedulingServiceSpecHarness
     with Matchers
     with BeforeAndAfterEach {
@@ -277,7 +281,7 @@ class WatchDogSpec(system: ActorSystem)
 
       runJobStateWatchDog(fakeSQS.savingManifestUploadNotifier)
 
-      fakeSQS.sentManifest shouldBe Some(payloadToManifest(job)(payload).right.get)
+      fakeSQS.sentManifest shouldBe Some(payloadToManifest(job)(payload).value)
     }
 
     "not resend if there are less jobs stuck in uploading than in SQS waiting" in {
@@ -337,7 +341,6 @@ class WatchDogSpec(system: ActorSystem)
   }
 
   private def createOldInactiveTaskWithEnv(slowJob: Job) = {
-    import scala.collection.JavaConverters._
     val envJobId =
       new KeyValuePair().withName(ImportId).withValue(slowJob.id.toString)
     val envPayloadId =
@@ -421,13 +424,14 @@ class WatchDogSpec(system: ActorSystem)
       .awaitFinite()
   }
 
-  import akka.stream.alpakka.sqs.ApproximateNumberOfMessages
   def successfulGetNumberOfMessages(numberOfMessages: Int): GetNumberOfMessages =
     () =>
       Future.successful(
         Right(
-          new GetQueueAttributesResult()
-            .addAttributesEntry(ApproximateNumberOfMessages.name, numberOfMessages.toString)
+          GetQueueAttributesResponse
+            .builder()
+            .attributes(Map(APPROXIMATE_NUMBER_OF_MESSAGES -> numberOfMessages.toString).asJava)
+            .build()
         )
       )
 

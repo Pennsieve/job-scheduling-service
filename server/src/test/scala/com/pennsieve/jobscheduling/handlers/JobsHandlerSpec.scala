@@ -7,14 +7,13 @@ import java.time.ZoneOffset.UTC
 import java.util.UUID
 import akka.actor.Scheduler
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.StatusCode._
 import akka.http.scaladsl.model.headers.{ Authorization, OAuth2BearerToken }
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import cats.data.EitherT
 import cats.implicits._
 import com.amazonaws.AmazonServiceException
-import com.amazonaws.services.sqs.model.SendMessageResult
+import software.amazon.awssdk.services.sqs.model.SendMessageResponse
 import com.pennsieve.auth.middleware.Jwt.Role.RoleIdentifier
 import com.pennsieve.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserClaim, UserId }
 import com.pennsieve.core.clients.packages.UploadCompleteResponse
@@ -60,21 +59,21 @@ import com.pennsieve.models.{
   Workflow
 }
 import com.pennsieve.notifications.{ NotificationMessage, UploadNotification }
-import com.pennsieve.test.EitherValue._
 import io.circe.Error
 import io.circe.parser.decode
 import io.circe.syntax._
 import org.scalatest.EitherValues._
-import org.scalatest.{ BeforeAndAfterEach, Matchers, WordSpec }
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import shapeless.syntax.inject.InjectSyntax
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration._
 import scala.concurrent.{ Future, TimeoutException }
-import scala.util.{ Success, Try }
 
 class JobsHandlerSpec
-    extends WordSpec
+    extends AnyWordSpec
     with ScalatestRouteTest
     with JobSchedulingServiceSpecHarness
     with Matchers
@@ -123,8 +122,8 @@ class JobsHandlerSpec
 
       val savingManifestUploadNotifier: NotifyUpload =
         string => {
-          sentManifest = Some(decode[Manifest](string.value).right.get)
-          Future.successful(Right(new SendMessageResult()))
+          sentManifest = Some(decode[Manifest](string.value).toOption.get)
+          Future.successful(Right(SendMessageResponse.builder().build()))
         }
 
       val (jobScheduler, _) = runScheduler()
@@ -144,7 +143,7 @@ class JobsHandlerSpec
       val maybePayloadEntry = ports.db.run(PayloadsMapper.get(job.payloadId)).awaitFinite()
       val maybePayload = maybePayloadEntry.map(_.payload)
 
-      val expectedManifest = payloadToManifest(job)(maybePayload).right.value
+      val expectedManifest = payloadToManifest(job)(maybePayload).value
 
       sentManifest shouldBe Some(expectedManifest)
     }
@@ -282,7 +281,7 @@ class JobsHandlerSpec
       val countingManifestUploadNotifier: NotifyUpload =
         _ => {
           sentManifests += 1
-          Future.successful(Right(new SendMessageResult()))
+          Future.successful(Right(SendMessageResponse.builder().build()))
         }
 
       val (jobScheduler, _) = runScheduler()
@@ -1215,10 +1214,10 @@ class JobsHandlerSpec
 
   def successfulNotify(sentNotifications: ArrayBuffer[MessageBody]): SendMessage = msg => {
     sentNotifications += msg
-    Future.successful(Right(new SendMessageResult()))
+    Future.successful(Right(SendMessageResponse.builder().build()))
   }
   val successfulSendMessage: SendMessage = { _ =>
-    Future.successful(Right(new SendMessageResult()))
+    Future.successful(Right(SendMessageResponse.builder().build()))
   }
 
   def createJobId(): UUID = UUID.randomUUID()
@@ -1254,7 +1253,7 @@ class JobsHandlerSpec
       )
     )
 
-  def createClient(routes: Route): JobsClient = JobsClient.httpClient(Route.asyncHandler(routes))
+  def createClient(routes: Route): JobsClient = JobsClient.httpClient(Route.toFunction(routes))
 
   def generateClaim(
     userId: UserId,

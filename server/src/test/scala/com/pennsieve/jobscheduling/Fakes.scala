@@ -7,7 +7,7 @@ import akka.http.scaladsl.model.StatusCodes.NotFound
 import cats.data.EitherT
 import com.amazonaws.AmazonServiceException
 import com.amazonaws.services.ecs.model._
-import com.amazonaws.services.sqs.model.{ DeleteMessageResult, SendMessageResult }
+import software.amazon.awssdk.services.sqs.model.{ DeleteMessageResponse, SendMessageResponse }
 import com.pennsieve.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserId }
 import com.pennsieve.core.clients.packages.UploadCompleteResponse
 import com.pennsieve.core.clients.packages.UploadCompleteResponse.OK
@@ -30,7 +30,7 @@ import com.pennsieve.models.{ JobId, Manifest, PackageState }
 import com.pennsieve.test.AwaitableImplicits
 
 import java.time.OffsetDateTime
-import scala.collection.JavaConverters.asJavaCollectionConverter
+import scala.jdk.CollectionConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 
 object Fakes extends AwaitableImplicits {
@@ -64,11 +64,13 @@ object Fakes extends AwaitableImplicits {
     }
   }
 
-  val successfulNotification: SendMessage = _ => Future.successful(Right(new SendMessageResult()))
+  val successfulNotification: SendMessage = _ =>
+    Future.successful(Right(SendMessageResponse.builder().build()))
 
   val receiptHandle: ReceiptHandle = ReceiptHandle("receiptHandle")
 
-  val successfulAck: SendAck = _ => Future.successful(Right(new DeleteMessageResult()))
+  val successfulAck: SendAck = _ =>
+    Future.successful(Right(DeleteMessageResponse.builder().build()))
 
   def getPayloadReal(implicit ports: JobSchedulingPorts): GetPayload = createGetPayload(ports.db)
 
@@ -125,8 +127,8 @@ class FakeSQS() {
 
   val savingManifestUploadNotifier: NotifyUpload =
     string => {
-      sentManifest = Some(decode[Manifest](string.value).right.get)
-      Future.successful(Right(new SendMessageResult()))
+      sentManifest = Some(decode[Manifest](string.value).toOption.get)
+      Future.successful(Right(SendMessageResponse.builder().build()))
     }
 }
 
@@ -150,7 +152,7 @@ class FakeFargate(attemptsTilSuccess: Int = 1) {
     Future.successful {
       val listTasksResult = new ListTasksResult()
       if (listAttempts < attemptsTilSuccess)
-        listTasksResult.setTaskArns(List("task").asJavaCollection)
+        listTasksResult.setTaskArns(List("task").asJava)
       listAttempts += 1
       Right(listTasksResult)
     }

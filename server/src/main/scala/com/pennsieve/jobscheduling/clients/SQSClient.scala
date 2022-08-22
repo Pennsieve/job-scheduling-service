@@ -2,12 +2,15 @@
 
 package com.pennsieve.jobscheduling.clients
 
-import com.amazonaws.services.sqs.AmazonSQSAsync
-import com.amazonaws.services.sqs.model._
-import com.pennsieve.jobscheduling.clients.AwsAsyncCallback.async
+import software.amazon.awssdk.services.sqs.SqsAsyncClient
+import software.amazon.awssdk.services.sqs.model._
+import com.pennsieve.jobscheduling.clients.AwsAsyncResponseAdapter.createRequestFunction
+
 import com.pennsieve.jobscheduling.model.EventualResult.EventualResult
 import io.circe.Encoder
 import io.circe.generic.extras.semiauto.deriveUnwrappedEncoder
+
+import java.util.function.Consumer
 
 object SQSClient {
 
@@ -17,40 +20,42 @@ object SQSClient {
 
     implicit val encoder: Encoder[ReceiptHandle] = deriveUnwrappedEncoder[ReceiptHandle]
 
-    def apply(message: Message): ReceiptHandle = ReceiptHandle(message.getReceiptHandle)
+    def apply(message: Message): ReceiptHandle = ReceiptHandle(message.receiptHandle())
   }
 
   case class QueueName(value: String) extends AnyVal
 
-  type SendAck = ReceiptHandle => EventualResult[DeleteMessageResult]
+  type SendAck = ReceiptHandle => EventualResult[DeleteMessageResponse]
 
-  def createSendAck(sqsClient: AmazonSQSAsync, queueName: QueueName): SendAck = { receiptHandle =>
-    val asyncCallback =
-      new AwsAsyncCallback[DeleteMessageRequest, DeleteMessageResult]
-    sqsClient.deleteMessageAsync(queueName.value, receiptHandle.value, asyncCallback)
-    asyncCallback.promise.future
+  def createSendAck(sqsClient: SqsAsyncClient, queueName: QueueName): SendAck = {
+    val buildRequest: ReceiptHandle => Consumer[DeleteMessageRequest.Builder] = receiptHandle =>
+      (builder: DeleteMessageRequest.Builder) =>
+        builder.queueUrl(queueName.value).receiptHandle(receiptHandle.value)
+
+    createRequestFunction(buildRequest, sqsClient.deleteMessage)
   }
 
   case class MessageBody(value: String) extends AnyVal
 
-  type SendMessage = MessageBody => EventualResult[SendMessageResult]
+  type SendMessage = MessageBody => EventualResult[SendMessageResponse]
 
-  def createSendMessage(sqsClient: AmazonSQSAsync, queueName: QueueName): SendMessage = { message =>
-    val callback = new AwsAsyncCallback[SendMessageRequest, SendMessageResult]
-    sqsClient.sendMessageAsync(queueName.value, message.value, callback)
-    callback.promise.future
+  def createSendMessage(sqsClient: SqsAsyncClient, queueName: QueueName): SendMessage = {
+    val buildRequest: MessageBody => Consumer[SendMessageRequest.Builder] = messageBody =>
+      (builder: SendMessageRequest.Builder) =>
+        builder.queueUrl(queueName.value).messageBody(messageBody.value)
+
+    createRequestFunction(buildRequest, sqsClient.sendMessage)
   }
 
-  import scala.collection.JavaConverters._
-  type GetNumberOfMessages = () => EventualResult[GetQueueAttributesResult]
+  type GetNumberOfMessages = () => EventualResult[GetQueueAttributesResponse]
   val ApproximateNumberOfMessages = "ApproximateNumberOfMessages"
 
   def createGetNumberOfMessages(
-    sqsClient: AmazonSQSAsync,
+    sqsClient: SqsAsyncClient,
     queueName: QueueName
-  ): GetNumberOfMessages =
-    () =>
-      async(sqsClient.getQueueAttributesAsync)(
-        new GetQueueAttributesRequest(queueName.value, List().asJava)
-      )
+  ): GetNumberOfMessages = {
+    val buildRequest: Consumer[GetQueueAttributesRequest.Builder] =
+      builder => builder.queueUrl(queueName.value)
+    createRequestFunction(buildRequest, sqsClient.getQueueAttributes)
+  }
 }

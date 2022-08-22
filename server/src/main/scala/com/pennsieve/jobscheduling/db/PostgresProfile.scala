@@ -31,7 +31,7 @@ trait PostgresProfile extends ExPostgresProfile with PgDate2Support with PgCirce
 
     implicit val taskIdMapper =
       MappedColumnType
-        .base[Option[TaskId], Json](_.asJson, json => json.as[Option[TaskId]].right.get)
+        .base[Option[TaskId], Json](_.asJson, json => json.as[Option[TaskId]].toOption.get)
 
     implicit val jobIdMapper =
       MappedColumnType
@@ -41,7 +41,7 @@ trait PostgresProfile extends ExPostgresProfile with PgDate2Support with PgCirce
 
     implicit val payloadMapper =
       MappedColumnType
-        .base[Payload, Json](_.asJson, _.as[Payload].right.get)
+        .base[Payload, Json](_.asJson, _.as[Payload].toOption.get)
   }
 
   override val api = PostgresAPI

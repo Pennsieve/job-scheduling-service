@@ -12,7 +12,7 @@ class AwsAsyncCallback[Request <: AmazonWebServiceRequest, Result]
     extends AWSAsyncHandler[Request, Result] {
 
   val promise: Promise[Either[Exception, Result]] =
-    Promise[Either[Exception, Result]]
+    Promise[Either[Exception, Result]]()
 
   override def onError(exception: Exception): Unit =
     promise.success(Left(exception))

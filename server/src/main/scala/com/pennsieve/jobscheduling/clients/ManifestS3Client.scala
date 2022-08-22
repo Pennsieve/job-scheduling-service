@@ -53,7 +53,7 @@ class ManifestS3Client(awsS3Client: AmazonS3, etlBucket: String) {
         }
 
         attempt match {
-          case Success(_) => Right(Unit)
+          case Success(_) => Right(())
           case Failure(exception) => Left(ManifestUploadFailure(exception))
         }
       }

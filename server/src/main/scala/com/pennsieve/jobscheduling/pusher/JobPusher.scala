@@ -25,7 +25,7 @@ import com.pennsieve.models.PayloadType.{ Append, Export, Workflow }
 import com.pennsieve.service.utilities.ContextLogger
 import io.circe.syntax.EncoderOps
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.control.NonFatal

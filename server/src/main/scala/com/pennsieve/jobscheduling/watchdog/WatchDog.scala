@@ -21,7 +21,7 @@ import com.pennsieve.jobscheduling.shapes.StreamRetry
 import com.pennsieve.models.JobId
 import com.pennsieve.service.utilities.{ ContextLogger, Tier }
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Try
 import scala.util.control.NonFatal

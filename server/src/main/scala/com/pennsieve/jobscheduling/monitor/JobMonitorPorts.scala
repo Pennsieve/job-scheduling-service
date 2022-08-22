@@ -2,7 +2,8 @@
 
 package com.pennsieve.jobscheduling.monitor
 
-import com.amazonaws.services.sqs.AmazonSQSAsync
+import software.amazon.awssdk.services.sqs.SqsAsyncClient
+
 import com.pennsieve.jobscheduling.JobSchedulingPorts.{
   createGetJob,
   createGetPayload,
@@ -21,7 +22,7 @@ import com.pennsieve.jobscheduling.db.profile.api._
 import scala.concurrent.ExecutionContext
 
 case class JobMonitorPorts(
-  sqsClient: AmazonSQSAsync,
+  sqsClient: SqsAsyncClient,
   sendMessage: SQSClient.SendMessage,
   getManifest: GetManifest,
   getJob: GetJob,
@@ -34,7 +35,7 @@ case class JobMonitorPorts(
 
 object JobMonitorPorts {
   def apply(
-    sqsClient: AmazonSQSAsync,
+    sqsClient: SqsAsyncClient,
     notificationsQueue: String,
     pennsieveApiClient: PennsieveApiClient,
     db: Database,

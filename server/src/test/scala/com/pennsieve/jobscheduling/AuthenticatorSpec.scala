@@ -8,12 +8,14 @@ import com.pennsieve.jobscheduling.handlers.AuthorizationChecks.{
   withDatasetAccess
 }
 import com.pennsieve.test.AwaitableImplicits
-import org.scalatest.{ Matchers, WordSpecLike }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.EitherValues._
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
-class AuthenticatorSpec extends WordSpecLike with AwaitableImplicits with Matchers {
+class AuthenticatorSpec extends AnyWordSpec with AwaitableImplicits with Matchers {
 
   "Authenticator" should {
     "generate a valid service claim" in {
@@ -22,7 +24,7 @@ class AuthenticatorSpec extends WordSpecLike with AwaitableImplicits with Matche
       val serviceToken =
         Authenticator.generateServiceToken(jwtConfig, 5 minutes, 1, 1)
 
-      val claim = Jwt.parseClaim(serviceToken).right.get
+      val claim = Jwt.parseClaim(serviceToken).value
 
       val maybeOne =
         withAuthorization(claim, 1) { _ =>

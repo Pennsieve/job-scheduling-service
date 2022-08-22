@@ -3,7 +3,6 @@
 package com.pennsieve.jobscheduling
 
 import java.net.URI
-
 import akka.actor.{ ActorSystem, Scheduler }
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ HttpRequest, HttpResponse }
@@ -21,6 +20,8 @@ import com.pennsieve.jobscheduling.monitor.{ JobMonitor, JobMonitorPorts }
 import com.pennsieve.jobscheduling.scheduler.{ JobScheduler, JobSchedulerPorts }
 import com.pennsieve.jobscheduling.watchdog.{ WatchDog, WatchDogPorts }
 import com.pennsieve.service.utilities.{ ContextLogger, MigrationRunner, QueueHttpResponder }
+import pureconfig.ConfigSource
+import pureconfig.generic.auto._
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success, Try }
@@ -56,8 +57,7 @@ object DatabaseMigrator {
 
 object Server extends App {
 
-  implicit val config: ServiceConfig =
-    pureconfig.loadConfigOrThrow[ServiceConfig]
+  implicit val config: ServiceConfig = ConfigSource.default.loadOrThrow[ServiceConfig]
 
   implicit val system: ActorSystem = ActorSystem("job-scheduling-service")
   implicit val executionContext: ExecutionContext = system.dispatcher
@@ -159,7 +159,8 @@ object Server extends App {
       Route.seal(jobRoutes ~ organizationRoutes ~ HealthcheckHandler.routes())
 
     Http()
-      .bindAndHandle(routes, config.host, config.port)
+      .newServerAt(config.host, config.port)
+      .bindFlow(routes)
       .flatMap { binding =>
         val localAddress = binding.localAddress
         log.noContext.info(

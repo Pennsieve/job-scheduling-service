@@ -3,7 +3,6 @@
 package com.pennsieve.jobscheduling.pusher
 
 import java.util.UUID
-
 import akka.actor.{ ActorSystem, Scheduler }
 import akka.stream.scaladsl.{ Sink, Source }
 import akka.testkit.TestKitBase
@@ -34,15 +33,17 @@ import com.pennsieve.models.{
 import com.pennsieve.service.utilities.ContextLogger
 import com.pennsieve.test.AwaitableImplicits
 import io.circe.parser.decode
-import org.scalatest._
+import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.io.{ Source => ScalaSource }
 
 class JobPusherSpec
-    extends WordSpecLike
+    extends AnyWordSpec
     with TestKitBase
     with Matchers
     with BeforeAndAfterAll

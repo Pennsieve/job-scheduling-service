@@ -67,7 +67,7 @@ trait JobSchedulingServiceSpecHarness
     }
   }
 
-  override def afterAll: Unit = {
+  override def afterAll(): Unit = {
     ports.db.close()
 
     super.afterAll()

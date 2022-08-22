@@ -10,7 +10,7 @@ import akka.stream.scaladsl.{ Flow, Keep, Source }
 import akka.{ Done, NotUsed }
 import cats.data.EitherT
 import cats.implicits._
-import com.amazonaws.services.sqs.model.Message
+import software.amazon.awssdk.services.sqs.model.Message
 import com.pennsieve.jobscheduling.JobSchedulingPorts.FinalSink
 import com.pennsieve.jobscheduling.clients.SQSClient.{ ReceiptHandle, SendAck }
 import com.pennsieve.jobscheduling.clients.{ Notifications, SQSClient }
@@ -46,7 +46,7 @@ class JobMonitor(
 
   private val cloudwatchSource = sqsMessageSource
     .map { msg =>
-      decode[CloudwatchMessage](msg.getBody)
+      decode[CloudwatchMessage](msg.body())
         .map(cloudwatchMessage => ReceiptHandle(msg) -> cloudwatchMessage)
         .leftMap(error => msg -> error)
     }

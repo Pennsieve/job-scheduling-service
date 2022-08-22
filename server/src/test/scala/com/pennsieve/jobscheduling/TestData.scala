@@ -11,7 +11,8 @@ import com.pennsieve.jobscheduling.db.PayloadsMapper.create
 import com.pennsieve.jobscheduling.db._
 import com.pennsieve.models._
 import com.pennsieve.test.AwaitableImplicits
-import pureconfig.loadConfigOrThrow
+import pureconfig.ConfigSource
+import pureconfig.generic.auto._
 
 import java.net.ServerSocket
 import java.nio.file.Paths
@@ -60,7 +61,8 @@ object TestConfig {
   private val testConfPath =
     Paths.get(getClass.getResource("/application-test.conf").toURI)
 
-  private lazy val rootConfig: RootConfig = loadConfigOrThrow[RootConfig](testConfPath)
+  private lazy val rootConfig: RootConfig =
+    ConfigSource.default(ConfigSource.file(testConfPath)).loadOrThrow[RootConfig]
 
   lazy val staticJobMonitorConfig: JobMonitorConfig = rootConfig.jobMonitor
 

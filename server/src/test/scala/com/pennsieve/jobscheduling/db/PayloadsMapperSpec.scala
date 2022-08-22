@@ -4,10 +4,11 @@ package com.pennsieve.jobscheduling.db
 import com.pennsieve.jobscheduling.JobSchedulingServiceSpecHarness
 import com.pennsieve.jobscheduling.TestPayload.uploadPayload
 import com.pennsieve.test.AwaitableImplicits
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 class PayloadsMapperSpec
-    extends WordSpec
+    extends AnyWordSpec
     with JobSchedulingServiceSpecHarness
     with AwaitableImplicits
     with Matchers {

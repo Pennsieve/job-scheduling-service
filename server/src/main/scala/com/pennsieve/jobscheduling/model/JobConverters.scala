@@ -31,7 +31,7 @@ import com.pennsieve.jobscheduling.errors.{ NoPayloadForJob, UnsupportedPayload 
 import com.pennsieve.jobscheduling.server.generated.definitions
 import io.circe.syntax.EncoderOps
 
-import scala.collection.JavaConverters.asJavaCollectionConverter
+import scala.jdk.CollectionConverters._
 
 object JobConverters {
   val ImportId = "IMPORT_ID"
@@ -57,8 +57,8 @@ object JobConverters {
       val workingDirectory = s"s3://$bucket/$jobPath/scratch"
 
       val vpcConfiguration = new AwsVpcConfiguration()
-        .withSecurityGroups(ecsConfig.securityGroups.asJavaCollection)
-        .withSubnets(ecsConfig.subnetIds.asJavaCollection)
+        .withSecurityGroups(ecsConfig.securityGroups.asJava)
+        .withSubnets(ecsConfig.subnetIds.asJava)
         .withAssignPublicIp("DISABLED")
 
       val networkConfiguration = new NetworkConfiguration()
@@ -81,7 +81,7 @@ object JobConverters {
         new KeyValuePair()
           .withName("NEXTFLOW_IAM_ACCESS_KEY_SECRET")
           .withValue(ecsConfig.nextflow.accessKeySecret)
-      ).asJavaCollection
+      ).asJava
 
       val containerOverride = new ContainerOverride()
         .withName("nextflow")

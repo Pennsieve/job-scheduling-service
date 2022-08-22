@@ -155,7 +155,7 @@ object Notifications {
 
       case _ =>
         log.context.info(s"$sender not sending notification for payload: $payload")
-        EitherT.pure[Future, Throwable](Unit)
+        EitherT.pure[Future, Throwable](())
     }
   }
 }

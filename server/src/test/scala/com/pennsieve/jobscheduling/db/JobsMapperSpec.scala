@@ -5,17 +5,18 @@ package com.pennsieve.jobscheduling.db
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
 import java.util.UUID
-
 import com.pennsieve.jobscheduling.TestPayload._
 import com.pennsieve.jobscheduling.commons.JobState._
 import com.pennsieve.jobscheduling.JobSchedulingServiceSpecHarness
 import com.pennsieve.jobscheduling.db.profile.api._
 import com.pennsieve.models.JobId
 import com.pennsieve.test.AwaitableImplicits
-import org.scalatest.{ BeforeAndAfterEach, Matchers, WordSpec }
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.matchers.should.Matchers
 
 class JobsMapperSpec
-    extends WordSpec
+    extends AnyWordSpec
     with JobSchedulingServiceSpecHarness
     with BeforeAndAfterEach
     with AwaitableImplicits

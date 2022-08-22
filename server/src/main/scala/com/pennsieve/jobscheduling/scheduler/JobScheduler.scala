@@ -39,7 +39,7 @@ class JobScheduler(
     Source
       .queue[JobArrived](config.bufferSize, OverflowStrategy.dropNew)
       .async
-      .preMaterialize
+      .preMaterialize()
 
   private var (jobQueue, jobRequestSource) = initializeRequestSource()
 
@@ -64,13 +64,13 @@ class JobScheduler(
   def closeQueue: Unit = jobQueue.fail(StreamShutdownException)
 
   private def restartQueueAndRun[A](finalSink: GenericFinalSink[A]): () => Future[A] = () => {
-    if (jobQueue.watchCompletion.isCompleted) {
+    if (jobQueue.watchCompletion().isCompleted) {
       val restarted = initializeRequestSource()
       jobQueue = restarted._1
       jobRequestSource = restarted._2
     }
     source
-      .via(DatabaseClientFlows.updateDatabaseFlow(config.throttle, ports.updateJob, () => addJob))
+      .via(DatabaseClientFlows.updateDatabaseFlow(config.throttle, ports.updateJob, addJob))
       .toMat(finalSink)(Keep.right)
       .run()
   }

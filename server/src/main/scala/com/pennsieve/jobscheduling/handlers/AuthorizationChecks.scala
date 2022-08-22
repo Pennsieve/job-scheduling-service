@@ -14,13 +14,13 @@ object AuthorizationChecks {
    * Ensure that this claim has access to the given dataset
    */
   def withDatasetAccess[T](claim: Jwt.Claim, datasetId: Int)(f: Unit => Future[T]): Future[T] =
-    if (hasDatasetAccess(claim, DatasetId(datasetId), DatasetPermission.CreateDeleteFiles)) f(Unit)
+    if (hasDatasetAccess(claim, DatasetId(datasetId), DatasetPermission.CreateDeleteFiles)) f(())
     else Future.failed(ForbiddenException)
 
   /*
    * Ensure that this claim has access to the given organization
    */
   def withAuthorization[T](claim: Jwt.Claim, organizationId: Int)(f: Unit => Future[T]): Future[T] =
-    if (hasOrganizationAccess(claim, OrganizationId(organizationId))) f(Unit)
+    if (hasOrganizationAccess(claim, OrganizationId(organizationId))) f(())
     else Future.failed(ForbiddenException)
 }

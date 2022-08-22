@@ -4,12 +4,10 @@ package com.pennsieve.jobscheduling.handlers
 
 import java.io.{ PrintWriter, StringWriter }
 import java.util.UUID
-
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Route
 import io.circe.syntax._
 import cats.data.EitherT
-import com.amazonaws.services.sqs.model.SendMessageResult
 import com.pennsieve.auth.middleware.AkkaDirective._
 import com.pennsieve.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserId }
 import com.pennsieve.jobscheduling._
@@ -49,6 +47,7 @@ import scala.language.reflectiveCalls
 import scala.util.control.NonFatal
 import scala.util.{ Failure, Success, Try }
 import com.pennsieve.jobscheduling.errors.ForbiddenException
+import software.amazon.awssdk.services.sqs.model.SendMessageResponse
 
 /**
   * The JobsHandler contains all HTTP endpoints that other services use to
@@ -182,18 +181,18 @@ class JobsHandler(
     )(implicit
       log: ContextLogger,
       logContext: ETLLogContext
-    ): EitherT[Future, CreateResponse, SendMessageResult] = {
+    ): EitherT[Future, CreateResponse, SendMessageResponse] = {
       JobSchedulingPorts
         .notifyUploadsConsumer(createdJob, payload)(ports.notifyUploadConsumer, executionContext)
         .leftFlatMap {
           case UnsupportedPayload(badPayload) =>
             val msg = s"Unsupported payload: $badPayload"
-            EitherT.leftT[Future, SendMessageResult](
+            EitherT.leftT[Future, SendMessageResponse](
               logResponse(respond.InternalServerError(msg), msg)
             )
           case error =>
             val msg = s"Failed to add manifest to queue with ${error.getMessage}"
-            EitherT.leftT[Future, SendMessageResult](
+            EitherT.leftT[Future, SendMessageResponse](
               logResponse(respond.InternalServerError(msg), msg)
             )
         }

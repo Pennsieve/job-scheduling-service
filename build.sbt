@@ -48,6 +48,7 @@ lazy val akka212Version = "2.6.5"
 lazy val akka213Version = "2.6.8"
 lazy val authMiddlewareVersion = "5.1.3"
 lazy val awsVersion = "1.11.414"
+lazy val aws2Version = "2.11.14"
 lazy val cats212Version = "1.5.0"
 lazy val cats213Version = "2.6.1"
 lazy val circe212Version = "0.11.1"
@@ -261,7 +262,13 @@ lazy val server = project
       "com.amazonaws" % "aws-java-sdk-core" % awsVersion exclude ("commons-logging", "commons-logging"),
       "com.amazonaws" % "aws-java-sdk-ecs" % awsVersion,
       "com.amazonaws" % "aws-java-sdk-s3" % awsVersion,
-      "com.amazonaws" % "aws-java-sdk-sqs" % awsVersion,
+      //"com.amazonaws" % "aws-java-sdk-sqs" % awsVersion,
+
+      //"software.amazon.awssdk" % "batch" % aws2Version,
+      //"software.amazon.awssdk" % "ecs" % aws2Version,
+      //"software.amazon.awssdk" % "s3" % aws2Version,
+      "software.amazon.awssdk" % "sqs" % aws2Version,
+
       "com.pennsieve" %% "service-utilities" % serviceUtilitiesVersion,
       "com.pennsieve" %% "utilities" % utilitiesVersion,
       "com.pennsieve" %% "auth-middleware" % authMiddlewareVersion,
@@ -292,6 +299,9 @@ lazy val server = project
       "io.circe" %% "circe-generic" % circeVersion.value,
       "io.circe" %% "circe-java8" % circeVersion.value,
       "io.circe" %% "circe-jawn" % circeVersion.value
+    ),
+    excludeDependencies ++= Seq(
+      "com.amazonaws" % "aws-java-sdk-sqs",
     ),
     coverageExcludedPackages := "com.pennsieve.jobscheduling.server\\..*;"
       + "com.pennsieve.jobscheduling.Server;"

@@ -8,7 +8,6 @@ import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.pennsieve.auth.middleware.Jwt.Role.RoleIdentifier
 import com.pennsieve.auth.middleware.{
   ClaimType,
-  DatasetPermission,
   Jwt,
   OrganizationId,
   ServiceClaim,
@@ -25,14 +24,16 @@ import com.pennsieve.jobscheduling.db.OrganizationQuotaMapper.getOrganization
 import com.pennsieve.jobscheduling.db.profile.api._
 import com.pennsieve.models.Role
 import com.pennsieve.test.AwaitableImplicits
-import org.scalatest.{ BeforeAndAfterEach, Matchers, WordSpec }
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import shapeless.Coproduct
 import shapeless.syntax.inject.InjectSyntax
 
 import scala.concurrent.duration.{ FiniteDuration, MINUTES }
 
 class OrganizationHandlerSpec
-    extends WordSpec
+    extends AnyWordSpec
     with ScalatestRouteTest
     with JobSchedulingServiceSpecHarness
     with AwaitableImplicits
@@ -111,7 +112,7 @@ class OrganizationHandlerSpec
   // http://doc.akka.io/docs/akka-http/10.0.0/scala/http/routing-dsl/testkit.html#testing-sealed-routes
   def createRoutes: Route = Route.seal(OrganizationsHandler.routes)
 
-  def createClient(routes: Route) = OrganizationsClient.httpClient(Route.asyncHandler(routes))
+  def createClient(routes: Route) = OrganizationsClient.httpClient(Route.toFunction(routes))
 
   val userClaim = UserClaim(
     id = UserId(userId),

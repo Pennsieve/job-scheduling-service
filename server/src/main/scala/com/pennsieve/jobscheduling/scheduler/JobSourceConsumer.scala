@@ -44,7 +44,7 @@ class JobSourceConsumer(
 
       private def tryGetNextJob: Unit =
         recurseTilCapacityAvailable onComplete {
-          case Success(_) => listTasksCallback.invoke(Unit)
+          case Success(_) => listTasksCallback.invoke(())
           case Failure(exception) =>
             log.tierNoContext
               .error("cannot list tasks this message should never be seen", exception)
@@ -118,7 +118,7 @@ class JobSourceConsumer(
           log.tierNoContext.info(
             s"found spare capacity of ${maxTasks - listTasksResult.getTaskArns.size} in ecs"
           )
-          Future.successful(Right(Unit))
+          Future.successful(Right(()))
         } else
           after(1.second, scheduler) {
             log.tierNoContext.info(s"checking for spare capacity in ecs")

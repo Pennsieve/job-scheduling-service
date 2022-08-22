@@ -2,6 +2,7 @@
 
 package com.pennsieve.jobscheduling
 
+import software.amazon.awssdk.regions.Region
 import com.amazonaws.regions.Regions
 import com.pennsieve.jobscheduling.clients.SQSClient.QueueName
 
@@ -15,7 +16,7 @@ case class JobMonitorConfig(
   throttle: ThrottleConfig,
   retry: RetryConfig
 ) {
-  val awsRegion: Regions = Regions.fromName(region)
+  val awsRegion: Region = Region.of(region)
   val queueName: QueueName = QueueName(queue)
 }
 
@@ -59,7 +60,7 @@ case class ECSTaskConfig(
 case class PennsieveApiConfig(baseUrl: String, queueSize: Int, rateLimit: Int)
 
 case class SQSConfig(queue: String, region: String) {
-  val awsRegion: Regions = Regions.fromName(region)
+  val awsRegion: Region = Region.of(region)
   val queueName: QueueName = QueueName(queue)
 }
 

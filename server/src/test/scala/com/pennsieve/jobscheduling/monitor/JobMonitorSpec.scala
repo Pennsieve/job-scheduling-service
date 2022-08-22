@@ -5,14 +5,16 @@ package com.pennsieve.jobscheduling.monitor
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
 import java.util.UUID
-
 import akka.actor.{ ActorSystem, Scheduler }
-import akka.http.scaladsl.model.StatusCodes.NotFound
 import akka.http.scaladsl.model.StatusCode
 import akka.stream.scaladsl.{ Sink, Source }
 import akka.testkit.TestKit
 import cats.data.EitherT
-import com.amazonaws.services.sqs.model.{ DeleteMessageResult, Message, SendMessageResult }
+import software.amazon.awssdk.services.sqs.model.{
+  DeleteMessageResponse,
+  Message,
+  SendMessageResponse
+}
 import com.pennsieve.jobscheduling.JobSchedulingPorts.{
   createGetJob,
   createUpdateJob,
@@ -61,13 +63,15 @@ import com.pennsieve.notifications.{
 import io.circe.Decoder
 import io.circe.generic.semiauto._
 import io.circe.syntax.EncoderOps
-import org.scalatest._
 import cats.implicits._
 import com.pennsieve.auth.middleware.{ OrganizationId, UserId }
 import com.pennsieve.jobscheduling.clients.PennsieveApiClient
 import com.pennsieve.jobscheduling.commons.JobState
 import com.pennsieve.jobscheduling.commons.JobState._
 import com.pennsieve.jobscheduling.db.JobStateHelpers._
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future, Promise }
@@ -76,7 +80,7 @@ import scala.concurrent.duration.DurationLong
 class JobMonitorSpec(system: ActorSystem)
     extends TestKit(system)
     with JobSchedulingServiceSpecHarness
-    with WordSpecLike
+    with AnyWordSpecLike
     with Matchers
     with BeforeAndAfterEach {
 
@@ -154,7 +158,7 @@ class JobMonitorSpec(system: ActorSystem)
             message =>
               Future.successful {
                 sentNotification = Some(message.value)
-                Right(new SendMessageResult())
+                Right(SendMessageResponse.builder().build())
               }
 
           val stream = runStream(eventMessage, sendNotification = saveNotification)
@@ -183,7 +187,7 @@ class JobMonitorSpec(system: ActorSystem)
             message =>
               Future.successful {
                 sentNotification = Some(message.value)
-                Right(new SendMessageResult())
+                Right(SendMessageResponse.builder().build())
               }
 
           val stream = runStream(eventMessage, sendNotification = saveNotification)
@@ -212,7 +216,7 @@ class JobMonitorSpec(system: ActorSystem)
             message =>
               Future.successful {
                 sentNotification = Some(message.value)
-                Right(new SendMessageResult())
+                Right(SendMessageResponse.builder().build())
               }
 
           val stream = runStream(eventMessage, sendNotification = saveNotification)
@@ -241,7 +245,7 @@ class JobMonitorSpec(system: ActorSystem)
             message =>
               Future.successful {
                 sentNotification = Some(message.value)
-                Right(new SendMessageResult())
+                Right(SendMessageResponse.builder().build())
               }
 
           val stream = runStream(eventMessage, sendNotification = saveNotification)
@@ -319,7 +323,7 @@ class JobMonitorSpec(system: ActorSystem)
             message =>
               Future.successful {
                 sentNotification = Some(message.value)
-                Right(new SendMessageResult())
+                Right(SendMessageResponse.builder().build())
               }
 
           runStream(
@@ -498,7 +502,7 @@ class JobMonitorSpec(system: ActorSystem)
     * Returns a future which will receive the value that is used to call function which is returned as the second argument
     */
   def createTestableFutureFn[M, R](fn: M => R): (Future[M], M => Future[R]) = {
-    val promise = Promise[M]
+    val promise = Promise[M]()
     promise.future -> { m: M =>
       promise.success(m)
       Future.successful {
@@ -508,10 +512,10 @@ class JobMonitorSpec(system: ActorSystem)
   }
 
   def createSaveNotification: (Future[MessageBody], SendMessage) =
-    createTestableFutureFn(_ => Right(new SendMessageResult()))
+    createTestableFutureFn(_ => Right(SendMessageResponse.builder().build()))
 
   def createSendAck: (Future[ReceiptHandle], SendAck) =
-    createTestableFutureFn(_ => Right(new DeleteMessageResult()))
+    createTestableFutureFn(_ => Right(DeleteMessageResponse.builder.build()))
 
   private def insertJobAndPayload(payload: Payload = uploadPayload) =
     ports.db
@@ -761,9 +765,11 @@ class JobMonitorSpec(system: ActorSystem)
     val jobMonitor =
       new JobMonitor(
         Source.single(
-          new Message()
-            .withBody(cloudwatchEvent)
-            .withReceiptHandle(receiptHandle.value)
+          Message
+            .builder()
+            .body(cloudwatchEvent)
+            .receiptHandle(receiptHandle.value)
+            .build()
         ),
         etlConfig.s3.etlBucket
       )

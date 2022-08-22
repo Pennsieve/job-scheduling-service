@@ -26,7 +26,7 @@ object JobPusherFakes {
     JobPusherPorts(runTask, putManifest, getPayload)
 
   val stubManifestPut: PutManifest =
-    (_, _) => Future.successful[Either[Throwable, Unit]](Right(Unit))
+    (_, _) => Future.successful[Either[Throwable, Unit]](Right(()))
 
   val workflowPayload: ETLWorkflow =
     ETLWorkflow(

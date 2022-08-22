@@ -3,12 +3,11 @@
 package com.pennsieve.jobscheduling.watchdog
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
-
 import akka.Done
-import akka.stream.alpakka.sqs.ApproximateNumberOfMessages
 import akka.stream.scaladsl.{ Flow, Keep, Sink }
 import cats.data.EitherT
 import cats.implicits._
+import software.amazon.awssdk.services.sqs.model.QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES
 import com.pennsieve.jobscheduling.JobSchedulingPorts.{ createGetPayload, GetPayload }
 import com.pennsieve.jobscheduling.clients.SQSClient.{
   createGetNumberOfMessages,
@@ -28,7 +27,7 @@ import com.pennsieve.jobscheduling.watchdog.JobStateWatchDogPorts.GetJobsStuckIn
 import com.pennsieve.jobscheduling.{ JobSchedulingPorts, JobStateWatchDogConfig }
 import com.pennsieve.service.utilities.ContextLogger
 
-import scala.collection.JavaConverters.mapAsScalaMapConverter
+import scala.jdk.CollectionConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.control.NonFatal
 import scala.util.{ Failure, Success, Try }
@@ -120,8 +119,8 @@ object JobStateWatchDog {
           .getNumberOfMessages()
           .map {
             _.flatMap {
-              _.getAttributes.asScala
-                .get(ApproximateNumberOfMessages.name) match {
+              _.attributes.asScala
+                .get(APPROXIMATE_NUMBER_OF_MESSAGES) match {
                 case Some(maybeInt) => Try(maybeInt.toInt).toEither
                 case None => Left(NoApproximateNumberOfMessagesAttribute)
               }

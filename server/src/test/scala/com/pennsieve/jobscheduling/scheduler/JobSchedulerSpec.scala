@@ -31,7 +31,9 @@ import com.pennsieve.jobscheduling.scheduler.JobSchedulerFakes.{
   schedulerAndRunnableEvent
 }
 import com.pennsieve.test.AwaitableImplicits
-import org.scalatest._
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.collection.immutable
 import scala.concurrent.Future
@@ -39,7 +41,7 @@ import scala.concurrent.duration.DurationLong
 
 class JobSchedulerSpec(system: ActorSystem)
     extends TestKit(system)
-    with WordSpecLike
+    with AnyWordSpecLike
     with JobSchedulingServiceSpecHarness
     with AwaitableImplicits
     with Matchers
@@ -136,7 +138,7 @@ class JobSchedulerSpec(system: ActorSystem)
 
       val (jobScheduler, eventualEvent) = runScheduler(fakeFargate.runTask())
 
-      jobScheduler.addJob.awaitFinite() shouldBe Right(JobQueued)
+      jobScheduler.addJob().awaitFinite() shouldBe Right(JobQueued)
 
       ports.db.run(JobsMapper.get(job.id)).awaitFinite().value
 
@@ -171,7 +173,7 @@ class JobSchedulerSpec(system: ActorSystem)
 
       jobScheduler.closeQueue
 
-      jobScheduler.addJob.awaitFinite() shouldBe Left(JobNotQueued)
+      jobScheduler.addJob().awaitFinite() shouldBe Left(JobNotQueued)
     }
 
     "not fail a job if above task limit" in {
