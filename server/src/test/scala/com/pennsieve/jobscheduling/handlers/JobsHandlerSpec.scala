@@ -12,7 +12,6 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import cats.data.EitherT
 import cats.implicits._
-import com.amazonaws.AmazonServiceException
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse
 import com.pennsieve.auth.middleware.Jwt.Role.RoleIdentifier
 import com.pennsieve.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserClaim, UserId }
@@ -67,6 +66,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import shapeless.syntax.inject.InjectSyntax
+import software.amazon.awssdk.awscore.exception.{ AwsErrorDetails, AwsServiceException }
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration._
@@ -152,7 +152,14 @@ class JobsHandlerSpec
       val (jobScheduler, _) = runScheduler()
 
       val failingNotifyUploadConsumer: NotifyUpload =
-        _ => Future.successful(Left(new AmazonServiceException("SQS is down")))
+        _ =>
+          Future.successful(
+            Left(
+              AwsServiceException.builder
+                .message("SQS is down")
+                .build()
+            )
+          )
 
       val client =
         createClient(createRoutes(jobScheduler, notifyUploadConsumer = failingNotifyUploadConsumer))
@@ -165,7 +172,7 @@ class JobsHandlerSpec
         .value
 
       response shouldBe CreateResponse.InternalServerError(
-        "Failed to add manifest to queue with SQS is down (Service: null; Status Code: 0; Error Code: null; Request ID: null)"
+        "Failed to add manifest to queue with SQS is down"
       )
 
       val createdJob = ports.db.run(JobsMapper.get(JobId(expectedJobId))).awaitFinite().value

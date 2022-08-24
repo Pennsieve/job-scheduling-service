@@ -229,7 +229,7 @@ lazy val commons = project
 lazy val server = project
   .enablePlugins(AutomateHeaderPlugin)
   .enablePlugins(DockerPlugin)
-  .dependsOn(client % "test->compile", commons)
+  .dependsOn(client % "test", commons)
   .settings(
     name := "job-scheduling-service",
     scalacOptions ++= getScalacOptions(scalaVersion.value),
