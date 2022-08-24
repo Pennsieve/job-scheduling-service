@@ -83,6 +83,17 @@ class JobsHandlerSpec
 
   import com.pennsieve.jobscheduling.TestPayload._
 
+  val forbiddenOrganization: Int = organizationId + 1
+  val claim: Jwt.Claim =
+    generateClaim(UserId(userId), DatasetId(datasetId), OrganizationId(organizationId))
+
+  val token: Jwt.Token = Jwt.generateToken(claim)(ports.jwt)
+
+  val authToken = List(Authorization(OAuth2BearerToken(token.value)))
+  val successfulSendMessage: SendMessage = { _ =>
+    Future.successful(Right(SendMessageResponse.builder().build()))
+  }
+
   override def beforeEach(): Unit = {
     ports.db.run(JobsMapper.delete).awaitFinite()
     ports.db.run(OrganizationQuotaMapper.delete).awaitFinite()
@@ -1204,26 +1215,14 @@ class JobsHandlerSpec
 
   def getJob(jobId: JobId): Job = ports.db.run(JobsMapper.get(jobId)).awaitFinite().value
 
-  val forbiddenOrganization: Int = organizationId + 1
-
   implicit class RichServerSwaggerJob(job: Job) {
     import io.scalaland.chimney.dsl.TransformerOps
     def toClientJob: SwaggerJob =
       job.toSwaggerJob.transformInto[SwaggerJob]
   }
 
-  val claim: Jwt.Claim =
-    generateClaim(UserId(userId), DatasetId(datasetId), OrganizationId(organizationId))
-
-  val token: Jwt.Token = Jwt.generateToken(claim)(ports.jwt)
-
-  val authToken = List(Authorization(OAuth2BearerToken(token.value)))
-
   def successfulNotify(sentNotifications: ArrayBuffer[MessageBody]): SendMessage = msg => {
     sentNotifications += msg
-    Future.successful(Right(SendMessageResponse.builder().build()))
-  }
-  val successfulSendMessage: SendMessage = { _ =>
     Future.successful(Right(SendMessageResponse.builder().build()))
   }
 
