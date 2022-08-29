@@ -47,8 +47,8 @@ lazy val akkaHttp213Version = "10.2.7"
 lazy val akka212Version = "2.6.5"
 lazy val akka213Version = "2.6.8"
 lazy val authMiddlewareVersion = "5.1.3"
-lazy val awsVersion = "1.11.414"
-lazy val aws2Version = "2.11.14"
+lazy val awsV1Version = "1.11.414"
+lazy val awsV2Version = "2.11.14"
 lazy val cats212Version = "1.5.0"
 lazy val cats213Version = "2.6.1"
 lazy val circe212Version = "0.11.1"
@@ -258,16 +258,16 @@ lazy val server = project
     libraryDependencies ++= sharedCatsDependencies.map(_ % catsVersion.value),
     libraryDependencies ++= Seq(
       "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % "2.0.2",
-      "com.amazonaws" % "aws-java-sdk-batch" % awsVersion,
-      "com.amazonaws" % "aws-java-sdk-core" % awsVersion exclude ("commons-logging", "commons-logging"),
-      "com.amazonaws" % "aws-java-sdk-ecs" % awsVersion,
-      "com.amazonaws" % "aws-java-sdk-s3" % awsVersion,
-      //"com.amazonaws" % "aws-java-sdk-sqs" % awsVersion,
+      "com.amazonaws" % "aws-java-sdk-batch" % awsV1Version,
+      "com.amazonaws" % "aws-java-sdk-core" % awsV1Version exclude ("commons-logging", "commons-logging"),
+      "com.amazonaws" % "aws-java-sdk-ecs" % awsV1Version,
+      //"com.amazonaws" % "aws-java-sdk-s3" % awsV1Version,
+      //"com.amazonaws" % "aws-java-sdk-sqs" % awsV1Version,
 
-      //"software.amazon.awssdk" % "batch" % aws2Version,
-      //"software.amazon.awssdk" % "ecs" % aws2Version,
-      //"software.amazon.awssdk" % "s3" % aws2Version,
-      "software.amazon.awssdk" % "sqs" % aws2Version,
+      //"software.amazon.awssdk" % "batch" % awsV2Version,
+      //"software.amazon.awssdk" % "ecs" % awsV2Version,
+      "software.amazon.awssdk" % "s3" % awsV2Version,
+      "software.amazon.awssdk" % "sqs" % awsV2Version,
 
       "com.pennsieve" %% "service-utilities" % serviceUtilitiesVersion,
       "com.pennsieve" %% "utilities" % utilitiesVersion,
@@ -302,6 +302,7 @@ lazy val server = project
     ),
     excludeDependencies ++= Seq(
       "com.amazonaws" % "aws-java-sdk-sqs",
+      "com.amazonaws" % "aws-java-sdk-s3",
     ),
     coverageExcludedPackages := "com.pennsieve.jobscheduling.server\\..*;"
       + "com.pennsieve.jobscheduling.Server;"

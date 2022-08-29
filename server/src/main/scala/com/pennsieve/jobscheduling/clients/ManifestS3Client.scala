@@ -2,24 +2,28 @@
 
 package com.pennsieve.jobscheduling.clients
 
-import java.io.ByteArrayInputStream
-
-import com.amazonaws.ClientConfiguration
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
-import com.amazonaws.services.s3.model.ObjectMetadata
-import com.amazonaws.services.s3.{ AmazonS3, AmazonS3ClientBuilder, AmazonS3URI }
+import software.amazon.awssdk.auth.signer.Aws4Signer
+import software.amazon.awssdk.services.s3.S3Client
+import com.pennsieve.jobscheduling.thirdparty.aws.AmazonS3URI
 import com.pennsieve.jobscheduling.S3Config
 import com.pennsieve.jobscheduling.model.ManifestUri
 import com.pennsieve.jobscheduling.model.EventualResult.EventualResult
 import com.pennsieve.jobscheduling.pusher.ManifestUploadFailure
 import com.pennsieve.models.Manifest
 import io.circe.parser.decode
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
+import software.amazon.awssdk.core.client.config.{
+  ClientOverrideConfiguration,
+  SdkAdvancedClientOption
+}
+import software.amazon.awssdk.core.sync.RequestBody
+import software.amazon.awssdk.services.s3.model.{ GetObjectRequest, PutObjectRequest }
 
 import scala.concurrent.{ blocking, ExecutionContext, Future }
 import scala.io.Source
 import scala.util.{ Failure, Success, Try }
 
-class ManifestS3Client(awsS3Client: AmazonS3, etlBucket: String) {
+class ManifestS3Client(awsS3Client: S3Client, etlBucket: String) {
 
   def putManifest(
     manifestS3: ManifestS3,
@@ -38,18 +42,17 @@ class ManifestS3Client(awsS3Client: AmazonS3, etlBucket: String) {
         */
       blocking[Either[ManifestUploadFailure, Unit]] {
         val attempt = Try {
-          val metadata = new ObjectMetadata()
 
-          metadata.setContentType("application/json")
-          metadata.setContentLength(manifestS3.bytes.length)
+          val putObjectRequest: PutObjectRequest = PutObjectRequest
+            .builder()
+            .contentType("application/json")
+            .contentLength(manifestS3.bytes.length)
+            .bucket(etlBucket)
+            .key(manifestS3.uri)
+            .build()
 
           awsS3Client
-            .putObject(
-              etlBucket,
-              manifestS3.uri,
-              new ByteArrayInputStream(manifestS3.bytes),
-              metadata
-            )
+            .putObject(putObjectRequest, RequestBody.fromBytes(manifestS3.bytes))
         }
 
         attempt match {
@@ -75,12 +78,12 @@ class ManifestS3Client(awsS3Client: AmazonS3, etlBucket: String) {
           uri <- Try(new AmazonS3URI(uri.toString)).toEither
           bucket = uri.getBucket
           key = uri.getKey
-          s3Object <- Try(awsS3Client.getObject(bucket, key)).toEither
+          getObjectRequest = GetObjectRequest.builder().bucket(bucket).key(key).build()
+          s3Object <- Try(awsS3Client.getObjectAsBytes(getObjectRequest)).toEither
           manifestJson = Source
-            .fromInputStream(s3Object.getObjectContent)
+            .fromBytes(s3Object.asByteArray())
             .getLines()
             .mkString("\n")
-          _ <- Try(s3Object.close()).toEither
           manifest <- decode[Manifest](manifestJson)
         } yield manifest
       }
@@ -90,17 +93,18 @@ class ManifestS3Client(awsS3Client: AmazonS3, etlBucket: String) {
 
 object ManifestS3Client {
 
-  val clientConfiguration: ClientConfiguration =
-    new ClientConfiguration()
-      .withSignerOverride("AWSS3V4SignerType")
+  val clientOverrideConfiguration: ClientOverrideConfiguration = ClientOverrideConfiguration
+    .builder()
+    .putAdvancedOption(SdkAdvancedClientOption.SIGNER, Aws4Signer.create())
+    .build()
 
   def apply(s3Config: S3Config): ManifestS3Client = {
     val amazonS3Client =
-      AmazonS3ClientBuilder
-        .standard()
-        .withClientConfiguration(clientConfiguration)
-        .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
-        .withRegion(s3Config.awsRegion)
+      S3Client
+        .builder()
+        .overrideConfiguration(clientOverrideConfiguration)
+        .credentialsProvider(DefaultCredentialsProvider.create())
+        .region(s3Config.awsRegion)
         .build()
 
     new ManifestS3Client(amazonS3Client, s3Config.etlBucket)

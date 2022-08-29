@@ -99,7 +99,7 @@ case class PostgresConfig(
 case class PusherConfig(environment: String)
 
 case class S3Config(host: String, region: String, etlBucket: String) {
-  val awsRegion: Regions = Regions.fromName(region)
+  val awsRegion: Region = Region.of(region)
 }
 
 case class ThrottleConfig(parallelism: Int, period: FiniteDuration = 1 second)
