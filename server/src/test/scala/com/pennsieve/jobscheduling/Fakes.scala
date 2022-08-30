@@ -5,8 +5,8 @@ package com.pennsieve.jobscheduling
 import akka.http.scaladsl.model.StatusCode
 import akka.http.scaladsl.model.StatusCodes.NotFound
 import cats.data.EitherT
-import com.amazonaws.AmazonServiceException
-import com.amazonaws.services.ecs.model._
+import software.amazon.awssdk.awscore.exception.AwsServiceException
+import software.amazon.awssdk.services.ecs.model._
 import software.amazon.awssdk.services.sqs.model.{ DeleteMessageResponse, SendMessageResponse }
 import com.pennsieve.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserId }
 import com.pennsieve.core.clients.packages.UploadCompleteResponse
@@ -148,67 +148,69 @@ class FakeFargate(attemptsTilSuccess: Int = 1) {
 
   def getSuccessfulRuns: Int = successfulRuns
 
-  def listTasks(request: ListTasksRequest): EventualResult[ListTasksResult] =
+  def listTasks(request: ListTasksRequest): EventualResult[ListTasksResponse] =
     Future.successful {
-      val listTasksResult = new ListTasksResult()
+      val listTasksResult = ListTasksResponse.builder()
       if (listAttempts < attemptsTilSuccess)
-        listTasksResult.setTaskArns(List("task").asJava)
+        listTasksResult.taskArns(List("task").asJava)
       listAttempts += 1
-      Right(listTasksResult)
+      Right(listTasksResult.build())
     }
 
-  def throwingListTasks(request: ListTasksRequest): EventualResult[ListTasksResult] =
+  def throwingListTasks(request: ListTasksRequest): EventualResult[ListTasksResponse] =
     if (taskAttempts < attemptsTilSuccess) {
       taskAttempts += 1
-      Future.successful(Left(new AmazonServiceException("List task failed")))
-    } else Future.successful(Right(new ListTasksResult()))
+      Future.successful(Left(AwsServiceException.builder().message("List task failed").build()))
+    } else Future.successful(Right(ListTasksResponse.builder().build()))
 
-  def runTask(task: Task = createTask())(request: RunTaskRequest): EventualResult[RunTaskResult] =
+  def runTask(task: Task = createTask())(request: RunTaskRequest): EventualResult[RunTaskResponse] =
     if (taskAttempts < attemptsTilSuccess) {
       taskAttempts += 1
-      Future.successful(Left(new AmazonServiceException("Task failed")))
+      Future.successful(Left(AwsServiceException.builder().message("Task failed").build()))
     } else {
       taskAttempts += 1
       successfulRuns += 1
       Future.successful(Right(runTaskResult(task)))
     }
 
-  def stopTask(request: StopTaskRequest): EventualResult[StopTaskResult] =
+  def stopTask(request: StopTaskRequest): EventualResult[StopTaskResponse] =
     if (stopAttempts < attemptsTilSuccess) {
       stopAttempts += 1
-      Future.successful(Left(new AmazonServiceException("Failed to stop")))
+      Future.successful(Left(AwsServiceException.builder().message("Failed to stop").build()))
     } else {
-      val task = new Task().withTaskArn(request.getTask)
-      stoppedTask = Some(task.getTaskArn)
-      Future.successful(Right(new StopTaskResult().withTask(task)))
+      val task = Task.builder().taskArn(request.task).build()
+      stoppedTask = Some(task.taskArn)
+      Future.successful(Right(StopTaskResponse.builder().task(task).build()))
     }
 
-  def failingStopTask(request: StopTaskRequest): EventualResult[StopTaskResult] =
+  def failingStopTask(request: StopTaskRequest): EventualResult[StopTaskResponse] =
     if (stopAttempts < attemptsTilSuccess) {
       stopAttempts += 1
       throw new Exception("This is just a test.")
     } else {
-      val task = new Task().withTaskArn(request.getTask)
-      stoppedTask = Some(task.getTaskArn)
-      Future.successful(Right(new StopTaskResult().withTask(task)))
+      val task = Task.builder().taskArn(request.task).build()
+      stoppedTask = Some(task.taskArn)
+      Future.successful(Right(StopTaskResponse.builder().task(task).build()))
     }
 
   def describeTasks(
     task: Task
   )(
     request: DescribeTasksRequest
-  ): EventualResult[DescribeTasksResult] =
+  ): EventualResult[DescribeTasksResponse] =
     if (describeAttempts < attemptsTilSuccess) {
       describeAttempts += 1
-      Future.successful(Left(new AmazonServiceException("Can't get description")))
+      Future.successful(
+        Left(AwsServiceException.builder().message("Can't get description").build())
+      )
     } else {
-      Future.successful(Right(new DescribeTasksResult().withTasks(task)))
+      Future.successful(Right(DescribeTasksResponse.builder().tasks(task).build()))
     }
 
   def successfulDescribeTasks(
     task: Task
   )(
     request: DescribeTasksRequest
-  ): EventualResult[DescribeTasksResult] =
-    Future.successful(Right(new DescribeTasksResult().withTasks(task)))
+  ): EventualResult[DescribeTasksResponse] =
+    Future.successful(Right(DescribeTasksResponse.builder().tasks(task).build()))
 }

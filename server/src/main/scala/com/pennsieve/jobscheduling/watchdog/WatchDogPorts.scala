@@ -3,11 +3,11 @@
 package com.pennsieve.jobscheduling.watchdog
 import java.time.OffsetDateTime
 
-import com.amazonaws.services.ecs.model.{
+import software.amazon.awssdk.services.ecs.model.{
   DescribeTasksRequest,
-  DescribeTasksResult,
+  DescribeTasksResponse,
   StopTaskRequest,
-  StopTaskResult
+  StopTaskResponse
 }
 import com.pennsieve.jobscheduling.JobSchedulingPorts._
 import com.pennsieve.jobscheduling.clients.{ ManifestS3Client, PennsieveApiClient }
@@ -38,8 +38,8 @@ case class WatchDogPorts(
 )
 
 object WatchDogPorts {
-  type StopTask = StopTaskRequest => EventualResult[StopTaskResult]
-  type DescribeTasks = DescribeTasksRequest => EventualResult[DescribeTasksResult]
+  type StopTask = StopTaskRequest => EventualResult[StopTaskResponse]
+  type DescribeTasks = DescribeTasksRequest => EventualResult[DescribeTasksResponse]
   type GetOldActiveJobs = OffsetDateTime => Future[Seq[Job]]
 
   def createGetOldActiveJobs(db: Database)(implicit ec: ExecutionContext): GetOldActiveJobs =

@@ -5,7 +5,7 @@ import java.util.UUID
 
 import akka.Done
 import akka.stream.scaladsl.{ Flow, Keep, Sink }
-import com.amazonaws.services.ecs.model.{ DescribeTasksResult, StopTaskRequest, Task }
+import software.amazon.awssdk.services.ecs.model.{ DescribeTasksResponse, StopTaskRequest, Task }
 import com.pennsieve.jobscheduling.db.TaskId
 import com.pennsieve.jobscheduling.db.TaskId._
 import com.pennsieve.jobscheduling.errors.TaskMissingArnException
@@ -40,7 +40,7 @@ object TaskWatchDog {
   private def getIds(
     config: WatchDogConfig
   )(
-    describeTasksResult: DescribeTasksResult
+    describeTasksResult: DescribeTasksResponse
   ): List[Either[Exception, TaskJobId]] = {
     def getJobIdAndMaybePayloadId(task: Task, strings: List[String]) =
       strings.map(string => (Try(JobId(UUID.fromString(string))), string)) match {
@@ -66,7 +66,7 @@ object TaskWatchDog {
             TaskId.fromTask(task) match {
               case None => Left(TaskMissingArnException(jobId))
               case Some(taskId) =>
-                Right((task, TaskId(task.getTaskArn, task.getClusterArn), jobId, payloadId))
+                Right((task, TaskId(task.taskArn, task.clusterArn), jobId, payloadId))
             }
         }
       }
@@ -128,9 +128,11 @@ object TaskWatchDog {
         case (task, taskId, jobId, payloadId) =>
           ports
             .stopTask(
-              new StopTaskRequest()
-                .withCluster(taskId.clusterArn)
-                .withTask(taskId.taskArn)
+              StopTaskRequest
+                .builder()
+                .cluster(taskId.clusterArn)
+                .task(taskId.taskArn)
+                .build()
             )
             .map {
               _.fold(

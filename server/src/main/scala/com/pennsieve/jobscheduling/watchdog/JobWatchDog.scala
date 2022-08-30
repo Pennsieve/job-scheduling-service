@@ -5,9 +5,9 @@ package com.pennsieve.jobscheduling.watchdog
 import java.util.UUID
 
 import akka.NotUsed
-import akka.stream.{ ActorMaterializer, FlowShape }
+import akka.stream.FlowShape
 import akka.stream.scaladsl.{ Flow, GraphDSL, Merge }
-import com.amazonaws.services.ecs.model.{ DescribeTasksResult, StopTaskRequest }
+import software.amazon.awssdk.services.ecs.model.{ DescribeTasksResponse, StopTaskRequest }
 import com.pennsieve.jobscheduling.WatchDogConfig
 import com.pennsieve.jobscheduling.commons.JobState
 import com.pennsieve.jobscheduling.db.{ DatabaseClientFlows, Job, TaskId }
@@ -67,7 +67,7 @@ object JobWatchDog {
     ec: ExecutionContext,
     log: ContextLogger
   ) = {
-    def getJobTask(job: Job)(describeTasksResult: DescribeTasksResult) =
+    def getJobTask(job: Job)(describeTasksResult: DescribeTasksResponse) =
       getActiveTasks(config, describeTasksResult)
         .map { task =>
           maybeEnvironmentIds(
@@ -138,9 +138,11 @@ object JobWatchDog {
         case (task, taskId, job) =>
           ports
             .stopTask(
-              new StopTaskRequest()
-                .withCluster(taskId.clusterArn)
-                .withTask(taskId.taskArn)
+              StopTaskRequest
+                .builder()
+                .cluster(taskId.clusterArn)
+                .task(taskId.taskArn)
+                .build()
             )
             .map {
               _.fold(error => Left((error, (task, taskId, job))), _ => Right((task, taskId, job)))

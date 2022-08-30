@@ -8,7 +8,7 @@ import akka.pattern.after
 import akka.stream.scaladsl.Flow
 import cats.data.EitherT
 import cats.implicits._
-import com.amazonaws.services.ecs.model.{ RunTaskRequest, RunTaskResult }
+import software.amazon.awssdk.services.ecs.model.{ RunTaskRequest, RunTaskResponse }
 import com.pennsieve.jobscheduling.commons.JobState
 import com.pennsieve.jobscheduling.db.{ Job, TaskId }
 import com.pennsieve.jobscheduling.errors.{
@@ -75,7 +75,7 @@ class JobPusher(
 
     runTask(runTaskRequest, job)
       .map {
-        _.map(_.getTasks.asScala.toList.headOption) match {
+        _.map(_.tasks.asScala.toList.headOption) match {
           case Right(Some(task)) =>
             TaskId.fromTask(task) match {
               case None => (Left(TaskMissingArnException(job.id)), job)
@@ -137,11 +137,11 @@ class JobPusher(
   )(implicit
     executionContext: ExecutionContext,
     scheduler: Scheduler
-  ): Future[Either[Throwable, RunTaskResult]] =
+  ): Future[Either[Throwable, RunTaskResponse]] =
     ports
       .runTask(task)
-      .flatMap[Either[Throwable, RunTaskResult]] {
-        case Right(runTaskResult) if runTaskResult.getFailures.isEmpty =>
+      .flatMap[Either[Throwable, RunTaskResponse]] {
+        case Right(runTaskResult) if runTaskResult.failures.isEmpty =>
           Future.successful(Right(runTaskResult))
 
         case _ if attempts < maxAttempts =>

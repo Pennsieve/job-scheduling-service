@@ -3,7 +3,7 @@
 package com.pennsieve.jobscheduling
 
 import cats.syntax.option.catsSyntaxOptionId
-import com.amazonaws.services.ecs.model.{ RunTaskResult, Task }
+import software.amazon.awssdk.services.ecs.model.{ RunTaskResponse, Task }
 import com.pennsieve.auth.middleware.{ OrganizationId, UserId }
 import com.pennsieve.jobscheduling.commons.JobState
 import com.pennsieve.jobscheduling.commons.JobState.Running
@@ -88,12 +88,15 @@ object TestTask {
   val clusterArn = "cluster-arn"
 
   def createTask(): Task = {
-    new Task()
-      .withTaskArn(taskArn)
-      .withClusterArn(clusterArn)
+    initTaskBuilder().build()
   }
 
-  def runTaskResult(task: Task = createTask()): RunTaskResult = new RunTaskResult().withTasks(task)
+  def initTaskBuilder(): Task.Builder = {
+    Task.builder().taskArn(taskArn).clusterArn(clusterArn)
+  }
+
+  def runTaskResult(task: Task = createTask()): RunTaskResponse =
+    RunTaskResponse.builder().tasks(task).build()
 
   val taskId = TaskId(taskArn, clusterArn)
 }

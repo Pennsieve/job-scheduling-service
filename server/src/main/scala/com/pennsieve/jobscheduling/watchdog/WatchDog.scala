@@ -8,7 +8,7 @@ import akka.Done
 import akka.actor.{ ActorSystem, Scheduler }
 import akka.stream.scaladsl.{ Keep, Sink, Source }
 import cats.implicits._
-import com.amazonaws.services.ecs.model._
+import software.amazon.awssdk.services.ecs.model._
 import com.pennsieve.jobscheduling.JobSchedulingPorts.FinalSink
 import com.pennsieve.jobscheduling.{ JobSchedulingPorts, WatchDogConfig }
 import com.pennsieve.jobscheduling.clients.SQSClient.QueueName
@@ -79,7 +79,7 @@ object WatchDog {
 
   implicit val watchDogTier: Tier[WatchDog] = Tier[WatchDog]
 
-  def isTaskStopped(task: Task) = task.getDesiredStatus == "STOPPED"
+  def isTaskStopped(task: Task) = task.desiredStatus == "STOPPED"
 
   def getCutoffTime(hoursRunning: Long): OffsetDateTime =
     OffsetDateTime.now(UTC).minusHours(hoursRunning)
@@ -88,10 +88,8 @@ object WatchDog {
     clusterArn: String
   )(implicit
     ports: WatchDogPorts
-  ): EventualResult[DescribeTasksResult] = {
-    val request = new DescribeTasksRequest()
-
-    request.setCluster(clusterArn)
+  ): EventualResult[DescribeTasksResponse] = {
+    val request = DescribeTasksRequest.builder().cluster(clusterArn).build()
 
     ports.describeTasks(request)
   }
@@ -109,16 +107,16 @@ object WatchDog {
     check: String => Boolean,
     getResult: List[String] => Try[A]
   ): Either[NoJobIdException, A] =
-    Try(task.getOverrides.getContainerOverrides)
+    Try(task.overrides.containerOverrides)
       .flatMap { containerOverride =>
         Try {
           val envs =
             containerOverride.asScala
-              .map(_.getEnvironment)
+              .map(_.environment)
               .flatMap {
                 _.asScala
                   .flatMap { envPair =>
-                    Try((envPair.getName, envPair.getValue)).toOption
+                    Try((envPair.name, envPair.value)).toOption
                   }
                   .filter {
                     case (name, _) => check(name)
@@ -134,19 +132,18 @@ object WatchDog {
         case NonFatal(_) => NoJobIdException(task)
       }
 
-  def getActiveTasks(config: WatchDogConfig, describeTasksResult: DescribeTasksResult): List[Task] =
-    describeTasksResult.getTasks.asScala.toList
+  def getActiveTasks(
+    config: WatchDogConfig,
+    describeTasksResult: DescribeTasksResponse
+  ): List[Task] =
+    describeTasksResult.tasks.asScala.toList
       .filter { task =>
         val withinTimePeriod =
-          Try(task.getCreatedAt)
-            .fold(
-              _ => false,
-              date =>
-                date.before(new Date(getCutoffTime(config.hoursRunning).toInstant.toEpochMilli))
-            )
+          Try(task.createdAt)
+            .fold(_ => false, date => date.isBefore(getCutoffTime(config.hoursRunning).toInstant))
 
         val wasStartedByEtlService =
-          Try(task.getStartedBy)
+          Try(task.startedBy)
             .fold(_ => false, {
               case JobSchedulingService => true
               case _ => false

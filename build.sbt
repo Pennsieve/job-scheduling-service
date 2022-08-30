@@ -260,12 +260,12 @@ lazy val server = project
       "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % "2.0.2",
       "com.amazonaws" % "aws-java-sdk-batch" % awsV1Version,
       "com.amazonaws" % "aws-java-sdk-core" % awsV1Version exclude ("commons-logging", "commons-logging"),
-      "com.amazonaws" % "aws-java-sdk-ecs" % awsV1Version,
+      //"com.amazonaws" % "aws-java-sdk-ecs" % awsV1Version,
       //"com.amazonaws" % "aws-java-sdk-s3" % awsV1Version,
       //"com.amazonaws" % "aws-java-sdk-sqs" % awsV1Version,
 
       //"software.amazon.awssdk" % "batch" % awsV2Version,
-      //"software.amazon.awssdk" % "ecs" % awsV2Version,
+      "software.amazon.awssdk" % "ecs" % awsV2Version,
       "software.amazon.awssdk" % "s3" % awsV2Version,
       "software.amazon.awssdk" % "sqs" % awsV2Version,
 
@@ -303,6 +303,7 @@ lazy val server = project
     excludeDependencies ++= Seq(
       "com.amazonaws" % "aws-java-sdk-sqs",
       "com.amazonaws" % "aws-java-sdk-s3",
+      "com.amazonaws" % "aws-java-sdk-ecs",
     ),
     coverageExcludedPackages := "com.pennsieve.jobscheduling.server\\..*;"
       + "com.pennsieve.jobscheduling.Server;"

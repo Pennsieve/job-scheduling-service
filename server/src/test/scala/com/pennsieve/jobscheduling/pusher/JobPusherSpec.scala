@@ -7,8 +7,8 @@ import akka.actor.{ ActorSystem, Scheduler }
 import akka.stream.scaladsl.{ Sink, Source }
 import akka.testkit.TestKitBase
 import cats.implicits._
-import com.amazonaws.AmazonServiceException
-import com.amazonaws.services.ecs.model._
+import software.amazon.awssdk.awscore.exception.AwsServiceException
+import software.amazon.awssdk.services.ecs.model._
 import com.pennsieve.jobscheduling.JobSchedulingPorts.GetPayload
 import com.pennsieve.jobscheduling.TestConfig.{ staticEcsConfig, staticS3Config }
 import com.pennsieve.jobscheduling.TestTask._
@@ -56,6 +56,15 @@ class JobPusherSpec
   implicit val executionContext: ExecutionContext = system.dispatcher
   implicit val scheduler: Scheduler = system.scheduler
   val etlBucket: String = staticS3Config.etlBucket
+  private val ecsConfigOneRetry: ECSConfig = staticEcsConfig
+    .copy(task = staticEcsConfig.task.copy(maxAttempts = 1))
+  val job = Job(
+    id = JobId(UUID.randomUUID()),
+    payloadId = 1,
+    organizationId = 1,
+    userId = Some(1),
+    state = JobState.Uploading
+  )
 
   "A Pusher" should {
     "push a task for a job" in {
@@ -87,7 +96,7 @@ class JobPusherSpec
     }
 
     "fail a task if it repeatedly fails" in {
-      val amazonServiceException = new AmazonServiceException("Failed")
+      val amazonServiceException = AwsServiceException.builder().message("Failed").build()
       val expectedEtlEvent =
         (JobRejected, job).toTaskCreationFailedEvent(etlBucket)
 
@@ -113,9 +122,9 @@ class JobPusherSpec
       val jobFailingRunTaskAsync =
         (_: RunTaskRequest) =>
           Future.successful {
-            val taskResult = new RunTaskResult()
-            taskResult.setFailures(List(new Failure()).asJavaCollection)
-            Right(taskResult)
+            val taskResult = RunTaskResponse.builder()
+            taskResult.failures(List(Failure.builder().build()).asJavaCollection)
+            Right(taskResult.build())
           }
 
       val pusher =
@@ -131,7 +140,8 @@ class JobPusherSpec
     }
 
     "fail if manifest cannot be uploaded" in {
-      val manifestUploadFailure = ManifestUploadFailure(new AmazonServiceException("amazon failed"))
+      val manifestUploadFailure =
+        ManifestUploadFailure(AwsServiceException.builder().message("amazon failed").build())
       val expectedEtlEvent =
         (manifestUploadFailure, job).toTaskCreationFailedEvent(etlBucket)
 
@@ -317,14 +327,4 @@ class JobPusherSpec
   def push(pusher: JobPusher)(job: Job): Option[ETLEvent] =
     Source.single(job).via(pusher.flow).runWith(Sink.headOption).awaitFinite(10 seconds)
 
-  private val ecsConfigOneRetry: ECSConfig = staticEcsConfig
-    .copy(task = staticEcsConfig.task.copy(maxAttempts = 1))
-
-  val job = Job(
-    id = JobId(UUID.randomUUID()),
-    payloadId = 1,
-    organizationId = 1,
-    userId = Some(1),
-    state = JobState.Uploading
-  )
 }

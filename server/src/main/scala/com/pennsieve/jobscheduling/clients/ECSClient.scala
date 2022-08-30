@@ -2,30 +2,32 @@
 
 package com.pennsieve.jobscheduling.clients
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
-import com.amazonaws.regions.Regions
-import com.amazonaws.services.ecs.AmazonECSAsyncClientBuilder
-import com.amazonaws.services.ecs.model._
-import com.pennsieve.jobscheduling.clients.AwsAsyncCallback.async
+import software.amazon.awssdk.services.ecs.EcsAsyncClient
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
+import software.amazon.awssdk.services.ecs.model._
+import com.pennsieve.jobscheduling.clients.AwsAsyncResponseAdapter.toEventualResult
 import com.pennsieve.jobscheduling.model.EventualResult.EventualResult
+import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient
 
-class ECSClient(region: Regions) {
+class ECSClient(region: Region) {
 
-  private val awsECSClient = AmazonECSAsyncClientBuilder
-    .standard()
-    .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
-    .withRegion(region)
+  private val awsECSClient = EcsAsyncClient
+    .builder()
+    .httpClientBuilder(NettyNioAsyncHttpClient.builder())
+    .credentialsProvider(DefaultCredentialsProvider.create())
+    .region(region)
     .build()
 
-  def runTask(request: RunTaskRequest): EventualResult[RunTaskResult] =
-    async(awsECSClient.runTaskAsync)(request)
+  def runTask(request: RunTaskRequest): EventualResult[RunTaskResponse] =
+    toEventualResult(awsECSClient.runTask(request))
 
-  def listTasks(request: ListTasksRequest): EventualResult[ListTasksResult] =
-    async(awsECSClient.listTasksAsync)(request)
+  def listTasks(request: ListTasksRequest): EventualResult[ListTasksResponse] =
+    toEventualResult(awsECSClient.listTasks(request))
 
-  def stopTask(request: StopTaskRequest): EventualResult[StopTaskResult] =
-    async(awsECSClient.stopTaskAsync)(request)
+  def stopTask(request: StopTaskRequest): EventualResult[StopTaskResponse] =
+    toEventualResult(awsECSClient.stopTask(request))
 
-  def describeTasks(request: DescribeTasksRequest): EventualResult[DescribeTasksResult] =
-    async(awsECSClient.describeTasksAsync)(request)
+  def describeTasks(request: DescribeTasksRequest): EventualResult[DescribeTasksResponse] =
+    toEventualResult(awsECSClient.describeTasks(request))
 }

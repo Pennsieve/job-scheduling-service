@@ -2,7 +2,7 @@
 
 package com.pennsieve.jobscheduling.db
 
-import com.amazonaws.services.ecs.model.Task
+import software.amazon.awssdk.services.ecs.model.Task
 import io.circe.{ Decoder, Encoder }
 import io.circe.generic.semiauto.{ deriveDecoder, deriveEncoder }
 
@@ -11,9 +11,9 @@ final case class TaskId(taskArn: String, clusterArn: String)
 object TaskId {
 
   def fromTask(task: Task): Option[TaskId] =
-    if (task.getTaskArn == null || task.getClusterArn == null) {
+    if (task.taskArn == null || task.clusterArn == null) {
       None
-    } else Some(TaskId(task.getTaskArn, task.getClusterArn))
+    } else Some(TaskId(task.taskArn, task.clusterArn))
 
   implicit def encoder: Encoder[TaskId] = deriveEncoder[TaskId]
   implicit def decoder: Decoder[TaskId] = deriveDecoder[TaskId]

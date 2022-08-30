@@ -3,11 +3,11 @@
 package com.pennsieve.jobscheduling.scheduler
 import akka.actor.{ ActorSystem, Scheduler }
 import akka.stream.scaladsl.{ Keep, Sink }
-import com.amazonaws.services.ecs.model.{
-  DescribeTasksResult,
-  ListTasksResult,
+import software.amazon.awssdk.services.ecs.model.{
+  DescribeTasksResponse,
+  ListTasksResponse,
   StopTaskRequest,
-  StopTaskResult
+  StopTaskResponse
 }
 import com.pennsieve.jobscheduling.JobSchedulingPorts
 import com.pennsieve.jobscheduling.JobSchedulingPorts.{ createUpdateJob, UpdateJob }
@@ -34,12 +34,13 @@ import scala.concurrent.{ ExecutionContext, Future }
 object JobSchedulerFakes extends AwaitableImplicits {
 
   val successfulStopTask: StopTask =
-    (_: StopTaskRequest) => Future.successful(Right(new StopTaskResult()))
+    (_: StopTaskRequest) => Future.successful(Right(StopTaskResponse.builder().build()))
 
-  val emptyDescribeTasks: DescribeTasks = _ => Future.successful(Right(new DescribeTasksResult()))
+  val emptyDescribeTasks: DescribeTasks = _ =>
+    Future.successful(Right(DescribeTasksResponse.builder().build()))
 
   val emptyListTasks: ListTasks =
-    _ => Future.successful(Right(new ListTasksResult()))
+    _ => Future.successful(Right(ListTasksResponse.builder().build()))
 
   def jobScheduler(
     runTask: RunTask = successfulRunTask,

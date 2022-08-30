@@ -2,11 +2,11 @@
 
 package com.pennsieve.jobscheduling.pusher
 
-import com.amazonaws.services.ecs.model.{
+import software.amazon.awssdk.services.ecs.model.{
   ListTasksRequest,
-  ListTasksResult,
+  ListTasksResponse,
   RunTaskRequest,
-  RunTaskResult
+  RunTaskResponse
 }
 import com.pennsieve.jobscheduling.JobSchedulingPorts.{ createGetPayload, GetPayload }
 import com.pennsieve.jobscheduling.clients.{ ECSClient, ManifestS3, ManifestS3Client }
@@ -23,9 +23,9 @@ object JobPusherPorts {
     (ManifestS3, EC) => EventualResult[Unit]
 
   type ListTasks =
-    ListTasksRequest => EventualResult[ListTasksResult]
+    ListTasksRequest => EventualResult[ListTasksResponse]
 
-  type RunTask = RunTaskRequest => EventualResult[RunTaskResult]
+  type RunTask = RunTaskRequest => EventualResult[RunTaskResponse]
 
   def apply(ecsClient: ECSClient, s3Client: ManifestS3Client, db: Database): JobPusherPorts =
     JobPusherPorts(

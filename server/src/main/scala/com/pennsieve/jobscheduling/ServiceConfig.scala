@@ -3,7 +3,6 @@
 package com.pennsieve.jobscheduling
 
 import software.amazon.awssdk.regions.Region
-import com.amazonaws.regions.Regions
 import com.pennsieve.jobscheduling.clients.SQSClient.QueueName
 
 import scala.concurrent.duration._
@@ -44,7 +43,7 @@ case class ECSConfig(
   nextflow: NextflowConfig,
   task: ECSTaskConfig
 ) {
-  val awsRegion: Regions = Regions.fromName(region)
+  val awsRegion: Region = Region.of(region)
   val subnetIds: List[String] = rawSubnetIds.split(",").toList
   val securityGroups: List[String] = rawSecurityGroups.split(",").toList
 }

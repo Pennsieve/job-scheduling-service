@@ -4,7 +4,7 @@ package com.pennsieve.jobscheduling.model
 
 import cats.implicits._
 
-import com.amazonaws.services.ecs.model._
+import software.amazon.awssdk.services.ecs.model._
 import com.pennsieve.jobscheduling.clients.ManifestS3
 import com.pennsieve.jobscheduling.commons.JobState
 import com.pennsieve.jobscheduling.db.{ Job, PayloadEntry, TaskId }
@@ -56,52 +56,70 @@ object JobConverters {
       val manifestUri = ManifestUri(bucket, jobId).value
       val workingDirectory = s"s3://$bucket/$jobPath/scratch"
 
-      val vpcConfiguration = new AwsVpcConfiguration()
-        .withSecurityGroups(ecsConfig.securityGroups.asJava)
-        .withSubnets(ecsConfig.subnetIds.asJava)
-        .withAssignPublicIp("DISABLED")
+      val vpcConfiguration: AwsVpcConfiguration = AwsVpcConfiguration
+        .builder()
+        .securityGroups(ecsConfig.securityGroups.asJava)
+        .subnets(ecsConfig.subnetIds.asJava)
+        .assignPublicIp("DISABLED")
+        .build()
 
-      val networkConfiguration = new NetworkConfiguration()
-        .withAwsvpcConfiguration(vpcConfiguration)
+      val networkConfiguration: NetworkConfiguration = NetworkConfiguration
+        .builder()
+        .awsvpcConfiguration(vpcConfiguration)
+        .build()
 
       val nextflowEnvironmentVariables = List(
-        new KeyValuePair().withName(ImportId).withValue(jobId.toString),
-        new KeyValuePair().withName(PayloadId).withValue(job.payloadId.toString),
-        new KeyValuePair()
-          .withName("WORKING_DIR")
-          .withValue(workingDirectory),
-        new KeyValuePair().withName("PARAMS_FILE").withValue(manifestUri),
-        new KeyValuePair().withName("MANIFEST_KEY").withValue(manifestPath),
-        new KeyValuePair()
-          .withName("ENVIRONMENT")
-          .withValue(pusherConfig.environment),
-        new KeyValuePair()
-          .withName("NEXTFLOW_IAM_ACCESS_KEY_ID")
-          .withValue(ecsConfig.nextflow.accessKeyId),
-        new KeyValuePair()
-          .withName("NEXTFLOW_IAM_ACCESS_KEY_SECRET")
-          .withValue(ecsConfig.nextflow.accessKeySecret)
+        KeyValuePair.builder().name(ImportId).value(jobId.toString).build(),
+        KeyValuePair.builder().name(PayloadId).value(job.payloadId.toString).build(),
+        KeyValuePair
+          .builder()
+          .name("WORKING_DIR")
+          .value(workingDirectory)
+          .build(),
+        KeyValuePair.builder().name("PARAMS_FILE").value(manifestUri).build(),
+        KeyValuePair.builder().name("MANIFEST_KEY").value(manifestPath).build(),
+        KeyValuePair
+          .builder()
+          .name("ENVIRONMENT")
+          .value(pusherConfig.environment)
+          .build(),
+        KeyValuePair
+          .builder()
+          .name("NEXTFLOW_IAM_ACCESS_KEY_ID")
+          .value(ecsConfig.nextflow.accessKeyId)
+          .build(),
+        KeyValuePair
+          .builder()
+          .name("NEXTFLOW_IAM_ACCESS_KEY_SECRET")
+          .value(ecsConfig.nextflow.accessKeySecret)
+          .build()
       ).asJava
 
-      val containerOverride = new ContainerOverride()
-        .withName("nextflow")
-        .withCpu(ecsConfig.task.containerCPU)
-        .withMemory(ecsConfig.task.containerMemory)
-        .withEnvironment(nextflowEnvironmentVariables)
+      val containerOverride: ContainerOverride = ContainerOverride
+        .builder()
+        .name("nextflow")
+        .cpu(ecsConfig.task.containerCPU)
+        .memory(ecsConfig.task.containerMemory)
+        .environment(nextflowEnvironmentVariables)
+        .build()
 
-      val taskOverride = new TaskOverride()
-        .withTaskRoleArn(ecsConfig.task.iamRole)
-        .withExecutionRoleArn(ecsConfig.task.iamRole)
-        .withContainerOverrides(containerOverride)
+      val taskOverride: TaskOverride = TaskOverride
+        .builder()
+        .taskRoleArn(ecsConfig.task.iamRole)
+        .executionRoleArn(ecsConfig.task.iamRole)
+        .containerOverrides(containerOverride)
+        .build()
 
-      new RunTaskRequest()
-        .withCluster(ecsConfig.cluster)
-        .withTaskDefinition(ecsConfig.task.taskDefinition)
-        .withOverrides(taskOverride)
-        .withCount(1)
-        .withStartedBy(JobSchedulingService)
-        .withLaunchType("FARGATE")
-        .withNetworkConfiguration(networkConfiguration)
+      RunTaskRequest
+        .builder()
+        .cluster(ecsConfig.cluster)
+        .taskDefinition(ecsConfig.task.taskDefinition)
+        .overrides(taskOverride)
+        .count(1)
+        .startedBy(JobSchedulingService)
+        .launchType("FARGATE")
+        .networkConfiguration(networkConfiguration)
+        .build()
     }
 
     import io.scalaland.chimney.dsl.TransformerOps

@@ -1,7 +1,7 @@
 // Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
 
 package com.pennsieve.jobscheduling.watchdog
-import com.amazonaws.services.ecs.model.Task
+import software.amazon.awssdk.services.ecs.model.Task
 import com.pennsieve.jobscheduling.db.TaskId
 import com.pennsieve.models.JobId
 import io.circe.Encoder

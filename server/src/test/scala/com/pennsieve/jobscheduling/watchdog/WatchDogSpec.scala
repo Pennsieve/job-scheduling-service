@@ -2,14 +2,19 @@
 
 package com.pennsieve.jobscheduling.watchdog
 
-import java.time.OffsetDateTime
+import java.time.{ Instant, OffsetDateTime }
 import java.time.ZoneOffset.UTC
 import java.util.Date
 import akka.Done
 import akka.actor.{ ActorSystem, Scheduler }
 import akka.stream.scaladsl.{ Keep, Sink, Source }
 import akka.testkit.TestKit
-import com.amazonaws.services.ecs.model.{ ContainerOverride, KeyValuePair, TaskOverride }
+import software.amazon.awssdk.services.ecs.model.{
+  ContainerOverride,
+  KeyValuePair,
+  Task,
+  TaskOverride
+}
 import software.amazon.awssdk.services.sqs.model.GetQueueAttributesResponse
 import software.amazon.awssdk.services.sqs.model.QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES
 import com.pennsieve.jobscheduling.Fakes.getManifest
@@ -62,6 +67,13 @@ class WatchDogSpec(system: ActorSystem)
 
   implicit val actorSystem: ActorSystem = system
   implicit val scheduler: Scheduler = system.scheduler
+  implicit val config = staticWatchDogConfig
+
+  val exception = new Exception()
+  val etlBucket: String = staticS3Config.etlBucket
+  val yesterday: OffsetDateTime = OffsetDateTime.now(UTC).minusDays(1L)
+  val yesterdayInstant = yesterday.toInstant
+  val yesterdayDate: Date = new Date(yesterday.toInstant.toEpochMilli)
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -179,7 +191,7 @@ class WatchDogSpec(system: ActorSystem)
       val regularJob = createJob(Some(taskId))
 
       val taskWithJobId =
-        createOldInactiveTaskWithEnv(entryToJob(regularJob)).withCreatedAt(new Date())
+        initOldInactiveTaskBuilderWithEnv(entryToJob(regularJob)).createdAt(Instant.now()).build()
 
       runWatchDogECS(fakeFargate.stopTask, fakeFargate.describeTasks(taskWithJobId))
 
@@ -192,7 +204,7 @@ class WatchDogSpec(system: ActorSystem)
       val regularJob = createJob(Some(taskId))
 
       val taskWithJobId =
-        createOldInactiveTaskWithEnv(entryToJob(regularJob)).withCreatedAt(new Date())
+        initOldInactiveTaskBuilderWithEnv(entryToJob(regularJob)).createdAt(Instant.now()).build()
 
       runWatchDogECS(
         fakeFargate.stopTask,
@@ -209,7 +221,7 @@ class WatchDogSpec(system: ActorSystem)
       val slowJob = createJob(Some(taskId))
 
       val taskWithJobId =
-        createOldInactiveTaskWithEnv(entryToJob(slowJob)).withCreatedAt(yesterdayDate)
+        initOldInactiveTaskBuilderWithEnv(entryToJob(slowJob)).createdAt(yesterdayInstant).build()
 
       runWatchDogECS(
         fakeFargate.stopTask,
@@ -227,7 +239,9 @@ class WatchDogSpec(system: ActorSystem)
       val regularJob = createJob(Some(taskId))
 
       val taskWithJobId =
-        createOldInactiveTaskWithEnv(entryToJob(regularJob)).withStartedBy("not-etl-service")
+        initOldInactiveTaskBuilderWithEnv(entryToJob(regularJob))
+          .startedBy("not-etl-service")
+          .build()
 
       runWatchDogECS(fakeFargate.stopTask, fakeFargate.describeTasks(taskWithJobId))
 
@@ -240,7 +254,7 @@ class WatchDogSpec(system: ActorSystem)
       val regularJob = createJob(Some(taskId))
 
       val taskWithJobId =
-        createOldInactiveTaskWithEnv(entryToJob(regularJob)).withDesiredStatus("RUNNING")
+        initOldInactiveTaskBuilderWithEnv(entryToJob(regularJob)).desiredStatus("RUNNING").build()
 
       runWatchDogECS(fakeFargate.stopTask, fakeFargate.describeTasks(taskWithJobId))
 
@@ -340,31 +354,32 @@ class WatchDogSpec(system: ActorSystem)
     }
   }
 
-  private def createOldInactiveTaskWithEnv(slowJob: Job) = {
+  private def initOldInactiveTaskBuilderWithEnv(slowJob: Job): Task.Builder = {
     val envJobId =
-      new KeyValuePair().withName(ImportId).withValue(slowJob.id.toString)
+      KeyValuePair.builder().name(ImportId).value(slowJob.id.toString).build()
     val envPayloadId =
-      new KeyValuePair()
-        .withName(PayloadId)
-        .withValue(slowJob.payloadId.toString)
+      KeyValuePair
+        .builder()
+        .name(PayloadId)
+        .value(slowJob.payloadId.toString)
+        .build()
     val containerOverride =
-      new ContainerOverride()
-        .withEnvironment(List(envPayloadId, envJobId).asJava)
+      ContainerOverride
+        .builder()
+        .environment(List(envPayloadId, envJobId).asJava)
+        .build()
     val taskOverride =
-      new TaskOverride().withContainerOverrides(containerOverride)
-    createTask()
-      .withOverrides(taskOverride)
-      .withStartedBy(JobSchedulingService)
-      .withCreatedAt(yesterdayDate)
-      .withDesiredStatus("STOPPED")
+      TaskOverride.builder().containerOverrides(containerOverride).build()
+    initTaskBuilder()
+      .overrides(taskOverride)
+      .startedBy(JobSchedulingService)
+      .createdAt(yesterdayInstant)
+      .desiredStatus("STOPPED")
   }
 
-  val exception = new Exception()
-  val etlBucket: String = staticS3Config.etlBucket
-  val yesterday: OffsetDateTime = OffsetDateTime.now(UTC).minusDays(1L)
-  val yesterdayDate: Date = new Date(yesterday.toInstant.toEpochMilli)
-
-  implicit val config = staticWatchDogConfig
+  private def createOldInactiveTaskWithEnv(slowJob: Job) = {
+    initOldInactiveTaskBuilderWithEnv(slowJob).build()
+  }
 
   def runWatchDogDatabase(
     stopTask: StopTask,
