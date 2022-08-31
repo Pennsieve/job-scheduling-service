@@ -55,8 +55,7 @@ lazy val akkaHttp213Version = "10.2.7"
 lazy val akka212Version = "2.6.5"
 lazy val akka213Version = "2.6.8"
 lazy val authMiddlewareVersion = "5.1.3"
-lazy val awsV1Version = "1.11.414"
-lazy val awsV2Version = "2.11.14"
+lazy val awsVersion = "2.11.14"
 lazy val cats212Version = "1.5.0"
 lazy val cats213Version = "2.6.1"
 lazy val circe212Version = "0.11.1"
@@ -210,10 +209,10 @@ lazy val server = project
     libraryDependencies ++= sharedCatsDependencies.map(_ % catsVersion.value),
     libraryDependencies ++= Seq(
       "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % "2.0.2",
-      "software.amazon.awssdk" % "batch" % awsV2Version,
-      "software.amazon.awssdk" % "ecs" % awsV2Version,
-      "software.amazon.awssdk" % "s3" % awsV2Version,
-      "software.amazon.awssdk" % "sqs" % awsV2Version,
+      "software.amazon.awssdk" % "batch" % awsVersion,
+      "software.amazon.awssdk" % "ecs" % awsVersion,
+      "software.amazon.awssdk" % "s3" % awsVersion,
+      "software.amazon.awssdk" % "sqs" % awsVersion,
       "com.pennsieve" %% "service-utilities" % serviceUtilitiesVersion,
       "com.pennsieve" %% "utilities" % utilitiesVersion,
       "com.pennsieve" %% "auth-middleware" % authMiddlewareVersion,
