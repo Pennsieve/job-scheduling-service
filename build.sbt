@@ -1,6 +1,10 @@
-import CrossCompilationUtil.{getScalacOptions, getVersion, handle212OnlyDependency, scalaVersionMatch}
+import CrossCompilationUtil.{
+  getScalacOptions,
+  getVersion,
+  handle212OnlyDependency,
+  scalaVersionMatch
+}
 Global / cancelable := true
-
 
 lazy val scala212 = "2.12.11"
 lazy val scala213 = "2.13.8"
@@ -11,10 +15,11 @@ ThisBuild / organization := "com.pennsieve"
 ThisBuild / scalaVersion := scala213
 ThisBuild / resolvers ++= Seq(
   "Pennsieve Releases" at "https://nexus.pennsieve.cc/repository/maven-releases",
-  "Pennsieve Snapshots" at "https://nexus.pennsieve.cc/repository/maven-snapshots",
+  "Pennsieve Snapshots" at "https://nexus.pennsieve.cc/repository/maven-snapshots"
 )
 
-ThisBuild / credentials += Credentials("Sonatype Nexus Repository Manager",
+ThisBuild / credentials += Credentials(
+  "Sonatype Nexus Repository Manager",
   "nexus.pennsieve.cc",
   sys.env("PENNSIEVE_NEXUS_USER"),
   sys.env("PENNSIEVE_NEXUS_PW")
@@ -30,15 +35,18 @@ ThisBuild / Test / fork := true
 ThisBuild / Test / testForkedParallel := true
 
 ThisBuild / Test / javaOptions ++=
-  sys.props.get("testDebug")
+  sys.props
+    .get("testDebug")
     .map(_ => Seq("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"))
     .getOrElse(Seq.empty[String])
 
 ThisBuild / version := sys.props.get("version").getOrElse("SNAPSHOT")
 
-lazy val headerLicenseValue = Some(HeaderLicense.Custom(
-  s"Copyright (c) [2018] - [${java.time.Year.now.getValue}] Pennsieve, Inc. All Rights Reserved."
-))
+lazy val headerLicenseValue = Some(
+  HeaderLicense.Custom(
+    s"Copyright (c) [2018] - [${java.time.Year.now.getValue}] Pennsieve, Inc. All Rights Reserved."
+  )
+)
 lazy val headerMappingsValue = HeaderFileType.scala -> HeaderCommentStyle.cppStyleLineComment
 
 // Dependency versions
@@ -71,34 +79,22 @@ lazy val catsVersion = SettingKey[String]("catsVersion")
 lazy val akkaHttpVersion = SettingKey[String]("akkaHttpVersion")
 lazy val akkaVersion = SettingKey[String]("akkaVersion")
 
-lazy val sharedEnumeratumDependencies = Seq(
-  "com.beachape"               %% "enumeratum",
-  "com.beachape"               %% "enumeratum-circe"
-)
+lazy val sharedEnumeratumDependencies =
+  Seq("com.beachape" %% "enumeratum", "com.beachape" %% "enumeratum-circe")
 
-lazy val sharedCirceDependencies = Seq(
-  "io.circe"                   %% "circe-core",
-  "io.circe"                   %% "circe-generic",
-  "io.circe"                   %% "circe-jawn",
-)
+lazy val sharedCirceDependencies =
+  Seq("io.circe" %% "circe-core", "io.circe" %% "circe-generic", "io.circe" %% "circe-jawn")
 
-lazy val sharedCatsDependencies = Seq(
-  "org.typelevel"              %% "cats-core",
-)
+lazy val sharedCatsDependencies = Seq("org.typelevel" %% "cats-core")
 
-lazy val sharedAkkaDependencies = Seq(
-  "com.typesafe.akka"          %% "akka-stream-typed"
-)
+lazy val sharedAkkaDependencies = Seq("com.typesafe.akka" %% "akka-stream-typed")
 
-lazy val sharedAkkaHttpDependencies = Seq(
-  "com.typesafe.akka"          %% "akka-http"
-)
+lazy val sharedAkkaHttpDependencies = Seq("com.typesafe.akka" %% "akka-http")
 
 // Shared dependencies
 ThisBuild / libraryDependencies ++= Seq(
-  "com.typesafe.scala-logging" %% "scala-logging"     % scalaLoggingVersion,
-
-  "com.pennsieve"              %% "core-models"       % coreVersion,
+  "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
+  "com.pennsieve" %% "core-models" % coreVersion
 )
 
 // project definitions
@@ -109,31 +105,11 @@ lazy val client = project
     name := "job-scheduling-service-client",
     scalacOptions ++= getScalacOptions(scalaVersion.value),
     crossScalaVersions := supportedScalaVersions,
-    circeVersion := getVersion(
-      scalaVersion.value,
-      circe212Version,
-      circe213Version
-    ),
-    enumeratumVersion := getVersion(
-      scalaVersion.value,
-      enumeratum212Version,
-      enumeratum213Version
-    ),
-    catsVersion := getVersion(
-      scalaVersion.value,
-      cats212Version,
-      cats213Version
-    ),
-    akkaVersion := getVersion(
-      scalaVersion.value,
-      akka212Version,
-      akka213Version
-    ),
-    akkaHttpVersion := getVersion(
-      scalaVersion.value,
-      akkaHttp212Version,
-      akkaHttp213Version
-    ),
+    circeVersion := getVersion(scalaVersion.value, circe212Version, circe213Version),
+    enumeratumVersion := getVersion(scalaVersion.value, enumeratum212Version, enumeratum213Version),
+    catsVersion := getVersion(scalaVersion.value, cats212Version, cats213Version),
+    akkaVersion := getVersion(scalaVersion.value, akka212Version, akka213Version),
+    akkaHttpVersion := getVersion(scalaVersion.value, akkaHttp212Version, akkaHttp213Version),
     libraryDependencies ++= sharedAkkaDependencies.map(_ % akkaVersion.value),
     libraryDependencies ++= sharedAkkaHttpDependencies.map(_ % akkaHttpVersion.value),
     libraryDependencies ++= sharedEnumeratumDependencies.map(_ % enumeratumVersion.value),
@@ -178,31 +154,11 @@ lazy val commons = project
     name := "job-scheduling-service-commons",
     scalacOptions ++= getScalacOptions(scalaVersion.value),
     crossScalaVersions := supportedScalaVersions,
-    circeVersion := getVersion(
-      scalaVersion.value,
-      circe212Version,
-      circe213Version
-    ),
-    enumeratumVersion := getVersion(
-      scalaVersion.value,
-      enumeratum212Version,
-      enumeratum213Version
-    ),
-    catsVersion := getVersion(
-      scalaVersion.value,
-      cats212Version,
-      cats213Version
-    ),
-    akkaVersion := getVersion(
-      scalaVersion.value,
-      akka212Version,
-      akka213Version
-    ),
-    akkaHttpVersion := getVersion(
-      scalaVersion.value,
-      akkaHttp212Version,
-      akkaHttp213Version
-    ),
+    circeVersion := getVersion(scalaVersion.value, circe212Version, circe213Version),
+    enumeratumVersion := getVersion(scalaVersion.value, enumeratum212Version, enumeratum213Version),
+    catsVersion := getVersion(scalaVersion.value, cats212Version, cats213Version),
+    akkaVersion := getVersion(scalaVersion.value, akka212Version, akka213Version),
+    akkaHttpVersion := getVersion(scalaVersion.value, akkaHttp212Version, akkaHttp213Version),
     libraryDependencies ++= sharedAkkaDependencies.map(_ % akkaVersion.value),
     libraryDependencies ++= sharedAkkaHttpDependencies.map(_ % akkaHttpVersion.value),
     libraryDependencies ++= sharedEnumeratumDependencies.map(_ % enumeratumVersion.value),
@@ -243,11 +199,7 @@ lazy val server = project
     ),
     assembly / test := {},
     circeVersion := getVersion(scalaVersion.value, circe212Version, circe213Version),
-    enumeratumVersion := getVersion(
-      scalaVersion.value,
-      enumeratum212Version,
-      enumeratum213Version
-    ),
+    enumeratumVersion := getVersion(scalaVersion.value, enumeratum212Version, enumeratum213Version),
     catsVersion := getVersion(scalaVersion.value, cats212Version, cats213Version),
     akkaVersion := getVersion(scalaVersion.value, akka212Version, akka213Version),
     akkaHttpVersion := getVersion(scalaVersion.value, akkaHttp212Version, akkaHttp213Version),
@@ -258,23 +210,17 @@ lazy val server = project
     libraryDependencies ++= sharedCatsDependencies.map(_ % catsVersion.value),
     libraryDependencies ++= Seq(
       "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % "2.0.2",
-      "com.amazonaws" % "aws-java-sdk-batch" % awsV1Version,
-      "com.amazonaws" % "aws-java-sdk-core" % awsV1Version exclude ("commons-logging", "commons-logging"),
-      //"com.amazonaws" % "aws-java-sdk-ecs" % awsV1Version,
-      //"com.amazonaws" % "aws-java-sdk-s3" % awsV1Version,
-      //"com.amazonaws" % "aws-java-sdk-sqs" % awsV1Version,
-
-      //"software.amazon.awssdk" % "batch" % awsV2Version,
+      "software.amazon.awssdk" % "batch" % awsV2Version,
       "software.amazon.awssdk" % "ecs" % awsV2Version,
       "software.amazon.awssdk" % "s3" % awsV2Version,
       "software.amazon.awssdk" % "sqs" % awsV2Version,
-
       "com.pennsieve" %% "service-utilities" % serviceUtilitiesVersion,
       "com.pennsieve" %% "utilities" % utilitiesVersion,
       "com.pennsieve" %% "auth-middleware" % authMiddlewareVersion,
       "com.pennsieve" %% "core-clients" % coreVersion,
       "org.apache.commons" % "commons-io" % "1.3.2",
-      "com.github.seratch" %% "awscala" % "0.8.5" exclude ("commons-logging", "commons-logging"),
+      // Don't know what this is for. Never used explicitly and tied to v1 of AWS Java SDK
+      //"com.github.seratch" %% "awscala" % "0.8.5" exclude ("commons-logging", "commons-logging"),
       "ch.qos.logback" % "logback-classic" % logbackVersion,
       "ch.qos.logback" % "logback-core" % logbackVersion,
       "net.logstash.logback" % "logstash-logback-encoder" % "5.2",
@@ -299,11 +245,6 @@ lazy val server = project
       "io.circe" %% "circe-generic" % circeVersion.value,
       "io.circe" %% "circe-java8" % circeVersion.value,
       "io.circe" %% "circe-jawn" % circeVersion.value
-    ),
-    excludeDependencies ++= Seq(
-      "com.amazonaws" % "aws-java-sdk-sqs",
-      "com.amazonaws" % "aws-java-sdk-s3",
-      "com.amazonaws" % "aws-java-sdk-ecs",
     ),
     coverageExcludedPackages := "com.pennsieve.jobscheduling.server\\..*;"
       + "com.pennsieve.jobscheduling.Server;"
