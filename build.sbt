@@ -270,6 +270,18 @@ lazy val server = project
     coverageMinimumStmtTotal := 85,
     coverageFailOnMinimum := true,
     scalafmtOnCompile := true,
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", "io.netty.versions.properties", _ @_*) => MergeStrategy.discard
+      case PathList("codegen-resources", "customization.config", _ @_*) => MergeStrategy.discard
+      case PathList("codegen-resources", "examples-1.json", _ @_*) => MergeStrategy.discard
+      case PathList("codegen-resources", "paginators-1.json", _ @_*) => MergeStrategy.discard
+      case PathList("codegen-resources", "service-2.json", _ @_*) => MergeStrategy.discard
+      case PathList("codegen-resources", "waiters-2.json", _ @_*) => MergeStrategy.discard
+      case PathList("module-info.class") => MergeStrategy.discard
+      case x =>
+        val oldStrategy = (assembly / assemblyMergeStrategy).value
+        oldStrategy(x)
+    },
     docker / dockerfile := {
       val artifact: File = assembly.value
       val artifactTargetPath = s"/app/${artifact.name}"

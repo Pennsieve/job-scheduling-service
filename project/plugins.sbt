@@ -14,7 +14,7 @@ credentials += Credentials(
 // See https://app.clickup.com/t/a8ned9
 ThisBuild / useCoursier := false
 
-addSbtPlugin("se.marcuslonnberg" % "sbt-docker" % "1.5.0")
+addSbtPlugin("se.marcuslonnberg" % "sbt-docker" % "1.9.0")
 
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.7")
 
