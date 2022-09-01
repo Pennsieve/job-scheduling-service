@@ -1,26 +1,25 @@
-cancelable in Global := true
+import CrossCompilationUtil.{
+  getScalacOptions,
+  getVersion,
+  handle212OnlyDependency,
+  scalaVersionMatch
+}
+Global / cancelable := true
+
+lazy val scala212 = "2.12.11"
+lazy val scala213 = "2.13.8"
+lazy val supportedScalaVersions = List(scala212, scala213)
 
 // Shared settings
 ThisBuild / organization := "com.pennsieve"
-ThisBuild / scalaVersion := "2.12.11"
-ThisBuild / scalacOptions ++= Seq(
-  "-language:implicitConversions",
-  "-language:postfixOps",
-  "-language:reflectiveCalls",
-  "-Ypartial-unification",
-  "-Xmax-classfile-name", "100",
-  "-feature",
-  "-deprecation",
-)
+ThisBuild / scalaVersion := scala213
 ThisBuild / resolvers ++= Seq(
   "Pennsieve Releases" at "https://nexus.pennsieve.cc/repository/maven-releases",
-  "Pennsieve Snapshots" at "https://nexus.pennsieve.cc/repository/maven-snapshots",
-  Resolver.bintrayRepo("hseeberger", "maven"),
-  Resolver.jcenterRepo,
-  Resolver.bintrayRepo("commercetools", "maven")
+  "Pennsieve Snapshots" at "https://nexus.pennsieve.cc/repository/maven-snapshots"
 )
 
-ThisBuild / credentials += Credentials("Sonatype Nexus Repository Manager",
+ThisBuild / credentials += Credentials(
+  "Sonatype Nexus Repository Manager",
   "nexus.pennsieve.cc",
   sys.env("PENNSIEVE_NEXUS_USER"),
   sys.env("PENNSIEVE_NEXUS_PW")
@@ -36,53 +35,65 @@ ThisBuild / Test / fork := true
 ThisBuild / Test / testForkedParallel := true
 
 ThisBuild / Test / javaOptions ++=
-  sys.props.get("testDebug")
+  sys.props
+    .get("testDebug")
     .map(_ => Seq("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"))
     .getOrElse(Seq.empty[String])
 
 ThisBuild / version := sys.props.get("version").getOrElse("SNAPSHOT")
 
-lazy val headerLicenseValue = Some(HeaderLicense.Custom(
-  s"Copyright (c) [2018] - [${java.time.Year.now.getValue}] Pennsieve, Inc. All Rights Reserved."
-))
+lazy val headerLicenseValue = Some(
+  HeaderLicense.Custom(
+    s"Copyright (c) [2018] - [${java.time.Year.now.getValue}] Pennsieve, Inc. All Rights Reserved."
+  )
+)
 lazy val headerMappingsValue = HeaderFileType.scala -> HeaderCommentStyle.cppStyleLineComment
 
 // Dependency versions
-lazy val AkkaHttpVersion = "10.1.11"
-lazy val AkkaVersion = "2.6.5"
-lazy val AuthMiddlewareVersion = "4.2.3"
-lazy val AwsVersion = "1.11.414"
-lazy val CatsVersion = "1.2.0"
-lazy val CirceVersion = "0.11.1"
-lazy val CoreVersion = "com.pennsieve-SNAPSHOT"
-lazy val DockerItVersion = "0.9.7"
-lazy val EnumeratumVersion = "1.5.14"
-lazy val LogbackVersion = "1.2.3"
-lazy val PureConfigVersion = "0.9.1"
-lazy val ScalaLoggingVersion = "3.9.2"
-lazy val SlickVersion = "3.3.2"
-lazy val SlickPgVersion = "0.17.3"
-lazy val ServiceUtilitiesVersion = "6-2a4488a"
-lazy val UtilitiesVersion = "3-cd7539b"
+lazy val akkaHttp212Version = "10.1.11"
+lazy val akkaHttp213Version = "10.2.7"
+lazy val akka212Version = "2.6.5"
+lazy val akka213Version = "2.6.8"
+lazy val authMiddlewareVersion = "5.1.3"
+lazy val awsVersion = "2.11.14"
+lazy val cats212Version = "1.5.0"
+lazy val cats213Version = "2.6.1"
+lazy val circe212Version = "0.11.1"
+lazy val circe213Version = "0.14.1"
+lazy val coreVersion = "191-fe6a5c7"
+lazy val dockerItVersion = "0.9.9"
+lazy val enumeratum212Version = "1.5.14"
+lazy val enumeratum213Version = "1.7.0"
+lazy val logbackVersion = "1.2.3"
+lazy val pureConfigVersion = "0.17.1"
+lazy val scalaLoggingVersion = "3.9.2"
+lazy val slickVersion = "3.3.3"
+lazy val slickPgVersion = "0.20.3"
+lazy val serviceUtilitiesVersion = "8-9751ee3"
+lazy val utilitiesVersion = "4-55953e4"
+
+lazy val circeVersion = SettingKey[String]("circeVersion")
+lazy val enumeratumVersion = SettingKey[String]("enumeratumVersion")
+lazy val catsVersion = SettingKey[String]("catsVersion")
+lazy val akkaHttpVersion = SettingKey[String]("akkaHttpVersion")
+lazy val akkaVersion = SettingKey[String]("akkaVersion")
+
+lazy val sharedEnumeratumDependencies =
+  Seq("com.beachape" %% "enumeratum", "com.beachape" %% "enumeratum-circe")
+
+lazy val sharedCirceDependencies =
+  Seq("io.circe" %% "circe-core", "io.circe" %% "circe-generic", "io.circe" %% "circe-jawn")
+
+lazy val sharedCatsDependencies = Seq("org.typelevel" %% "cats-core")
+
+lazy val sharedAkkaDependencies = Seq("com.typesafe.akka" %% "akka-stream-typed")
+
+lazy val sharedAkkaHttpDependencies = Seq("com.typesafe.akka" %% "akka-http")
 
 // Shared dependencies
 ThisBuild / libraryDependencies ++= Seq(
-  "com.typesafe.scala-logging" %% "scala-logging"     % ScalaLoggingVersion,
-
-  "com.pennsieve"              %% "core-models"       % CoreVersion,
-
-  "com.typesafe.akka"          %% "akka-http"         % AkkaHttpVersion,
-  "com.typesafe.akka"          %% "akka-stream-typed" % AkkaVersion,
-
-  "com.beachape"               %% "enumeratum"        % EnumeratumVersion,
-  "com.beachape"               %% "enumeratum-circe"  % EnumeratumVersion,
-
-  "io.circe"                   %% "circe-core"        % CirceVersion,
-  "io.circe"                   %% "circe-generic"     % CirceVersion,
-  "io.circe"                   %% "circe-java8"       % CirceVersion,
-  "io.circe"                   %% "circe-jawn"        % CirceVersion,
-
-  "org.typelevel"              %% "cats-core"         % CatsVersion,
+  "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
+  "com.pennsieve" %% "core-models" % coreVersion
 )
 
 // project definitions
@@ -91,6 +102,22 @@ lazy val client = project
   .dependsOn(commons)
   .settings(
     name := "job-scheduling-service-client",
+    scalacOptions ++= getScalacOptions(scalaVersion.value),
+    crossScalaVersions := supportedScalaVersions,
+    circeVersion := getVersion(scalaVersion.value, circe212Version, circe213Version),
+    enumeratumVersion := getVersion(scalaVersion.value, enumeratum212Version, enumeratum213Version),
+    catsVersion := getVersion(scalaVersion.value, cats212Version, cats213Version),
+    akkaVersion := getVersion(scalaVersion.value, akka212Version, akka213Version),
+    akkaHttpVersion := getVersion(scalaVersion.value, akkaHttp212Version, akkaHttp213Version),
+    libraryDependencies ++= sharedAkkaDependencies.map(_ % akkaVersion.value),
+    libraryDependencies ++= sharedAkkaHttpDependencies.map(_ % akkaHttpVersion.value),
+    libraryDependencies ++= sharedEnumeratumDependencies.map(_ % enumeratumVersion.value),
+    libraryDependencies ++= sharedCirceDependencies.map(_ % circeVersion.value),
+    libraryDependencies ++= handle212OnlyDependency(
+      scalaVersion.value,
+      "io.circe" %% "circe-java8" % circeVersion.value
+    ),
+    libraryDependencies ++= sharedCatsDependencies.map(_ % catsVersion.value),
     headerLicense := headerLicenseValue,
     headerMappings := headerMappings.value + headerMappingsValue,
     publishTo := {
@@ -102,8 +129,21 @@ lazy val client = project
       }
     },
     publishMavenStyle := true,
-    guardrailTasks in Compile := List(
-      Client(file("./swagger/job-scheduling-service.yml"), pkg="com.pennsieve.jobscheduling.clients.generated")
+    Compile / guardrailTasks := scalaVersionMatch(
+      scalaVersion.value,
+      List(
+        ScalaClient(
+          file("./swagger/job-scheduling-service.yml"),
+          pkg = "com.pennsieve.jobscheduling.clients.generated",
+          modules = List("akka-http", "circe-0.11")
+        )
+      ),
+      List(
+        ScalaClient(
+          file("./swagger/job-scheduling-service.yml"),
+          pkg = "com.pennsieve.jobscheduling.clients.generated"
+        )
+      )
     )
   )
 
@@ -111,6 +151,22 @@ lazy val commons = project
   .enablePlugins(AutomateHeaderPlugin)
   .settings(
     name := "job-scheduling-service-commons",
+    scalacOptions ++= getScalacOptions(scalaVersion.value),
+    crossScalaVersions := supportedScalaVersions,
+    circeVersion := getVersion(scalaVersion.value, circe212Version, circe213Version),
+    enumeratumVersion := getVersion(scalaVersion.value, enumeratum212Version, enumeratum213Version),
+    catsVersion := getVersion(scalaVersion.value, cats212Version, cats213Version),
+    akkaVersion := getVersion(scalaVersion.value, akka212Version, akka213Version),
+    akkaHttpVersion := getVersion(scalaVersion.value, akkaHttp212Version, akkaHttp213Version),
+    libraryDependencies ++= sharedAkkaDependencies.map(_ % akkaVersion.value),
+    libraryDependencies ++= sharedAkkaHttpDependencies.map(_ % akkaHttpVersion.value),
+    libraryDependencies ++= sharedEnumeratumDependencies.map(_ % enumeratumVersion.value),
+    libraryDependencies ++= sharedCirceDependencies.map(_ % circeVersion.value),
+    libraryDependencies ++= handle212OnlyDependency(
+      scalaVersion.value,
+      "io.circe" %% "circe-java8" % circeVersion.value
+    ),
+    libraryDependencies ++= sharedCatsDependencies.map(_ % catsVersion.value),
     headerLicense := headerLicenseValue,
     headerMappings := headerMappings.value + headerMappingsValue,
     publishTo := {
@@ -128,71 +184,67 @@ lazy val commons = project
 lazy val server = project
   .enablePlugins(AutomateHeaderPlugin)
   .enablePlugins(DockerPlugin)
-  .dependsOn(client % "test->compile", commons)
+  .dependsOn(client % "test", commons)
   .settings(
     name := "job-scheduling-service",
+    scalacOptions ++= getScalacOptions(scalaVersion.value),
     headerLicense := headerLicenseValue,
     headerMappings := headerMappings.value + headerMappingsValue,
-    guardrailTasks in Compile := List(
-      Server(file("./swagger/job-scheduling-service.yml"), pkg="com.pennsieve.jobscheduling.server.generated")
+    Compile / guardrailTasks := List(
+      ScalaServer(
+        file("./swagger/job-scheduling-service.yml"),
+        pkg = "com.pennsieve.jobscheduling.server.generated"
+      )
     ),
-    test in assembly := {},
+    assembly / test := {},
+    circeVersion := getVersion(scalaVersion.value, circe212Version, circe213Version),
+    enumeratumVersion := getVersion(scalaVersion.value, enumeratum212Version, enumeratum213Version),
+    catsVersion := getVersion(scalaVersion.value, cats212Version, cats213Version),
+    akkaVersion := getVersion(scalaVersion.value, akka212Version, akka213Version),
+    akkaHttpVersion := getVersion(scalaVersion.value, akkaHttp212Version, akkaHttp213Version),
+    libraryDependencies ++= sharedAkkaDependencies.map(_ % akkaVersion.value),
+    libraryDependencies ++= sharedAkkaHttpDependencies.map(_ % akkaHttpVersion.value),
+    libraryDependencies ++= sharedEnumeratumDependencies.map(_ % enumeratumVersion.value),
+    libraryDependencies ++= sharedCirceDependencies.map(_ % circeVersion.value),
+    libraryDependencies ++= sharedCatsDependencies.map(_ % catsVersion.value),
     libraryDependencies ++= Seq(
-      "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % "1.0-M1",
-
-      "com.amazonaws" % "aws-java-sdk-batch" % AwsVersion,
-      "com.amazonaws" % "aws-java-sdk-core" % AwsVersion exclude ("commons-logging", "commons-logging"),
-      "com.amazonaws" % "aws-java-sdk-ecs" % AwsVersion,
-      "com.amazonaws" % "aws-java-sdk-s3" % AwsVersion,
-      "com.amazonaws" % "aws-java-sdk-sqs" % AwsVersion,
-
-      "com.pennsieve" %% "service-utilities" % ServiceUtilitiesVersion,
-      "com.pennsieve" %% "utilities" % UtilitiesVersion,
-
-      "com.pennsieve" %% "auth-middleware" % AuthMiddlewareVersion,
-      "com.pennsieve" %% "core-clients" % CoreVersion,
-
+      "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % "2.0.2",
+      "software.amazon.awssdk" % "batch" % awsVersion,
+      "software.amazon.awssdk" % "ecs" % awsVersion,
+      "software.amazon.awssdk" % "s3" % awsVersion,
+      "software.amazon.awssdk" % "sqs" % awsVersion,
+      "com.pennsieve" %% "service-utilities" % serviceUtilitiesVersion,
+      "com.pennsieve" %% "utilities" % utilitiesVersion,
+      "com.pennsieve" %% "auth-middleware" % authMiddlewareVersion,
+      "com.pennsieve" %% "core-clients" % coreVersion,
       "org.apache.commons" % "commons-io" % "1.3.2",
-
-      "com.github.seratch" %% "awscala" % "0.6.0" exclude ("commons-logging", "commons-logging"),
-
-      "ch.qos.logback" % "logback-classic" % LogbackVersion,
-      "ch.qos.logback" % "logback-core" % LogbackVersion,
+      // Don't know what this is for. Never used explicitly and tied to v1 of AWS Java SDK
+      //"com.github.seratch" %% "awscala" % "0.8.5" exclude ("commons-logging", "commons-logging"),
+      "ch.qos.logback" % "logback-classic" % logbackVersion,
+      "ch.qos.logback" % "logback-core" % logbackVersion,
       "net.logstash.logback" % "logstash-logback-encoder" % "5.2",
-
-      "ch.megard" %% "akka-http-cors" % "0.3.0",
-
-      "com.github.pureconfig" %% "pureconfig" % PureConfigVersion,
-
-      "com.typesafe.slick" %% "slick" % SlickVersion,
-      "com.typesafe.slick" %% "slick-hikaricp" % SlickVersion,
-
-      "com.github.tminglei" %% "slick-pg" % SlickPgVersion,
-      "com.github.tminglei" %% "slick-pg_circe-json" % SlickPgVersion,
-
-      "com.beachape" %% "enumeratum" % EnumeratumVersion,
-      "com.beachape" %% "enumeratum-circe" % EnumeratumVersion,
-
+      "ch.megard" %% "akka-http-cors" % "1.1.3",
+      "com.github.pureconfig" %% "pureconfig" % pureConfigVersion,
+      "com.typesafe.slick" %% "slick" % slickVersion,
+      "com.typesafe.slick" %% "slick-hikaricp" % slickVersion,
+      "com.github.tminglei" %% "slick-pg" % slickPgVersion,
+      "com.github.tminglei" %% "slick-pg_circe-json" % slickPgVersion,
       "org.postgresql" % "postgresql" % "42.2.4",
-
-      "io.scalaland" %% "chimney" % "0.2.1",
-
-      "com.pennsieve" %% "utilities" % UtilitiesVersion % "test" classifier "tests",
-      "com.whisk" %% "docker-testkit-scalatest" % DockerItVersion % Test,
-      "com.whisk" %% "docker-testkit-impl-spotify" % DockerItVersion % Test,
-      "org.scalatest" %% "scalatest"% "3.0.5" % Test,
-      "com.typesafe.akka" %% "akka-http-testkit" % AkkaHttpVersion % Test,
-      "com.typesafe.akka" %% "akka-actor-testkit-typed" % AkkaVersion % Test,
-      "com.typesafe.akka" %% "akka-stream-testkit" % AkkaVersion % Test,
+      "io.scalaland" %% "chimney" % "0.6.1",
+      "com.pennsieve" %% "utilities" % utilitiesVersion % Test classifier "tests",
+      "com.whisk" %% "docker-testkit-scalatest" % dockerItVersion % Test,
+      "com.whisk" %% "docker-testkit-impl-spotify" % dockerItVersion % Test,
+      "org.scalatest" %% "scalatest" % "3.2.12" % Test,
+      "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion.value % Test,
+      "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion.value % Test,
+      "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion.value % Test
     ),
-
     dependencyOverrides ++= Seq(
-      "io.circe" %% "circe-core" % CirceVersion,
-      "io.circe" %% "circe-generic" % CirceVersion,
-      "io.circe" %% "circe-java8" % CirceVersion,
-      "io.circe" %% "circe-jawn" % CirceVersion,
+      "io.circe" %% "circe-core" % circeVersion.value,
+      "io.circe" %% "circe-generic" % circeVersion.value,
+      "io.circe" %% "circe-java8" % circeVersion.value,
+      "io.circe" %% "circe-jawn" % circeVersion.value
     ),
-
     coverageExcludedPackages := "com.pennsieve.jobscheduling.server\\..*;"
       + "com.pennsieve.jobscheduling.Server;"
       + "com.pennsieve.jobscheduling.ServiceConfig;"
@@ -215,29 +267,40 @@ lazy val server = project
       + "com.pennsieve.jobscheduling.clients\\..*;"
       + "com.pennsieve.jobscheduling.errors\\..*;"
       + "com.pennsieve.jobscheduling.db.PostgresProfile",
-    coverageMinimum := 85,
+    coverageMinimumStmtTotal := 85,
     coverageFailOnMinimum := true,
-
     scalafmtOnCompile := true,
-
-    dockerfile in docker := {
+    docker / dockerfile := {
       val artifact: File = assembly.value
       val artifactTargetPath = s"/app/${artifact.name}"
       new Dockerfile {
         from("pennsieve/java-cloudwrap:10-jre-slim-0.5.9")
-        copy(artifact, artifactTargetPath, chown="pennsieve:pennsieve")
-        copy(baseDirectory.value / "bin" / "run.sh", "/app/run.sh", chown="pennsieve:pennsieve")
-        run("wget", "-qO", "/app/newrelic.jar", "http://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic.jar")
+        copy(artifact, artifactTargetPath, chown = "pennsieve:pennsieve")
+        copy(baseDirectory.value / "bin" / "run.sh", "/app/run.sh", chown = "pennsieve:pennsieve")
+        run(
+          "wget",
+          "-qO",
+          "/app/newrelic.jar",
+          "http://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic.jar"
+        )
         run("mkdir", "-p", "/home/pennsieve/.postgresql")
-        run("wget", "-qO", "/home/pennsieve/.postgresql/root.crt", "https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem")
+        run(
+          "wget",
+          "-qO",
+          "/home/pennsieve/.postgresql/root.crt",
+          "https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem"
+        )
         env("RUST_BACKTRACE", "1")
         cmd("--service", "job-scheduling-service", "exec", "app/run.sh", artifactTargetPath)
       }
     },
-    imageNames in docker := Seq(
-      ImageName("pennsieve/job-scheduling-service:latest")
-    )
+    docker / imageNames := Seq(ImageName("pennsieve/job-scheduling-service:latest"))
   )
 
 lazy val root = (project in file("."))
   .aggregate(server, client)
+  .settings(
+    // crossScalaVersions must be set to Nil on the aggregating project
+    crossScalaVersions := Nil,
+    publish / skip := true
+  )
