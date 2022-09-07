@@ -93,16 +93,10 @@ class ManifestS3Client(awsS3Client: S3Client, etlBucket: String) {
 
 object ManifestS3Client {
 
-  val clientOverrideConfiguration: ClientOverrideConfiguration = ClientOverrideConfiguration
-    .builder()
-    .putAdvancedOption(SdkAdvancedClientOption.SIGNER, Aws4Signer.create())
-    .build()
-
   def apply(s3Config: S3Config): ManifestS3Client = {
     val amazonS3Client =
       S3Client
         .builder()
-        .overrideConfiguration(clientOverrideConfiguration)
         .credentialsProvider(DefaultCredentialsProvider.create())
         .region(s3Config.awsRegion)
         .build()
