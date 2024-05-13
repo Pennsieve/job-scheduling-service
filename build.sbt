@@ -285,6 +285,10 @@ lazy val server = project
     docker / dockerfile := {
       val artifact: File = assembly.value
       val artifactTargetPath = s"/app/${artifact.name}"
+
+      // Where Postgres (psql/JDBC) expects to find the trusted CA certificate
+      val CA_CERT_LOCATION = "/home/pennsieve/.postgresql/root.crt"
+
       new Dockerfile {
         from("pennsieve/java-cloudwrap:10-jre-slim-0.5.9")
         copy(artifact, artifactTargetPath, chown = "pennsieve:pennsieve")
@@ -295,14 +299,13 @@ lazy val server = project
           "/app/newrelic.jar",
           "http://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic.jar"
         )
-        run("mkdir", "-p", "/home/pennsieve/.postgresql")
-        run(
-          "wget",
-          "-qO",
-          "/home/pennsieve/.postgresql/root.crt",
-          "https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem"
+        addRaw(
+          "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem",
+          CA_CERT_LOCATION,
         )
-        env("RUST_BACKTRACE", "1")
+        user("root")
+        run("chmod", "+r", CA_CERT_LOCATION)
+        user("pennsieve")
         cmd("--service", "job-scheduling-service", "exec", "app/run.sh", artifactTargetPath)
       }
     },
