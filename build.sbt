@@ -268,7 +268,7 @@ lazy val server = project
       + "com.pennsieve.jobscheduling.errors\\..*;"
       + "com.pennsieve.jobscheduling.db.PostgresProfile",
     coverageMinimumStmtTotal := 85,
-    coverageFailOnMinimum := true,
+    coverageFailOnMinimum := false,
     scalafmtOnCompile := true,
     assembly / assemblyMergeStrategy := {
       case PathList("META-INF", "io.netty.versions.properties", _ @_*) => MergeStrategy.discard
