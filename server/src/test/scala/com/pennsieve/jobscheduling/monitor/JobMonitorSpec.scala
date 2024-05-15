@@ -70,6 +70,7 @@ import com.pennsieve.jobscheduling.commons.JobState
 import com.pennsieve.jobscheduling.commons.JobState._
 import com.pennsieve.jobscheduling.db.JobStateHelpers._
 import org.scalatest.BeforeAndAfterEach
+import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 
@@ -77,6 +78,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ ExecutionContext, Future, Promise }
 import scala.concurrent.duration.DurationLong
 
+@DoNotDiscover
 class JobMonitorSpec(system: ActorSystem)
     extends TestKit(system)
     with JobSchedulingServiceSpecHarness

@@ -1,12 +1,14 @@
-// Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2024] Pennsieve, Inc. All Rights Reserved.
 
 package com.pennsieve.jobscheduling.db
 import com.pennsieve.jobscheduling.JobSchedulingServiceSpecHarness
 import com.pennsieve.jobscheduling.TestPayload.uploadPayload
 import com.pennsieve.test.AwaitableImplicits
+import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+@DoNotDiscover
 class PayloadsMapperSpec
     extends AnyWordSpec
     with JobSchedulingServiceSpecHarness
