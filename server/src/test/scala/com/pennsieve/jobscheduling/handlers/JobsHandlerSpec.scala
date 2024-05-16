@@ -61,8 +61,8 @@ import com.pennsieve.notifications.{ NotificationMessage, UploadNotification }
 import io.circe.Error
 import io.circe.parser.decode
 import io.circe.syntax._
-import org.scalatest.BeforeAndAfterEach
 import org.scalatest.EitherValues._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import shapeless.syntax.inject.InjectSyntax

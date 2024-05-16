@@ -1,4 +1,4 @@
-// Copyright (c) [2018] - [2024] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
 
 package com.pennsieve.jobscheduling.db
 import com.pennsieve.jobscheduling.JobSchedulingServiceSpecHarness
