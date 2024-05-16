@@ -12,12 +12,10 @@ import com.pennsieve.test.AwaitableImplicits
 import com.pennsieve.jobscheduling.clients.generated.healthcheck.HealthcheckClient
 import com.pennsieve.jobscheduling.clients.generated.healthcheck.HealthcheckResponse
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.EitherValues._
 
-@DoNotDiscover
 class HealthyHealthcheckHandlerSpec
     extends AnyWordSpec
     with ScalatestRouteTest
@@ -39,7 +37,6 @@ class HealthyHealthcheckHandlerSpec
   }
 }
 
-@DoNotDiscover
 class UnhealthyHealthcheckHandlerSpec
     extends AnyWordSpec
     with ScalatestRouteTest

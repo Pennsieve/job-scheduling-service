@@ -13,10 +13,8 @@ import com.pennsieve.models.JobId
 import com.pennsieve.test.AwaitableImplicits
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.should.Matchers
 
-@DoNotDiscover
 class JobsMapperSpec
     extends AnyWordSpec
     with JobSchedulingServiceSpecHarness

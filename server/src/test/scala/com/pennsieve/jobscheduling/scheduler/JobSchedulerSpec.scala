@@ -32,7 +32,6 @@ import com.pennsieve.jobscheduling.scheduler.JobSchedulerFakes.{
 }
 import com.pennsieve.test.AwaitableImplicits
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 
@@ -40,7 +39,6 @@ import scala.collection.immutable
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
-@DoNotDiscover
 class JobSchedulerSpec(system: ActorSystem)
     extends TestKit(system)
     with AnyWordSpecLike

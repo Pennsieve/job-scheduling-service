@@ -49,7 +49,6 @@ import com.pennsieve.jobscheduling.scheduler.JobSchedulerFakes.emptyDescribeTask
 import com.pennsieve.jobscheduling.watchdog.JobStateWatchDogPorts.createGetJobsStuckInState
 import com.pennsieve.jobscheduling.watchdog.WatchDogPorts._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.EitherValues._
@@ -57,7 +56,6 @@ import org.scalatest.EitherValues._
 import scala.concurrent.Future
 import scala.jdk.CollectionConverters._
 
-@DoNotDiscover
 class WatchDogSpec(system: ActorSystem)
     extends TestKit(system)
     with AnyWordSpecLike

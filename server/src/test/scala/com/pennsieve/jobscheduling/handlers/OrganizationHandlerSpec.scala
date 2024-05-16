@@ -25,7 +25,6 @@ import com.pennsieve.jobscheduling.db.profile.api._
 import com.pennsieve.models.Role
 import com.pennsieve.test.AwaitableImplicits
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import shapeless.Coproduct
@@ -33,7 +32,6 @@ import shapeless.syntax.inject.InjectSyntax
 
 import scala.concurrent.duration.{ FiniteDuration, MINUTES }
 
-@DoNotDiscover
 class OrganizationHandlerSpec
     extends AnyWordSpec
     with ScalatestRouteTest
