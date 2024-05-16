@@ -38,7 +38,7 @@ trait JobSchedulingServiceSpecHarness
         .fromEnv()
         .apiVersion("v1.41")
         .build()
-      )
+    )
     catch {
       case _: DockerException => fail(new DockerException("Docker may not be running"))
     }
