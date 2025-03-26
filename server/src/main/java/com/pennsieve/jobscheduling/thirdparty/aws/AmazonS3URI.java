@@ -1,5 +1,5 @@
 /*
- * Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
+ * Copyright (c) [2018] - [2025] Pennsieve, Inc. All Rights Reserved.
  */
 
 package com.pennsieve.jobscheduling.thirdparty.aws;
