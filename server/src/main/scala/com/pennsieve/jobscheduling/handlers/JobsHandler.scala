@@ -1,4 +1,4 @@
-// Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2025] Pennsieve, Inc. All Rights Reserved.
 
 package com.pennsieve.jobscheduling.handlers
 
@@ -388,12 +388,6 @@ class JobsHandler(
       ports: JobsHandlerPorts
     ): EitherT[Future, Throwable, Job] = {
       for {
-        jobState <- {
-          val state = if (isUploadSuccessful) NotProcessing else Failed
-          ports
-            .setJobState(job.id, state)
-            .map(_ => state)
-        }
         foundJob <- EitherT {
           ports
             .getJob(job.id)
@@ -416,17 +410,7 @@ class JobsHandler(
             ports.updatePackageState(OrganizationId(organizationId), UPLOAD_FAILED, payload, job.id)
         }
         _ = log.tierContext[CompleteUpload].info("finished calling packages upload-complete")
-        _ <- {
-          Notifications.sendNotification(
-            "JobsHandler",
-            foundJob.id,
-            foundJob.organizationId,
-            jobState,
-            payload,
-            ports.notifyUser
-          )
-        }
-        _ = log.tierContext[CompleteUpload].info("sent notification")
+
       } yield foundJob
     }
 

@@ -1,4 +1,4 @@
-// Copyright (c) [2018] - [2022] Pennsieve, Inc. All Rights Reserved.
+// Copyright (c) [2018] - [2025] Pennsieve, Inc. All Rights Reserved.
 
 package com.pennsieve.jobscheduling
 package monitor
@@ -128,22 +128,22 @@ class JobMonitor(
         case Left(errorWithContext) => Future.successful(Left(errorWithContext))
       }
       .mapAsyncUnordered(config.throttle.parallelism) {
-        case Right((event, payload)) =>
-          Notifications
-            .sendNotification(
-              "JobMonitor",
-              event.importId,
-              event.organizationId,
-              event.jobState,
-              payload,
-              ports.sendMessage
-            )
-            .leftMap((_, event.logContext))
-            .flatMap(_ => ackEvent(ports.sendAck)(event))
-            .value
+        case Right((event, _)) =>
+          logAndAck(ports, event)
 
         case Left(errorContext) => Future.successful(Left(errorContext))
       }
+
+  private def logAndAck(
+    ports: JobMonitorPorts,
+    event: ETLEvent
+  ): Future[Either[(Throwable, ETLLogContext), ETLEvent]] = {
+    Notifications
+      .noOp()
+      .leftMap((_, event.logContext))
+      .flatMap(_ => ackEvent(ports.sendAck)(event))
+      .value
+  }
 
   def run(finalSink: FinalSink, tryNum: Int = 0): Future[Done] =
     StreamRetry(
