@@ -11,7 +11,6 @@ import cats.data.EitherT
 import com.pennsieve.auth.middleware.AkkaDirective._
 import com.pennsieve.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserId }
 import com.pennsieve.jobscheduling._
-import com.pennsieve.jobscheduling.clients.Notifications
 import com.pennsieve.jobscheduling.db._
 import com.pennsieve.jobscheduling.errors._
 import com.pennsieve.jobscheduling.handlers.AuthorizationChecks._
