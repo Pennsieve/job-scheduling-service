@@ -635,7 +635,7 @@ class JobsHandlerSpec
       val sentNotifications = new ArrayBuffer[MessageBody]()
 
       val client =
-        createClient(createRoutes(jobScheduler, notifyUser = successfulNotify(sentNotifications)))
+        createClient(createRoutes(jobScheduler))
 
       val jobId = JobId(createJobId())
 
@@ -679,7 +679,7 @@ class JobsHandlerSpec
       val sentNotifications = new ArrayBuffer[MessageBody]()
 
       val client =
-        createClient(createRoutes(jobScheduler, notifyUser = successfulNotify(sentNotifications)))
+        createClient(createRoutes(jobScheduler))
 
       val jobId = JobId(createJobId())
 
@@ -1234,7 +1234,6 @@ class JobsHandlerSpec
   def createRoutes(
     jobScheduler: JobScheduler,
     notifyUploadConsumer: NotifyUpload = successfulSendMessage,
-    notifyUser: NotifyUser = successfulSendMessage,
     createJob: CreateJob = JobsHandlerPorts.createJob(ports.db),
     apiClient: PennsieveApiClient = fakePennsieveApiClient()
   ): Route =
@@ -1243,7 +1242,6 @@ class JobsHandlerSpec
         JobsHandlerPorts(
           createJob,
           notifyUploadConsumer,
-          notifyUser,
           JobsHandlerPorts.getJobs(ports.db),
           JobsHandlerPorts.getOrganization(ports.db),
           JobSchedulingPorts.createGetJob(ports.db),

@@ -51,7 +51,6 @@ import com.pennsieve.jobscheduling.db.{
 }
 import com.pennsieve.jobscheduling.model.EventualResult.EitherContext
 import com.pennsieve.jobscheduling.model.{ ETLEvent, ManifestUri }
-import com.pennsieve.jobscheduling.clients.Notifications._
 import com.pennsieve.models.{ PayloadType, _ }
 import com.pennsieve.notifications.{
   ETLExportNotification,
@@ -129,132 +128,6 @@ class JobMonitorSpec(system: ActorSystem)
       }
     }
 
-    "send a notification for states that send notifications" in {
-      val insertedJob = insertJobAndPayload()
-
-      val etlNotification =
-        UploadNotification(
-          users = List(uploadPayload.userId),
-          success = true,
-          datasetId = uploadPayload.datasetId,
-          packageId = uploadPayload.packageId,
-          organizationId = insertedJob.organizationId.value,
-          uploadedFiles = uploadPayload.files
-        )
-
-      testMessages(insertedJob.id).foreach {
-        case (eventMessage, state) =>
-          val notification: NotificationMessage =
-            etlNotification.copy(success = isSuccess(state))
-          val etlNotificationJson =
-            notification.asJson.noSpaces
-          val expectedMaybeSentNotification =
-            if (shouldSendNotification(state)) Some(etlNotificationJson)
-            else None
-
-          var sentNotification: Option[String] = None
-
-          val saveNotification: SendMessage =
-            message =>
-              Future.successful {
-                sentNotification = Some(message.value)
-                Right(SendMessageResponse.builder().build())
-              }
-
-          val stream = runStream(eventMessage, sendNotification = saveNotification)
-          stream should not be None
-
-          sentNotification shouldBe expectedMaybeSentNotification
-      }
-    }
-
-    "send a notification for states that send notifications for import workflow payload" in {
-      val workflowJob = insertJobAndPayload(importPayload())
-
-      testMessages(workflowJob.id).foreach {
-        case (eventMessage, state) =>
-          val notification: NotificationMessage =
-            createNotification(workflowJob, importPayload(), isSuccess(state))
-          val etlNotificationJson =
-            notification.asJson.noSpaces
-          val expectedMaybeSentNotification =
-            if (shouldSendNotification(state)) Some(etlNotificationJson)
-            else None
-
-          var sentNotification: Option[String] = None
-
-          val saveNotification: SendMessage =
-            message =>
-              Future.successful {
-                sentNotification = Some(message.value)
-                Right(SendMessageResponse.builder().build())
-              }
-
-          val stream = runStream(eventMessage, sendNotification = saveNotification)
-          stream should not be None
-
-          sentNotification shouldBe expectedMaybeSentNotification
-      }
-    }
-
-    "send a notification for states that send notifications for export worflow payload" in {
-      val exportJob = insertJobAndPayload(exportPayload)
-
-      testMessages(exportJob.id).foreach {
-        case (eventMessage, state) =>
-          val notification: NotificationMessage =
-            createNotification(exportJob, exportPayload, isSuccess(state))
-          val exportNotificationJson =
-            notification.asJson.noSpaces
-          val expectedMaybeSentNotification =
-            if (shouldSendNotification(state)) Some(exportNotificationJson)
-            else None
-
-          var sentNotification: Option[String] = None
-
-          val saveNotification: SendMessage =
-            message =>
-              Future.successful {
-                sentNotification = Some(message.value)
-                Right(SendMessageResponse.builder().build())
-              }
-
-          val stream = runStream(eventMessage, sendNotification = saveNotification)
-          stream should not be None
-
-          sentNotification shouldBe expectedMaybeSentNotification
-      }
-    }
-
-    "send a notification for states that send notifications for append worflow payload" in {
-      val appendJob = insertJobAndPayload(appendPayload)
-
-      testMessages(appendJob.id).foreach {
-        case (eventMessage, state) =>
-          val notification: NotificationMessage =
-            createNotification(appendJob, appendPayload, isSuccess(state))
-          val appendNotificationJson =
-            notification.asJson.noSpaces
-          val expectedMaybeSentNotification =
-            if (shouldSendNotification(state)) Some(appendNotificationJson)
-            else None
-
-          var sentNotification: Option[String] = None
-
-          val saveNotification: SendMessage =
-            message =>
-              Future.successful {
-                sentNotification = Some(message.value)
-                Right(SendMessageResponse.builder().build())
-              }
-
-          val stream = runStream(eventMessage, sendNotification = saveNotification)
-          stream should not be None
-
-          sentNotification shouldBe expectedMaybeSentNotification
-      }
-    }
-
     "update database job state one by one in order" in {
       val insertedJobId = insertJobAndPayload(appendPayload).id
 
@@ -319,17 +192,9 @@ class JobMonitorSpec(system: ActorSystem)
         case (eventMessage, _) =>
           var sentNotification: Option[String] = None
 
-          val saveNotification: SendMessage =
-            message =>
-              Future.successful {
-                sentNotification = Some(message.value)
-                Right(SendMessageResponse.builder().build())
-              }
-
           runStream(
             eventMessage,
             fakePennsieveApiClient(notImplementedSetPackageState),
-            saveNotification,
             updateJob = (_, _, _, _, _) => Future.failed[EitherContext[Unit]](new Exception()),
             getJob = _ => Future.failed[Option[Job]](new Exception("Test database is down")),
             getPayload = _ => Future.failed[Option[PayloadEntry]](new Exception())
@@ -730,7 +595,6 @@ class JobMonitorSpec(system: ActorSystem)
   private def runStream(
     cloudwatchEvent: String,
     apiClient: PennsieveApiClient = fakePennsieveApiClient(),
-    sendNotification: SendMessage = successfulNotification,
     sendAck: SendAck = successfulAck,
     updateJob: UpdateJob = createUpdateJob(ports.db),
     getJob: GetJob = createGetJob(ports.db),
@@ -743,7 +607,6 @@ class JobMonitorSpec(system: ActorSystem)
     implicit val jobMonitorPorts: JobMonitorPorts =
       JobMonitorPorts(
         ports.sqsClient,
-        sendNotification,
         getManifest,
         getJob,
         getPayload,

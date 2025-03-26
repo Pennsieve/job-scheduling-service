@@ -388,6 +388,12 @@ class JobsHandler(
       ports: JobsHandlerPorts
     ): EitherT[Future, Throwable, Job] = {
       for {
+        _ <- {
+          val state = if (isUploadSuccessful) NotProcessing else Failed
+          ports
+            .setJobState(job.id, state)
+            .map(_ => state)
+        }
         foundJob <- EitherT {
           ports
             .getJob(job.id)

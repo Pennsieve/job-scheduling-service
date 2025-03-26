@@ -33,7 +33,6 @@ import scala.util.{ Failure, Success }
 case class JobsHandlerPorts(
   createJob: CreateJob,
   notifyUploadConsumer: NotifyUpload,
-  notifyUser: NotifyUser,
   getJobs: GetJobs,
   getOrganization: GetOrganization,
   getJob: GetJob,
@@ -197,7 +196,6 @@ object JobsHandlerPorts {
     JobsHandlerPorts(
       createJob = createJob(ports.db),
       notifyUploadConsumer = createSendMessage(ports.sqsClient, config.uploadsConsumer.queueName),
-      notifyUser = createSendMessage(ports.sqsClient, config.notifications.queueName),
       getJobs = getJobs(ports.db),
       getOrganization = getOrganization(ports.db),
       getJob = createGetJob(ports.db),

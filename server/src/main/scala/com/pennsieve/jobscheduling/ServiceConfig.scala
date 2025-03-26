@@ -30,7 +30,6 @@ case class ServiceConfig(
   s3: S3Config,
   watchDog: WatchDogConfig,
   uploadsConsumer: SQSConfig,
-  notifications: SQSConfig,
   host: String = "0.0.0.0",
   port: Int = 8080
 )
@@ -124,4 +123,4 @@ case class WatchDogConfig(
   retry: RetryConfig
 )
 
-case class JobsHandlerConfig(uploadsConsumer: SQSConfig, notifications: SQSConfig)
+case class JobsHandlerConfig(uploadsConsumer: SQSConfig)
