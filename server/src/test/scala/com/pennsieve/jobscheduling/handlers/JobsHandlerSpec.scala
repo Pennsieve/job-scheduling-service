@@ -57,7 +57,6 @@ import com.pennsieve.models.{
   Upload,
   Workflow
 }
-import com.pennsieve.notifications.{ NotificationMessage, UploadNotification }
 import io.circe.Error
 import io.circe.parser.decode
 import io.circe.syntax._

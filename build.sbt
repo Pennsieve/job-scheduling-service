@@ -301,7 +301,7 @@ lazy val server = project
         )
         addRaw(
           "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem",
-          CA_CERT_LOCATION,
+          CA_CERT_LOCATION
         )
         user("root")
         run("chmod", "+r", CA_CERT_LOCATION)

@@ -52,13 +52,6 @@ import com.pennsieve.jobscheduling.db.{
 import com.pennsieve.jobscheduling.model.EventualResult.EitherContext
 import com.pennsieve.jobscheduling.model.{ ETLEvent, ManifestUri }
 import com.pennsieve.models.{ PayloadType, _ }
-import com.pennsieve.notifications.{
-  ETLExportNotification,
-  ETLNotification,
-  MessageType,
-  NotificationMessage,
-  UploadNotification
-}
 import io.circe.Decoder
 import io.circe.generic.semiauto._
 import io.circe.syntax.EncoderOps
@@ -90,8 +83,6 @@ class JobMonitorSpec(system: ActorSystem)
   implicit val actorSystem: ActorSystem = system
   implicit val executionContext: ExecutionContext = actorSystem.dispatcher
   implicit val scheduler: Scheduler = actorSystem.scheduler
-  implicit val etlNotificationDecoder: Decoder[ETLNotification] =
-    deriveDecoder[ETLNotification]
 
   override def beforeEach(): Unit = {
     ports.db.run(JobsMapper.delete).awaitFinite()
@@ -395,73 +386,6 @@ class JobMonitorSpec(system: ActorSystem)
         )
       )
       .awaitFinite()
-
-  private def createNotification(
-    job: Job,
-    payload: Payload,
-    success: Boolean = true
-  ): NotificationMessage =
-    payload match {
-
-      case uploadPayload: Upload =>
-        UploadNotification(
-          users = List(uploadPayload.userId),
-          success = success,
-          datasetId = uploadPayload.datasetId,
-          packageId = uploadPayload.packageId,
-          organizationId = job.organizationId.value,
-          uploadedFiles = uploadPayload.files
-        )
-
-      case appendPayload: ETLAppendWorkflow =>
-        ETLNotification(
-          users = List(appendPayload.userId),
-          messageType = MessageType.JobDone,
-          success = success,
-          jobType = appendPayload.`type`,
-          importId = job.id.toString,
-          organizationId = job.organizationId.value,
-          packageId = appendPayload.packageId,
-          datasetId = appendPayload.datasetId,
-          uploadedFiles = appendPayload.files,
-          fileType = appendPayload.fileType,
-          packageType = appendPayload.packageType,
-          message = s"${appendPayload.`type`} job complete"
-        )
-
-      case exportPayload: ETLExportWorkflow =>
-        ETLExportNotification(
-          users = List(exportPayload.userId),
-          messageType = MessageType.JobDone,
-          success = success,
-          jobType = exportPayload.`type`,
-          importId = job.id.toString,
-          organizationId = job.organizationId.value,
-          packageId = exportPayload.packageId,
-          datasetId = exportPayload.datasetId,
-          packageType = exportPayload.packageType,
-          fileType = exportPayload.fileType,
-          sourcePackageId = exportPayload.sourcePackageId,
-          sourcePackageType = exportPayload.sourcePackageType,
-          message = s"${exportPayload.`type`} job complete"
-        )
-
-      case importPayload: ETLWorkflow =>
-        ETLNotification(
-          users = List(importPayload.userId),
-          messageType = MessageType.JobDone,
-          success = success,
-          jobType = importPayload.`type`,
-          importId = job.id.toString,
-          organizationId = job.organizationId.value,
-          packageId = importPayload.packageId,
-          datasetId = importPayload.datasetId,
-          uploadedFiles = importPayload.files,
-          fileType = importPayload.fileType,
-          packageType = importPayload.packageType,
-          message = s"${importPayload.`type`} job complete"
-        )
-    }
 
   def cloudwatchEvent(jobId: JobId) =
     CloudwatchMessage(
