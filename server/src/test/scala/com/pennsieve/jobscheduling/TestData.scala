@@ -51,7 +51,6 @@ object TestConfig {
     ecs: ECSConfig,
     pennsieveApi: PennsieveApiConfig,
     jobScheduler: JobSchedulerConfig,
-    notifications: SQSConfig,
     jwt: JwtConfig,
     pusher: PusherConfig,
     s3: S3Config,
@@ -65,8 +64,6 @@ object TestConfig {
     ConfigSource.default(ConfigSource.file(testConfPath)).loadOrThrow[RootConfig]
 
   lazy val staticJobMonitorConfig: JobMonitorConfig = rootConfig.jobMonitor
-
-  lazy val staticNotificationsConfig: SQSConfig = rootConfig.notifications
 
   lazy val staticEcsConfig: ECSConfig = rootConfig.ecs
 

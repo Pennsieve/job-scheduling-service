@@ -53,8 +53,7 @@ trait JobSchedulingServiceSpecHarness
     pusher = staticPusherConfig,
     s3 = staticS3Config,
     watchDog = staticWatchDogConfig,
-    uploadsConsumer = SQSConfig("queue", "us-east-1"),
-    notifications = SQSConfig("queue", "us-east-1")
+    uploadsConsumer = SQSConfig("queue", "us-east-1")
   )
 
   lazy implicit val ports: JobSchedulingPorts = new JobSchedulingPorts(etlConfig)

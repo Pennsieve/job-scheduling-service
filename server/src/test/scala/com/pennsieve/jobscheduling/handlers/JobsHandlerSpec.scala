@@ -57,7 +57,6 @@ import com.pennsieve.models.{
   Upload,
   Workflow
 }
-import com.pennsieve.notifications.{ NotificationMessage, UploadNotification }
 import io.circe.Error
 import io.circe.parser.decode
 import io.circe.syntax._
@@ -619,94 +618,6 @@ class JobsHandlerSpec
       getJob(insertedJobId).state shouldBe Cancelled
     }
 
-    "send the user a notification for a Upload payload" in {
-      val expectedMessage: NotificationMessage =
-        UploadNotification(
-          users = List(userId),
-          success = true,
-          datasetId = datasetId,
-          packageId = packageId,
-          organizationId = organizationId,
-          uploadedFiles = uploadPayload.files
-        )
-
-      val (jobScheduler, _) = runScheduler()
-
-      val sentNotifications = new ArrayBuffer[MessageBody]()
-
-      val client =
-        createClient(createRoutes(jobScheduler, notifyUser = successfulNotify(sentNotifications)))
-
-      val jobId = JobId(createJobId())
-
-      client
-        .create(organizationId, jobId.value.toString, uploadPayload, authToken)
-        .awaitFinite()
-        .value
-        .getOrFail[CreateResponse.Created, SwaggerJob]
-
-      client
-        .completeUpload(
-          organizationId,
-          jobId.value.toString,
-          UploadResult(isSuccess = true),
-          Nil :+ Authorization(OAuth2BearerToken(token.value))
-        )
-        .awaitFinite()
-        .value
-
-      sentNotifications should have length 1
-
-      val message: Either[Error, NotificationMessage] =
-        decode[NotificationMessage](sentNotifications.head.value)
-
-      message shouldBe Right(expectedMessage)
-    }
-
-    "send the user a notification for a failed Upload payload" in {
-      val expectedMessage: NotificationMessage =
-        UploadNotification(
-          users = List(userId),
-          success = false,
-          datasetId = datasetId,
-          packageId = packageId,
-          organizationId = organizationId,
-          uploadedFiles = uploadPayload.files
-        )
-
-      val (jobScheduler, _) = runScheduler()
-
-      val sentNotifications = new ArrayBuffer[MessageBody]()
-
-      val client =
-        createClient(createRoutes(jobScheduler, notifyUser = successfulNotify(sentNotifications)))
-
-      val jobId = JobId(createJobId())
-
-      client
-        .create(organizationId, jobId.value.toString, uploadPayload, authToken)
-        .awaitFinite()
-        .value
-        .getOrFail[CreateResponse.Created, SwaggerJob]
-
-      client
-        .completeUpload(
-          organizationId,
-          jobId.value.toString,
-          UploadResult(isSuccess = false),
-          Nil :+ Authorization(OAuth2BearerToken(token.value))
-        )
-        .awaitFinite()
-        .value
-
-      sentNotifications should have length 1
-
-      val message: Either[Error, NotificationMessage] =
-        decode[NotificationMessage](sentNotifications.head.value)
-
-      message shouldBe Right(expectedMessage)
-    }
-
     "a failed upload should update the package state in API" in {
       var maybeUpdatePackageState = Option.empty[PackageState]
 
@@ -1234,7 +1145,6 @@ class JobsHandlerSpec
   def createRoutes(
     jobScheduler: JobScheduler,
     notifyUploadConsumer: NotifyUpload = successfulSendMessage,
-    notifyUser: NotifyUser = successfulSendMessage,
     createJob: CreateJob = JobsHandlerPorts.createJob(ports.db),
     apiClient: PennsieveApiClient = fakePennsieveApiClient()
   ): Route =
@@ -1243,7 +1153,6 @@ class JobsHandlerSpec
         JobsHandlerPorts(
           createJob,
           notifyUploadConsumer,
-          notifyUser,
           JobsHandlerPorts.getJobs(ports.db),
           JobsHandlerPorts.getOrganization(ports.db),
           JobSchedulingPorts.createGetJob(ports.db),

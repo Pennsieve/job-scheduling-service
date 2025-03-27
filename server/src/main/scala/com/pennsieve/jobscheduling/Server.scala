@@ -87,7 +87,6 @@ object Server extends App {
       config.jobMonitor,
       JobMonitorPorts(
         ports.sqsClient,
-        config.notifications.queue,
         pennsieveApiClient,
         ports.db,
         ports.manifestClient,
@@ -146,10 +145,7 @@ object Server extends App {
 
     val jobRoutes =
       JobsHandler.routes(
-        JobsHandlerPorts(
-          JobsHandlerConfig(config.uploadsConsumer, config.notifications),
-          pennsieveApiClient
-        ),
+        JobsHandlerPorts(JobsHandlerConfig(config.uploadsConsumer), pennsieveApiClient),
         jobScheduler
       )
 

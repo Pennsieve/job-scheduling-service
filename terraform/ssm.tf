@@ -132,14 +132,6 @@ resource "aws_ssm_parameter" "event_throttle_period" {
   value = var.event_throttle_period
 }
 
-# Notifications Service Configuration
-
-resource "aws_ssm_parameter" "notifications_sqs_id" {
-  name  = "/${var.environment_name}/${var.service_name}/notifications-sqs-id"
-  type  = "String"
-  value = data.terraform_remote_state.platform_infrastructure.outputs.notifications_queue_id
-}
-
 # Database Configuration
 
 # DB is model-schema in dev, etl in prod

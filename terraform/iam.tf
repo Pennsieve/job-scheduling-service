@@ -46,7 +46,6 @@ data "aws_iam_policy_document" "iam_policy_document" {
     ]
 
     resources = [
-      data.terraform_remote_state.platform_infrastructure.outputs.notifications_kms_key_arn,
       data.terraform_remote_state.etl_infrastructure.outputs.sqs_kms_key_arn,
     ]
   }
@@ -62,7 +61,6 @@ data "aws_iam_policy_document" "iam_policy_document" {
     ]
 
     resources = [
-      data.terraform_remote_state.platform_infrastructure.outputs.notifications_queue_arn,
       data.terraform_remote_state.etl_infrastructure.outputs.uploads_queue_arn,
     ]
   }

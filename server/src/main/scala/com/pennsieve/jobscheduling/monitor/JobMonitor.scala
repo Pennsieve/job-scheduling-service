@@ -13,7 +13,6 @@ import cats.implicits._
 import software.amazon.awssdk.services.sqs.model.Message
 import com.pennsieve.jobscheduling.JobSchedulingPorts.FinalSink
 import com.pennsieve.jobscheduling.clients.SQSClient.{ ReceiptHandle, SendAck }
-import com.pennsieve.jobscheduling.clients.{ Notifications, SQSClient }
 import com.pennsieve.jobscheduling.commons.JobState.Cancelled
 import com.pennsieve.jobscheduling.db.DatabaseClientFlows
 import com.pennsieve.jobscheduling.model.EventualResult.{ EitherContext, EventualResultContextT }
@@ -128,19 +127,8 @@ class JobMonitor(
         case Left(errorWithContext) => Future.successful(Left(errorWithContext))
       }
       .mapAsyncUnordered(config.throttle.parallelism) {
-        case Right((event, payload)) =>
-          Notifications
-            .sendNotification(
-              "JobMonitor",
-              event.importId,
-              event.organizationId,
-              event.jobState,
-              payload,
-              ports.sendMessage
-            )
-            .leftMap((_, event.logContext))
-            .flatMap(_ => ackEvent(ports.sendAck)(event))
-            .value
+        case Right((event, _)) =>
+          ackEvent(ports.sendAck)(event).value
 
         case Left(errorContext) => Future.successful(Left(errorContext))
       }
