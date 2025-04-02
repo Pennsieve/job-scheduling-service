@@ -11,7 +11,6 @@ import cats.data.EitherT
 import com.pennsieve.auth.middleware.AkkaDirective._
 import com.pennsieve.auth.middleware.{ DatasetId, Jwt, OrganizationId, UserId }
 import com.pennsieve.jobscheduling._
-import com.pennsieve.jobscheduling.clients.Notifications
 import com.pennsieve.jobscheduling.db._
 import com.pennsieve.jobscheduling.errors._
 import com.pennsieve.jobscheduling.handlers.AuthorizationChecks._
@@ -388,7 +387,7 @@ class JobsHandler(
       ports: JobsHandlerPorts
     ): EitherT[Future, Throwable, Job] = {
       for {
-        jobState <- {
+        _ <- {
           val state = if (isUploadSuccessful) NotProcessing else Failed
           ports
             .setJobState(job.id, state)
@@ -416,17 +415,7 @@ class JobsHandler(
             ports.updatePackageState(OrganizationId(organizationId), UPLOAD_FAILED, payload, job.id)
         }
         _ = log.tierContext[CompleteUpload].info("finished calling packages upload-complete")
-        _ <- {
-          Notifications.sendNotification(
-            "JobsHandler",
-            foundJob.id,
-            foundJob.organizationId,
-            jobState,
-            payload,
-            ports.notifyUser
-          )
-        }
-        _ = log.tierContext[CompleteUpload].info("sent notification")
+
       } yield foundJob
     }
 

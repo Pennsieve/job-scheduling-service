@@ -23,7 +23,6 @@ import scala.concurrent.ExecutionContext
 
 case class JobMonitorPorts(
   sqsClient: SqsAsyncClient,
-  sendMessage: SQSClient.SendMessage,
   getManifest: GetManifest,
   getJob: GetJob,
   getPayload: GetPayload,
@@ -36,7 +35,6 @@ case class JobMonitorPorts(
 object JobMonitorPorts {
   def apply(
     sqsClient: SqsAsyncClient,
-    notificationsQueue: String,
     pennsieveApiClient: PennsieveApiClient,
     db: Database,
     manifestClient: ManifestS3Client,
@@ -49,7 +47,6 @@ object JobMonitorPorts {
 
     JobMonitorPorts(
       sqsClient,
-      SQSClient.createSendMessage(sqsClient, SQSClient.QueueName(notificationsQueue)),
       manifestClient.getManifest,
       createGetJob(db),
       createGetPayload(db),
