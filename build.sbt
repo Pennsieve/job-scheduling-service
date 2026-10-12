@@ -293,12 +293,6 @@ lazy val server = project
         from("pennsieve/java-cloudwrap:10-jre-slim-0.5.9")
         copy(artifact, artifactTargetPath, chown = "pennsieve:pennsieve")
         copy(baseDirectory.value / "bin" / "run.sh", "/app/run.sh", chown = "pennsieve:pennsieve")
-        run(
-          "wget",
-          "-qO",
-          "/app/newrelic.jar",
-          "http://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic.jar"
-        )
         addRaw(
           "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem",
           CA_CERT_LOCATION
