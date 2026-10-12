@@ -178,20 +178,7 @@ variable "watch_dog_no_job_throttle_period" {
   default = "1 second"
 }
 
-# New Relic
-variable "newrelic_agent_enabled" {
-  default = "true"
-}
-
 locals {
-  java_opts = [
-    "-javaagent:/app/newrelic.jar",
-    "-Dnewrelic.config.agent_enabled=${var.newrelic_agent_enabled}",
-  ]
-
-  service = element(split("-", var.service_name), 0)
-  tier    = element(split("-", var.service_name), 1)
-
   etl_nextflow_task_definition_arn_wildcard_version = "arn:aws:ecs:${data.aws_region.current_region.name}:${data.aws_caller_identity.current.account_id}:task-definition/${data.terraform_remote_state.etl_nextflow.outputs.ecs_task_definition_family}:*"
 }
 
