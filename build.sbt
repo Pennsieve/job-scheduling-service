@@ -6,24 +6,37 @@ import CrossCompilationUtil.{
 }
 Global / cancelable := true
 
-lazy val scala212 = "2.12.11"
-lazy val scala213 = "2.13.8"
+lazy val scala212 = "2.12.20"
+lazy val scala213 = "2.13.16"
 lazy val supportedScalaVersions = List(scala212, scala213)
 
 // Shared settings
 ThisBuild / organization := "com.pennsieve"
 ThisBuild / scalaVersion := scala213
-ThisBuild / resolvers ++= Seq(
-  "Pennsieve Releases" at "https://nexus.pennsieve.cc/repository/maven-releases",
-  "Pennsieve Snapshots" at "https://nexus.pennsieve.cc/repository/maven-snapshots"
-)
+// Pennsieve packages live in AWS CodeArtifact (pennsieve-cc), `maven` repository.
+// Access is IAM: the build exchanges the active AWS credentials -- the Jenkins
+// agent's instance role, or `assume-role non-prod admin` locally -- for a
+// short-lived token. CODEARTIFACT_AUTH_TOKEN, if set, is used instead.
+lazy val codeArtifactHost = "pennsieve-932986170183.d.codeartifact.us-east-1.amazonaws.com"
+lazy val codeArtifactRepo = s"https://$codeArtifactHost/maven/maven/"
+lazy val codeArtifactToken: String = sys.env.get("CODEARTIFACT_AUTH_TOKEN").getOrElse {
+  import scala.sys.process._
+  val cmd = Seq("aws", "codeartifact", "get-authorization-token", "--domain", "pennsieve",
+    "--domain-owner", "932986170183", "--region", "us-east-1",
+    "--query", "authorizationToken", "--output", "text")
+  scala.util.Try(cmd.!!(ProcessLogger(_ => ())).trim).getOrElse {
+    println("[warn] No CodeArtifact token: AWS credentials missing or not allowed. Run assume-role non-prod admin.")
+    ""
+  }
+}
 
-ThisBuild / credentials += Credentials(
-  "Sonatype Nexus Repository Manager",
-  "nexus.pennsieve.cc",
-  sys.env("PENNSIEVE_NEXUS_USER"),
-  sys.env("PENNSIEVE_NEXUS_PW")
-)
+ThisBuild / resolvers += "pennsieve" at codeArtifactRepo
+
+ThisBuild / credentials += Credentials("pennsieve/maven", codeArtifactHost, "aws", codeArtifactToken)
+
+// With coverage on, scoverage 2's reporter brings scala-xml 2.x; akka-http-xml
+// was built against 1.x.
+ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 
 // Temporarily disable Coursier because parallel builds fail on Jenkins.
 // See https://app.clickup.com/t/a8ned9
@@ -120,14 +133,10 @@ lazy val client = project
     libraryDependencies ++= sharedCatsDependencies.map(_ % catsVersion.value),
     headerLicense := headerLicenseValue,
     headerMappings := headerMappings.value + headerMappingsValue,
-    publishTo := {
-      val nexus = "https://nexus.pennsieve.cc/repository"
-      if (isSnapshot.value) {
-        Some("Nexus Realm" at s"$nexus/maven-snapshots")
-      } else {
-        Some("Nexus Realm" at s"$nexus/maven-releases")
-      }
-    },
+    publishTo := Some("pennsieve" at codeArtifactRepo),
+    // sbt's own publisher writes no maven-metadata.xml, so its releases stay
+    // Unfinished in CodeArtifact; sbt-aether-deploy publishes like Maven.
+    publish := aether.AetherKeys.aetherDeploy.value,
     publishMavenStyle := true,
     Compile / guardrailTasks := scalaVersionMatch(
       scalaVersion.value,
@@ -169,15 +178,10 @@ lazy val commons = project
     libraryDependencies ++= sharedCatsDependencies.map(_ % catsVersion.value),
     headerLicense := headerLicenseValue,
     headerMappings := headerMappings.value + headerMappingsValue,
-    publishTo := {
-      val nexus = "https://nexus.pennsieve.cc/repository"
-
-      if (isSnapshot.value) {
-        Some("Nexus Realm" at s"$nexus/maven-snapshots")
-      } else {
-        Some("Nexus Realm" at s"$nexus/maven-releases")
-      }
-    },
+    publishTo := Some("pennsieve" at codeArtifactRepo),
+    // sbt's own publisher writes no maven-metadata.xml, so its releases stay
+    // Unfinished in CodeArtifact; sbt-aether-deploy publishes like Maven.
+    publish := aether.AetherKeys.aetherDeploy.value,
     publishMavenStyle := true
   )
 

@@ -7,46 +7,33 @@ node("executor") {
     def imageTag = "${env.BUILD_NUMBER}-${commitHash}"
 
     def sbt = "sbt -Dsbt.log.noformat=true -Dversion=$imageTag"
-    def pennsieveNexusCreds = usernamePassword(
-            credentialsId: "pennsieve-nexus-ci-login",
-            usernameVariable: "PENNSIEVE_NEXUS_USER",
-            passwordVariable: "PENNSIEVE_NEXUS_PW"
-    )
+    // sbt resolves and publishes Pennsieve libraries through AWS CodeArtifact with a
+    // short-lived token from the agent's instance role (see build.sbt).
 
     stage("Build") {
-        withCredentials([pennsieveNexusCreds]) {
-            sh "$sbt clean +compile"
-        }
+        sh "$sbt clean +compile"
     }
 
     stage("Test") {
-        withCredentials([pennsieveNexusCreds]) {
-            try {
-                sh "$sbt coverageOn +test"
-            } finally {
-                junit '**/target/test-reports/*.xml'
-            }
+        try {
+            sh "$sbt coverageOn +test"
+        } finally {
+            junit '**/target/test-reports/*.xml'
         }
     }
 
     stage("Test Coverage") {
-        withCredentials([pennsieveNexusCreds]) {
-            sh "$sbt coverageReport"
-        }
+        sh "$sbt coverageReport"
     }
 
     if (["main"].contains(env.BRANCH_NAME)) {
         stage("Publish Jars") {
-            withCredentials([pennsieveNexusCreds]) {
-                sh "$sbt +commons/publish"
-                sh "$sbt +client/publish"
-            }
+            sh "$sbt +commons/publish"
+            sh "$sbt +client/publish"
         }
 
         stage("Docker") {
-            withCredentials([pennsieveNexusCreds]) {
-                sh "$sbt clean docker"
-            }
+            sh "$sbt clean docker"
 
             sh "docker tag pennsieve/job-scheduling-service:latest pennsieve/job-scheduling-service:$imageTag"
             sh "docker push pennsieve/job-scheduling-service:latest"

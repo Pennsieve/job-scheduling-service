@@ -13,7 +13,4 @@ sbt> coverageReport
 ```
 
 ## Releasing the Client
-The client is built and published to Pennsieve's Nexus repository on every push to the `master` branch.
-
-### SNAPSHOT RELEASE
-Run `sbt publish` to publish the current snapshot version to Pennsieve's nexus repository
+Every push to `main` publishes the `commons` and `client` jars, versioned `<build>-<commit>`, to Pennsieve's AWS CodeArtifact. Only Jenkins publishes; locally, `assume-role non-prod admin` lets you build against CodeArtifact.
